@@ -1,0 +1,418 @@
+﻿@model RequestViewModel
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Request Item";
+    ViewData["MainMenu"] = "Facility Management";
+    ViewData["Page"] = "Request Item";
+
+    var settings = await _dataService.GetSettings();
+}
+
+<div class="d-flex flex-column flex-lg-row w-100">
+
+    <div class="d-flex flex-row-fluid me-xl-9 mb-10 mb-xl-0" style="background-color:#FFFFFF;">
+        <div class="card card-flush bg-transparent border-0 w-100">
+            <div class="card-header pt-5">
+                <div class="col fv-row">
+                    <div class="d-flex align-items-center position-relative">
+                        <i class="ki-duotone ki-magnifier fs-1 position-absolute ms-4 text-primary">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        <input id="searchInput" type="text" class="form-control fs-3 ps-12" autocomplete="off" placeholder="Search...">
+                        <button id="btnClear" type="button" class="btn btn-primary fs-4 mx-2">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-8">
+
+                <div id="productsContainer" class="">
+                    @await Html.PartialAsync("Inventory/_FormItemList", Model)
+                </div>
+
+            </div>
+        </div>
+        <!--end::Pos order-->
+    </div>
+
+
+    <div class="flex-row-auto w-xl-500px">
+        <div class="card card-flush bg-body ">
+            <div class="card-header pt-5">
+                <h3 class="card-title fw-bold text-gray-800 fs-3">Request Items</h3>
+                <div class="card-toolbar">
+                    <a href="javascript:void(0)" onclick="clearCartPartial();"
+                       class="btn btn-light-danger fs-5 fw-bold py-2">Clear Items</a>
+                </div>
+            </div>
+            <div class="separator separator-dashed border-primary my-2"></div>
+            <!--begin::Body-->
+            <div class="card-body pt-0">
+                <div id="divCartItemsDisplay">
+                    @await Html.PartialAsync("Inventory/_CartItemsPartial", Model.CartItems)
+                </div>
+                <div class="separator separator-dotted border-primary my-10"></div>
+                <form id="formCreateRequest" asp-controller="Facility" asp-action="RequestItem" method="post" class="form">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Status" value="" />
+                    <div class="mb-10 fv-row">
+                        <label class="fs-4 fw-bold mb-2">Purpose:</label>
+                        <textarea rows="3" asp-for="@Model.Purpose" type="" class="form-control mb-2" placeholder="" value=""></textarea>
+                        <div class="text-muted fs-7">Enter purpose of request.</div>
+                    </div>
+                    <div class="mb-10">
+                        <label class="fs-4 fw-bold mb-2">Requested By</label>
+                        <div class="input-group mb-5 input-group-solid flex-nowrap">
+                            <span class="input-group-text p-3">
+                                <i class="ki-duotone ki-user fs-2 me-2 text-primary">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            </span>
+                            <div class="overflow-hidden flex-grow-1">
+                                <select asp-for="@Model.RequestedById" asp-items="@(new SelectList(Model.Users,"Id","FullName"))"
+                                        onchange="getStaffForRole(this);"
+                                        class="form-select form-select-solid rounded-start-0 border-start"
+                                        data-control="select2"
+                                        data-hide-search="false"
+                                        data-placeholder="Select Staff"
+                                        data-allow-clear="true"
+                                        data-role="receiving">
+                                    <option value="">Select Staff...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-10">
+                        <div class="row">
+                            <div class="col">
+                                <label class="fs-4 fw-bold mb-2">Date Requested</label>
+                                <input asp-for="@Model.RequestDate" class="form-control form-control-solid" placeholder="Pick date">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="m-0 g-5">
+                        <button type="submit" class="btn btn-primary fs-3 w-100 py-4 mx-3 ">
+                            <i class="ki-duotone ki-mouse-square fs-2x">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            Save Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- modal placeholders-->
+<div id="modal-add" tabindex="-1" class=" modal fade">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+
+            <div id='modal-add-content'></div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            $('.types-select').select2({ width: 'resolve' });
+
+            initializeSelect2();
+            searchInputField.focus();
+
+
+            $("#RequestDate").flatpickr({
+                altInput: true,
+                altFormat: "d-M-Y",
+                dateFormat: "d-M-Y",
+                weekNumbers: true
+            });
+
+        });
+
+        var lastInputTime = 0;
+        var inputTimer;
+        var searchInputField = document.getElementById("searchInput");
+        var hfSearchReset = document.getElementById("hfResetSearch");
+        var invalidMessageBox = document.getElementById("divInvalidMessageBox");
+
+        // var holdShopInputField = document.getElementById("HoldShopId");
+        // var holdOrderTypeInputField = document.getElementById("HoldOrderType");
+
+        function rebindTableScript() {
+            // Initialize DataTables
+            const table = $('#productTable').DataTable({
+                "paging": true, // Enable pagination
+                "pageLength": 10, // Set the default number of records per page
+                "searching": true, // Disable default searching to use custom search input
+                "info": false // Disable the info display at the bottom
+            });
+
+            // Function to handle search
+            function handleSearch() {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                console.log('Search term:', searchTerm);
+
+                table.search(searchTerm).draw();
+
+                if (table.rows({ search: 'applied' }).count() === 1) {
+                    const row = table.row({ search: 'applied' }).node();
+                    console.log(row);
+                    // Use jQuery to access data attributes
+                    const productId = $(row).data('productid');
+                    const productName = $(row).data('productname');
+
+                    //addProductToCart(productId);
+                    addSearchItemToCart(productId, productName, orderTypeInputField.value);
+                    searchInputField.value = ''; // Clear the search input
+                    searchInputField.focus();
+                    table.search('').draw(); // Clear the search results
+                }
+            }
+
+            // Add event listeners for the search input
+            document.getElementById('searchInput').addEventListener('keyup', handleSearch);
+            //document.getElementById('searchInput').addEventListener('change', handleSearch);
+            //document.getElementById('searchInput').addEventListener('paste', handleSearch);
+
+            // Function to clear the search box
+            function clearSearchBox() {
+                const searchBox = document.getElementById("searchInput");
+                searchBox.value = '';
+                searchBox.focus();
+                table.search('').draw();
+            }
+
+            // Event listener for clear button
+            document.getElementById('btnClear').addEventListener('click', clearSearchBox);
+
+            function addSearchItemToCart(productId, productName, orderType) {
+                //validation result
+                validateSelectedProduct(productId, 1, function (result) {
+                    if (result) {
+                        $.ajax({
+                            type: "GET",
+                            url: "@Url.Action("AddPartial", "Facility")",
+                            data: { id: productId, ot: orderType },
+                            success: function (result) {
+                                console.log('Product added to cart : ', productName);
+                                searchInputField.value = ''; // Clear the search input
+                                searchInputField.focus();
+                                $("#divCartItemsDisplay").html(result);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        function isZeroNullOrEmpty(value) {
+            return value === "0" || value === 0 || value === null || value === "" || value === undefined || Number.isNaN(value);
+        }
+
+        function isNotZeroNullOrEmpty(value) {
+            return value !== "0" && value !== 0 && value !== null && value !== "" && value !== undefined && !Number.isNaN(value);
+        }
+
+        function GetProducts() {
+            $("#productsContainer").html("");
+            // Proceed with AJAX request if both values are valid
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetItemsPartialView", "Facility")",
+                data: { id: shop, ot: orderType },
+                success: function (result) {
+                    $("#productsContainer").html(result);
+                    rebindTableScript();
+                }
+            });
+        }
+
+        function updateCartView() {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("UpdateCartView", "Facility")",
+                success: function (result) {
+                    $("#divCartItemsDisplay").html(result);
+                }
+            });
+        }
+
+        function validateSelectedProduct(id, quantity, callback) {
+            if (isZeroNullOrEmpty(quantity)) {
+                toast_message("error", "Quantity cannot be 0.", "Invalid Quantity");
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("ValidateOrderQuantity", "Facility")",
+                    data: { id: id, quantity: quantity },
+                    success: function (result) {
+                        toggleInvalidMessageBox(result);
+                        callback(result);
+                    },
+                    error: function (error) {
+                        console.error("Error during AJAX request:", error);
+                    }
+                });
+            }
+        }
+
+        function toggleInvalidMessageBox(condition) {
+            if (condition) {
+                //hide
+                $("#divInvalidMessageBox").addClass("d-none");
+            } else {
+                //show
+                $("#divInvalidMessageBox").removeClass("d-none");
+                toast_message("error", "Quantity requested not available in store.", "Invalid Quantity");
+            }
+        }
+
+        function addProductToCart(id) {
+            //validation result
+            validateSelectedProduct(id, 1, function (result) {
+                if (result) {
+                    $.ajax({
+                        type: "GET",
+                        url: "@Url.Action("AddPartial", "Facility")",
+                        data: { id: id },
+                        success: function (result) {
+                            $("#divCartItemsDisplay").html(result);
+                        }
+                    });
+                }
+            });
+        }
+
+        function removeFromCartPartial(id) {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("RemovePartial", "Facility")",
+                data: { id: id },
+                success: function (data) {
+                    $("#divCartItemsDisplay").html(data);
+                    searchInputField.focus();
+                }
+            });
+        }
+
+        function decreaseQuantityPartial(id) {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("DecreasePartial", "Facility")",
+                data: { id: id },
+                success: function (data) {
+                    $("#divCartItemsDisplay").html(data);
+                }
+            });
+        }
+
+        //Todo : Not done
+        function updateProductQuantity(id, storeQuantity, inputElement) {
+            var maxAllowedQuantity = parseInt(storeQuantity);
+            var quantityEntered = parseInt(inputElement.value);
+            console.log(quantityEntered);
+            if (quantityEntered === NaN || quantityEntered == 0) {
+                removeFromCartPartial(id);
+                toast_message("error", "Product removed.", "Zero Quantity");
+            } else if (quantityEntered > maxAllowedQuantity) {
+                toast_message("error", "Quantity cannot be more than Store Qunatity.", "Invalid Quantity");
+                // Reset the input value to the maximum allowed quantity
+                inputElement.value = maxAllowedQuantity;
+            } else {
+
+                validateSelectedProduct(id, quantityEntered, function (result) {
+                    if (result) {
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("UpdateCartProductQuantity", "Facility")",
+                            data: { id: id, quantity: quantityEntered },
+                            success: function (data) {
+                                $("#divCartItemsDisplay").html(data);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        function clearCartPartial() {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("ClearPartial", "Facility")",
+                // data: { id: id },
+                success: function (data) {
+                    $("#divCartItemsDisplay").html(data);
+                    searchInputField.focus();
+                }
+            });
+        }
+
+        function addToCart(productId) {
+            fetch('/Facility/AddToCart/${productId}', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Item added to cart');
+                    updateCartPartial();
+                });
+        }
+
+        function updateCartPartial() {
+            fetch('/Facility/CartItemsPartial')
+                .then(response => response.text())
+                .then(data => {
+                    const cartItemsPartialDiv = document.getElementById('cartItemsPartial');
+                    cartItemsPartialDiv.innerHTML = data;
+                });
+        }
+
+        function getSelectedStaff(selectedValue, displaybox) {
+            if (selectedValue) {
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("GetStaffPartial", "Facility")',
+                    contentType: 'application/json;',
+                    data: { id: selectedValue },
+                    success: function (response) {
+                        $(displaybox).html(response);
+                        initializeSelect2();
+                        //initializeDataTables();
+                    },
+                    error: function (er) {
+                        console.error('Error fetching staff details:', error);
+                    }
+                });
+            }
+        }
+
+        // Get staff for a specific role
+        function getStaffForRole(selectElement) {
+            const selectedValue = selectElement.value;
+            const role = selectElement.getAttribute('data-role');
+            if (selectedValue) {
+                let displayBox;
+                if (role === 'delivery') {
+                    displayBox = '#divDeliveryStaffDisplay';
+                } else if (role === 'receiving') {
+                    displayBox = '#divReceivingStaffDisplay';
+                } else {
+                    console.error('Unknown role:', role);
+                    return;
+                }
+                getSelectedStaff(selectedValue, displayBox);
+            }
+        }
+
+    </script>
+}

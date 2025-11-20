@@ -1,0 +1,181 @@
+﻿<script type="text/javascript">
+    var msg = @(TempData["Message"] != null ? Html.Raw(TempData["Message"]) : Html.Raw("undefined"));
+    if (msg) {
+        if (msg.provider == "sweetAlert") {
+            swal.fire({
+                title: msg.title,
+                html: msg.text,
+                icon: msg.icon,
+                confirmButtonColor: '#3085d6'
+            });
+        }
+        else if (msg.provider == "sweetAlertCustomIcon") {
+            swal.fire({
+                title: msg.title,
+                html: msg.text,
+                iconHtml: msg.customIcon,
+                customClass: {
+                    icon: 'border border-0'
+                },
+                confirmButtonColor: '#3085d6'
+            });
+        }
+        // else if (msg.provider == "sweetAlertConfirm") {
+        //     var form = document.getElementById(msg.formId);
+        //     Swal.fire({
+        //         title: 'Confirm Action',
+        //         html: "<div>Are you sure you want to perform action? </div><div>You won't be able to revert this!</div>",
+        //         icon: 'question',
+        //         showCancelButton: true,
+        //         confirmButtonColor: '#3085d6',
+        //         cancelButtonColor: '#d33',
+        //         confirmButtonText: '<i class="fas fa-check-circle text-white"></i> Yes',
+        //         cancelButtonText: '<i class="fas fa-times-circle text-white"></i> No '
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             form.submit();
+        //         } else {
+        //             Swal.fire({
+        //                 title: 'Failed!',
+        //                 html: 'Action not performed',
+        //                 icon: 'error',
+        //                 confirmButtonColor: '#3085d6'
+        //             })
+        //         }
+        //     })
+        // }
+        else if (msg.provider == "sweetAlertToast") {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: msg.icon,
+                title: msg.text
+            })
+        }
+        else if (msg.provider == "toastr") {
+
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toastr-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "500",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+
+            toastr[msg.type](msg.text, msg.title);
+        }
+        else {
+            toastr[msg.type](msg.text, msg.title);
+        }
+    }
+
+    function swalConfirm(itemId, event) {
+        var form = document.getElementById('actionForm_' + itemId);
+        Swal.fire({
+            title: 'Confirm Action',
+            html: "<div>Are you sure you want to perform action? </div><div>You won't be able to revert this!</div>",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '<i class="fas fa-check-circle text-white"></i> Yes',
+            cancelButtonText: '<i class="fas fa-times-circle text-white"></i> No '
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+                return true;
+
+            } else {
+                return false;
+            }
+        })
+        return false;
+    }
+
+    function confirmDialog(formId, event) {
+        var form = document.getElementById(formId);
+        Swal.fire({
+            title: 'Confirm Action',
+            html: "<div>Are you sure you want to perform action? </div><div>You won't be able to revert this!</div>",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '<i class="fas fa-check-circle text-white"></i> Yes',
+            cancelButtonText: '<i class="fas fa-times-circle text-white"></i> No '
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+                //Swal.fire(
+                //    'Deleted!',
+                //    'Your file has been deleted.',
+                //    'success'
+                //)
+                return true;
+
+            } else {
+                return false;
+            }
+        })
+        return false;
+    }
+
+    //Toastr message popup
+    function toast_message(type, message, title) {
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toastr-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "500",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+        toastr[type](message, title);
+    }
+
+    function initializeSelect2() {
+        $('.types-select').select2({ width: 'resolve' });
+    }
+
+    function initializeSelect2InModal(modalId) {
+        $('.types-select').select2({
+            width: 'resolve',
+            dropdownParent: $(modalId)
+        });
+    }
+</script>

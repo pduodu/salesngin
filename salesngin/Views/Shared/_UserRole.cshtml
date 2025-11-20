@@ -1,0 +1,45 @@
+﻿@model UserViewModel
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
+@inject IDataControllerService _dataService
+
+@{
+
+    <div class="card card-dashed">
+        <div class="card-body">
+            <label class="fs-6 fw-bold form-label mb-8">
+                <span class="">Select a user role<i class="fa fa-asterisk px-2 text-danger"></i></span>
+            </label>
+            <div id="divRoles" class="fv-row mb-4 px-5">
+                @{
+                    async Task<bool> ShouldDisplayRole(ApplicationRole role)
+                    {
+                        return !(role.Name == ApplicationRoles.SuperAdministrator && !await _dataService.IsUserInRole(Model.UserLoggedIn.Id, ApplicationRoles.SuperAdministrator));
+                    }
+
+
+                    int rolenum = 0;
+                    foreach (var role in Model.Roles)
+                    {
+                        rolenum++;
+                        if (await ShouldDisplayRole(role))
+                        {
+                            <div class="d-flex">
+                                <div class="form-check form-check-custom form-check-solid">
+                                    <input asp-for="RoleId" class="form-check-input me-3 roleRadio" type="radio" value="@role.Id" id="RoleId_@rolenum" />
+                                    <div class="form-check-label" for="RoleId_@rolenum">
+                                        <div class="fw-bolder text-gray-800">@role.RoleDisplayText</div>
+                                        <div class="text-gray-600">@role.RoleDescription</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='separator separator-dashed my-5'></div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+}
+

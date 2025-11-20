@@ -1,0 +1,44 @@
+﻿@model string
+
+
+@{
+    if (@Model == SalesStatus.Paid)
+    {
+        <span class="badge badge-light-success fw-bold fs-6 px-4 py-3 pulse pulse-success">
+            <span class="pulse-ring"></span>
+            <i class="ki-duotone ki-document fs-2x mx-2 text-success"><i class="path1"></i><i class="path2"></i></i>
+            @SalesStatus.Paid
+        </span>
+
+    }
+    else if (@Model == SalesStatus.Unpaid)
+    {
+        <span class="badge badge-light-danger fw-bold fs-6 px-4 py-3 pulse pulse-danger">
+            <span class="pulse-ring"></span>
+            <i class="ki-duotone ki-document fs-2x mx-2 text-danger"><i class="path1"></i><i class="path2"></i></i>
+            @SalesStatus.Unpaid
+        </span>
+    }
+
+    else if (@Model == SalesStatus.Part)
+    {
+        <span class="badge badge-light-info fw-bold fs-6 px-4 py-3 pulse pulse-info">
+            <span class="pulse-ring"></span>
+            <i class="ki-duotone ki-document fs-2x mx-2 text-info"><i class="path1"></i><i class="path2"></i></i>
+            @SalesStatus.Part
+        </span>
+    }
+
+    else
+    {
+        <span class="badge badge-light-warning fw-bold fs-6 px-4 py-3 pulse pulse-primary">
+            <span class="pulse-ring"></span>
+            <i class="ki-duotone ki-document fs-2x mx-2 text-primary"><i class="path1"></i><i class="path2"></i></i>
+            Pending
+        </span>
+    }
+    // "New"; //Blue
+    // "Preparing"; //Yellow
+    // "Cancelled"; //Red
+    // "Ready"; //Green
+}

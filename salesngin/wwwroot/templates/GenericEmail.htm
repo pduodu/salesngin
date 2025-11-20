@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title></title>
+    <style type="text/css">
+        .style1 {
+            font-weight: bold;
+            font-size: large;
+            color:white;
+        }
+
+        .style2 {
+            color: #336699;
+        }
+
+        .style3 {
+            color: #CC3300;
+        }
+
+        .style4 {
+            color: #CC3300;
+            font-weight: bold;
+        }
+
+        .style5 {
+            font-size: medium;
+            font-weight: bold;
+        }
+
+        .button {
+            background-color: #008CBA;
+            border: none;
+            color: white;
+            text-decoration-color:none;
+            padding: 15px 32px;
+            text-align: center;
+            display: inline-block;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body style="background-color:#F4F6F9;font-family:sans-serif;">
+    <!--<div id="mailContainer" style="width:auto;padding-left:30px;padding-right:30px;padding-bottom:30px;padding-top:10px;">-->
+    <div id="mailContainer" style="max-width: 50%; margin: auto;">
+        <div id="mailHeader" style="background-color:#007BFF;padding:20px;border-bottom:4px solid  #336699; ">
+            <span class="style1">SFAETY MANAGEMENT SYSTEM -  GCAA</span>
+        </div>
+        <div id="mailBody" style="background-color:#FFFFFF;padding:20px;">
+            <div style="font-size:medium;padding:20px;"><span>Hello </span><b>{UserName}</b>,<br /></div>
+            <div style="font-size:large;border-bottom:2px dashed #E9ECEF;padding:20px;"><b>{Title}</b></div>
+            <!--<div style="font-size:medium;padding:20px;">
+                <span>{ResetCodeMessage}</span>
+            </div>
+            <div style="font-size:large;padding:20px;">
+                <span>Reset Code: </span><b>{ResetCode}</b>
+            </div>
+            <div style="text-align:center; border-bottom:2px dashed #E9ECEF;padding-bottom:5px;">
+                <b style="font-size:x-large;"> OR </b>
+            </div>-->
+            <div style="font-size:medium;padding:20px;">
+                <span>{MailMessage}</span>
+            </div>
+            <div style="font-size:medium;padding:20px; text-align:center; ">
+                <span>{MailLink}</span>
+            </div>
+            <div style="font-size:medium;color:red;padding:20px;text-align:center;">
+                <p>{CautionMessage}</p>
+                <!--<p> Kindly report to the ICT section if you are not the one who requested for this code. Thank You</p>-->
+            </div>
+        </div>
+        <br />
+        <div id="mailFooter" style="font-size: 12pt;">
+            <div>
+                <span>Ghana Civil Aviation Authority</span>
+            </div>
+            <div><b>Contact:</b> 0302 255300 / 0302 77 6171</div>
+            <div><b>Email:</b> info@gcaa.com.gh</div>
+            <div><b>Website:</b> www.gcaa.com.gh</div>
+            <br />
+            <div><span style="font-size:11pt;">© 2020 Ghana Civil Aviation Authority. All rights reserved.</span></div>
+            <br />
+            <br />
+            <br />
+        </div>
+    </div>
+
+</body>
+</html>

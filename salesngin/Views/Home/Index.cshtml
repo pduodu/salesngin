@@ -1,0 +1,121 @@
+﻿@{
+    Layout = "_FrontendLayout";
+    ViewData["Title"] = "SMS";
+    ViewData["MainMenu"] = "";
+    ViewData["SubMenu"] = "";
+    ViewData["Page"] = "";
+    ViewBag.ShowTitle = false;
+}
+
+@*
+<div class="row mt-3">
+    <div class="col-md-10 mx-auto">
+
+        <section class="content">
+
+            <div class="row row-cols-1 row-cols-md-3 row-cols-xl-3">
+                <div class="col">
+                    <a asp-controller="Home" asp-action="Hazard">
+                        <div class="card mb-3">
+                            <div class="card-body d-flex align-items-center flex-wrap">
+                                <div class="me-2">
+                                    <h4 class="fw-bold text-gray-800 mb-3">Hazard Identification</h4>
+                                    <h6 class="text-muted fw-semibold">Report Form</h6>
+                                </div>
+                                <div class="widgets-icons rounded-circle bg-light-danger text-danger ms-auto p-3">
+                                    <i class='bx bx-error fs-3x'></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col">
+                    <a asp-controller="Home" asp-action="Voluntary">
+                        <div class="card mb-3">
+                            <div class="card-body d-flex align-items-center flex-wrap">
+                                <div class="me-2">
+                                    <h4 class="fw-bold text-gray-800 mb-3">Voluntary & Confidential</h4>
+                                    <h6 class="text-muted fw-semibold">Report Form</h6>
+                                </div>
+                                <div class="widgets-icons rounded-circle bg-light-primary text-primary ms-auto p-3">
+                                    <i class='bx bx-group fs-3x'></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col">
+                    <a asp-controller="Form" asp-action="Forms">
+                        <div class="card mb-3">
+                            <div class="card-body d-flex align-items-center flex-wrap">
+                                <div class="me-2">
+                                    <h4 class="fw-bold text-gray-800 mb-3">Mandatory</h4>
+                                    <h6 class="text-muted fw-semibold">Report Forms</h6>
+                                </div>
+                                <div class="widgets-icons rounded-circle bg-light-success text-success ms-auto p-3">
+                                    <i class='bx bx-shield-quarter fs-3x'></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </section>
+    </div>
+</div>
+*@
+
+<div class="row mt-5">
+    <div class="col-md-10 mx-auto">
+
+        <section class="content">
+
+            <div class="card card-xl-stretch mb-5">
+                <!--begin::Body-->
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-7">
+                        <!--begin::Avatar-->
+                        <div class="symbol symbol-50px rounded-circle bg-light-primary text-primary me-2 p-3">
+                            <i class="ki-duotone ki-search-list text-primary fs-3x">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                        </div>
+                        <!--end::Avatar-->
+                        <!--begin::Text-->
+                        <div class="flex-grow-1">
+                            <h2 class="text-gray-900 fw-bold ">Tracking</h2>
+
+                            <span class="text-muted d-block fw-semibold fs-5">Enter tracking number ( <code class="text-danger">XXXXXX</code> ) to check the status of your report.</span>
+                        </div>
+                        <!--end::Text-->
+                    </div>
+
+                    <form id="trackingForm" asp-controller="Home" asp-action="Track" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="d-flex align-items-center mb-7">
+                            <div class="input-group input-group-lg mb-3">
+                                <input href="#" type="text" class="form-control form-control-lg fs-3" placeholder="Enter here..." autocomplete="off" required aria-label="Tracking Number" aria-describedby="number-addon" />
+                                <span class="input-group-text p-0 bg-primary" id="number-addon">
+                                    <button type="submit" form="trackingForm" class="btn btn-primary">
+                                        <i class="ki-duotone ki-magnifier fs-3x">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+                <!--end::Body-->
+            </div>
+
+        </section>
+    </div>
+</div>

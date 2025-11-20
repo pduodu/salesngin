@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GCAA - @ViewData["Title"] </title>
+    <!--begin::favicon-->
+    <link rel="apple-touch-icon" sizes="180x180" href="~/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/favicon/favicon-16x16.png">
+    <!--end::favicon-->
+    <!--begin::Fonts-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700">
+    <!--end::Fonts-->
+    <!--plugins-->
+    <link href="~/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+    <!--end::Page Vendor Stylesheets-->
+    <!--begin::Global Stylesheets Bundle(used by all pages)-->
+    <link href="~/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/css/style.bundle32.css" rel="stylesheet" type="text/css" />
+    <link href="~/lib/boxicons/css/boxicons.css" rel="stylesheet" type="text/css" />
+    <link href="~/lib/pint.js/css/print.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link href="~/lib/apexcharts/apexcharts.min.css" rel="stylesheet" />
+    <!--end::Global Stylesheets Bundle-->
+</head>
+@* oncontextmenu="return false;" *@
+<body id="kt_app_body" data-kt-app-header-fixed-mobile="true" data-kt-app-toolbar-enabled="true" class="app-default">
+
+    <!--begin::Theme mode setup on page load-->
+    <script>
+        var defaultThemeMode = "light";
+        var themeMode;
+
+        if (document.documentElement) {
+            if (document.documentElement.hasAttribute("data-bs-theme-mode")) {
+                themeMode = document.documentElement.getAttribute("data-bs-theme-mode");
+            } else {
+                if (localStorage.getItem("data-bs-theme") !== null) {
+                    themeMode = localStorage.getItem("data-bs-theme");
+                } else {
+                    themeMode = defaultThemeMode;
+                }
+            }
+
+            if (themeMode === "system") {
+                themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+
+            document.documentElement.setAttribute("data-bs-theme", themeMode);
+        }
+
+    </script>
+    <!--end::Theme mode setup on page load-->
+    <!--begin::Main-->
+    <!--begin::Root-->
+    <div class="d-flex flex-column flex-root app-root custom-div-front-bg" id="kt_app_root">
+        <!--begin::Page-->
+        <div class="app-page  flex-column flex-column-fluid " id="kt_app_page">
+
+            <!--begin::Header-->
+            @await Html.PartialAsync("_FrontendHeader")
+            <!--end::Header-->
+            <!--begin::Wrapper-->
+            <div class="app-wrapper  flex-column flex-row-fluid " id="kt_app_wrapper">
+
+                <!--begin::Toolbar-->
+                @await Html.PartialAsync("_FrontendToolbar")
+                <!--end::Toolbar-->
+                <!--begin::Wrapper container-->
+                <div class="app-container  container-xxl ">
+
+                    <!--begin::Main-->
+                    <div class="app-main flex-column flex-row-fluid " id="kt_app_main">
+                        <!--begin::Content wrapper-->
+                        <div class="d-flex flex-column flex-column-fluid">
+
+                            <!--begin::Content-->
+                            <div id="kt_app_content" class="app-content flex-column-fluid ">
+
+                                <!--begin::Content-->
+                                @RenderBody()
+                                <!--end::Content-->
+
+                            </div>
+                            <!--end::Content-->
+                        </div>
+                        <!--end::Content wrapper-->
+                        <!--begin::Footer-->
+                        @await Html.PartialAsync("_FrontendFooter")
+                        <!--end::Footer-->
+                    </div>
+                    <!--end:::Main-->
+
+                </div>
+
+            </div>
+            <!--end::Wrapper-->
+        </div>
+        <!--end::Page-->
+    </div>
+    <!--end::Root-->
+    <!--begin::Scrolltop-->
+    <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
+        <i class="ki-duotone ki-arrow-up"></i>
+    </div>
+    <!--end::Scrolltop-->
+    <div id="div_notification_popup" class="modal fade" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <!--begin::Modal dialog-->
+        <div class="modal-dialog modal-dialog-centered">
+            <!--begin::Modal content-->
+            <div id="div_notification_content" class="modal-content">
+            </div>
+            <!--end::Modal content-->
+        </div>
+        <!--end::Modal dialog-->
+    </div>
+    <!-- Example Bootstrap modal for the session expiry popup -->
+    <div class="modal fade" id="sessionExpiryModal" tabindex="-1" role="dialog" aria-labelledby="sessionExpiryModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sessionExpiryModalLabel">Session Expiry Warning</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Your session is about to expire. Please save your work.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="extendSessionButton">Extend Session</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--begin::Javascript-->
+    <script>var hostUrl = "~/assets/";</script>
+    <!--begin::Global Javascript Bundle-->
+    <script src="~/assets/plugins/global/plugins.bundle.js"></script>
+    <script src="~/assets/js/scripts.bundle.js"></script>
+    <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+    <!--end::Global Javascript Bundle-->
+    <!--begin::Page Vendors Javascript-->
+    <script src="~/assets/plugins/custom/datatables/datatables.bundle.js"></script>
+    <script src="~/lib/list.js/list.js"></script>
+    <!--end::Page Vendors Javascript-->
+    <!--begin::Page Custom Javascript-->
+    <script src="~/js/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/assets/js/tablelist.js"></script>
+    @* <script src="~/assets/js/list.js"></script> *@
+    <script src="~/lib/pint.js/js/print.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/notification.js"></script>
+    <script src="~/lib/apexcharts/apexcharts.min.js"></script>
+    <script src="~/lib/printthis/printthis.min.js" asp-append-version="true"></script>
+    <!--end::Page Custom Javascript-->
+    <!-- script to handle notification button clicked in header -->
+    <script type="text/javascript">
+
+    </script>
+    <!-- Notification Partial -->
+    @await Html.PartialAsync("_NotificationPartial")
+    @await Html.PartialAsync("_CustomScriptsPartial")
+    <!--end::Javascript-->
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <style>
+        .requiredField:after {
+            content: " *";
+            color: red;
+            font-size: larger;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .borderInvalid {
+            border: dotted 1px red;
+        }
+    </style>
+</body>
+</html>

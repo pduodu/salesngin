@@ -1,0 +1,145 @@
+﻿@model OrderViewModel
+@inject IDataControllerService _dataService
+@{
+    var settings = await _dataService.GetSettings();
+
+    <div class="table-responsive">
+        <style>
+            .table-grid {
+                display: grid;
+                gap: 20px;
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+
+            .table-grid colgroup {
+                display: none;
+            }
+
+            .table-grid .grid-item {
+                display: flex;
+                flex-direction: column;
+                align-items: start;
+                text-align: center;
+                border: 1px solid #e0e0e0;
+                border-radius: 5px;
+                /* padding-top: 15px; */
+                padding-bottom: 15px;
+            }
+
+            .table-grid .grid-item img {
+                width: 120px;
+                /*height: 120px; */
+                /*width: 100%;
+                                             height: 100%; */
+            }
+
+            .table-grid .grid-item .btn {
+                margin-top: 2px;
+            }
+
+            /* Hide the header row */
+            .table-grid thead {
+                display: none;
+            }
+
+            .table-grid tbody {
+                display: contents;
+            }
+
+            .table-grid td {
+                display: block;
+                width: 100%;
+            }
+
+            /* Apply zero padding to all td elements */
+            #productTable td {
+                padding: 0;
+            }
+        </style>
+        @if (Model.StoreItems.Count > 0)
+        {
+            <table id="productTable" class="table-grid background-transparent" style="padding:0 !important;">
+                <thead>
+                    <tr class="d-none">
+                        <th>Image</th>
+                        <th>Category</th>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    @if (Model.StoreItems.Count > 0)
+                    {
+                        foreach (var inventoryItem in Model.StoreItems)
+                        {
+                            int i = 0;
+                            string itemPrice = string.Empty;
+                            itemPrice = Model.OrderType == OrderType.Wholesale ? @inventoryItem.WholesalePrice.ToString() :
+                            @inventoryItem.RetailPrice.ToString();
+                            i++;
+                            int storeQuantity = inventoryItem.Quantity;
+
+                            <tr data-id="@inventoryItem.Id"
+                                class="grid-item cursor-pointer bg-white rounded-3 ribbon ribbon-top w-100 mh-100"
+                                data-productId="@inventoryItem.Item?.Id" data-productPhoto="@inventoryItem.Item?.ItemPhotoPath"
+                                data-productName="@inventoryItem.Item?.ItemName" data-productPrice="@itemPrice"
+                                onclick="addProductToCart(@inventoryItem.Item?.Id);">
+                                <td class="">
+                                    <span class="ribbon-label bg-success fw-bold fs-4">
+                                        @settings.Currency @itemPrice
+                                    </span>
+                                    <div class="pt-5 pl-3">
+                                        <img src="@Url.Content(inventoryItem.Item?.ItemPhotoPath)" class="rounded-3 w-80px mt-7" alt="">
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="separator separator-dashed border-primary my-2"></span>
+                                    <span class="fw-bold text-gray-900 fs-6 m-2">@inventoryItem.Item?.ItemName</span>
+                                </td>
+                                <td>
+                                    <span class="text-info d-block fs-7 bg-light-info fw-bold">@inventoryItem.Item?.ItemCode</span>
+                                    @* <span class="text-info d-block fs-7 bg-light-info">@inventoryItem.Item?.Category?.CategoryName</span> *@
+                                </td>
+                                <td>
+                                    <span class="bg-light text-dark d-block fw-semibold fs-6 py-2 productQuantity">
+                                        Quantity Available : <b>@storeQuantity</b>
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="grid-item">
+                                <span></span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center mt-3">
+                @if (Model.TotalRecords > Model.PageSize)
+                {
+                    int totalPages = (int)Math.Ceiling((double)Model.TotalRecords / Model.PageSize);
+                    for (int i = 1; i <= totalPages; i++)
+                    {
+                        <button class="btn btn-sm @(i == Model.CurrentPage ? "btn-primary" : "btn-light") mx-1"
+                            onclick="loadItemsPage(@i)">
+                            @i
+                        </button>
+                    }
+                }
+            </div>
+        }
+    </div>
+}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function ()
+    {
+
+        $('.types-select').select2({ width: 'resolve' });
+
+    });
+</script>

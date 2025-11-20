@@ -1,0 +1,36 @@
+﻿@model string
+@* FixedItemStatus.Good),
+FixedItemStatus.OutOfOrder),
+FixedItemStatus.UnderMaintenance),
+FixedItemStatus.UnderRepairs), *@
+@{
+    if (@Model == FixedItemStatus.Good)
+    {
+        <span class="badge badge-light-success fw-bold fs-6 px-4 py-3">
+            @FixedItemStatus.Good
+        </span>
+
+    }
+    else if (@Model == FixedItemStatus.OutOfOrder)
+    {
+        <span class="badge badge-light-danger fw-bold fs-6 px-4 py-3">
+            @FixedItemStatus.OutOfOrder
+        </span>
+    }
+    else if (@Model == FixedItemStatus.UnderMaintenance)
+    {
+        <span class="badge badge-light-info fw-bold fs-6 px-4 py-3">
+            @FixedItemStatus.UnderMaintenance
+        </span>
+    }
+    else if (@Model == FixedItemStatus.UnderRepairs)
+    {
+        <span class="badge badge-light-warning fw-bold fs-6 px-4 py-3">
+            @FixedItemStatus.UnderRepairs
+        </span>
+    }
+    else
+    {
+        <span class="badge badge-light-primary fw-bold fs-6 px-4 py-3">...</span>
+    }
+}

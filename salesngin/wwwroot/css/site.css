@@ -1,0 +1,35 @@
+.custom-div-front-bg {
+    /*background-image: url(../images/formfill.png);*/
+    /*background: rgba(233, 236, 239, 0.19) url(../images/formfill.png);*/
+    background: linear-gradient(rgba(233, 236, 239, 0.5), rgba(233, 236, 239, 0.5)), url(../images/formfill.png);
+    /*background-image: url(../images/agreement.gif);*/
+    width: 100%;
+    /*opacity: 0.4;*/
+    /*background-size:cover;*/
+    background-position: bottom right;
+    background-repeat: no-repeat;
+    /*background-color:lightgray;*/
+}
+
+/* default black */
+/* .threshold-marker {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 3px;
+    background-color: #000;
+    border-radius: 2px;
+} */
+
+.threshold-marker {
+    position: absolute;
+    top: 0;
+    /* inside the bar */
+    bottom: 0;
+    width: 3px;
+    background-color: #0dcaf0;
+    /* Metronic info color */
+    border-radius: 2px;
+    pointer-events: none;
+    /* don’t block hover/click */
+}

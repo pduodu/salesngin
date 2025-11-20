@@ -1,0 +1,71 @@
+﻿@model ItemViewModel
+@{
+
+    <div class="card card-flush py-4">
+        <div class="card-header">
+            <div class="card-title">
+                <h2>Inventory</h2>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            <div class="fv-row mb-5 mt-10" id="inventoryItemDiv">
+                <div class="row mt-5 g-5">
+                    @{
+                        if (Model.InventoryItem == null)
+                        {
+                            <div class="col">
+                                <label class="form-label">Quantity Available</label>
+                                <input asp-for="@Model.Quantity" type="number" class="form-control mb-2" placeholder="Quantity" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col">
+                                <label class="form-label">Quantity Available</label>
+                                <label class="form-control form-control-solid mb-2" placeholder="Quantity">@Model.Quantity</label>
+                            </div>
+                        }
+                        <div class="col">
+                            <label class="form-label">Unit of Measurement</label>
+                            <select asp-for="@Model.UnitOfMeasurement"
+                                asp-items="@(new SelectList(Model.UnitOfMeasurements, "CategoryName", "CategoryName"))"
+                                class="form-select" data-control="select2" data-hide-search="false"
+                                data-placeholder="Select Option" data-allow-clear="true">
+                                <option value="0" selected>Select...</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Restock Alert Quantity</label>
+                            <input asp-for="@Model.RestockLevel" type="number" class="form-control mb-2" placeholder="" />
+                        </div>
+                    }
+                </div>
+                <div class="row mt-5 g-5">
+                    <div class="col">
+                        <label class="form-label">Location</label>
+                        @* <select asp-for="@Model.LocationId"
+                            asp-items="@(new SelectList(Model.Locations, "Id", "LocationName"))" class="form-select"
+                            data-control="select2" data-hide-search="false" data-placeholder="Select Option"
+                            data-allow-clear="true">
+                            <option value="0" selected>Select...</option>
+                        </select> *@
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Condition</label>
+                        <select asp-for="@Model.Condition" asp-items="Model.FixedItemStatuses" class="form-select"
+                            data-control="select2" data-hide-search="false" data-placeholder="Select Option"
+                            data-allow-clear="true">
+                            <option value="0" selected>Select...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-5 mt-5 fv-row">
+                    <label class="form-label fs-6 fw-semibold">Additional Notes</label>
+                    <textarea rows="3" asp-for="@Model.Notes" type="" class="form-control mb-2" placeholder="" value=""></textarea>
+                    <div class="text-muted fs-7">Add notes concerning this Item.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

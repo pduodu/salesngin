@@ -1,0 +1,98 @@
+﻿@model PaginationViewModel
+
+@* Begin : Pagination *@
+<ul class="pagination pagination-outline">
+    @{
+        int pageNumber = Model.PageNumber;
+        int totalPages = Model.TotalPages;
+        int pageRange = 2; // Number of pages to show on each side of the current page
+        string linkSortOrder = Model.SortOrder;
+        string linkCurrentFilter = Model.CurrentFilter;
+        string actionUrl = Model.ActionUrl;
+        if (pageNumber > 1)
+        {
+            <li class="page-item previous">
+                <a class="page-link" href="#" 
+                data-page-number="@(pageNumber - 1)" 
+                data-sort-order="@linkSortOrder" 
+                data-current-filter="@linkCurrentFilter" 
+                data-action-url="@actionUrl"
+                onclick="linkFunction(this)">Previous</a>
+            </li>
+        }
+
+        // Show the first page link if the current page is beyond the first page range
+        if (pageNumber > pageRange + 1)
+        {
+            <li class="page-item">
+                <a class="page-link" href="#" 
+                data-page-number="1" 
+                data-sort-order="@linkSortOrder" 
+                data-current-filter="@linkCurrentFilter"
+                data-action-url="@actionUrl"
+                onclick="linkFunction(this)">1</a>
+            </li>
+
+            if (pageNumber > pageRange + 2)
+            {
+                <li class="page-item">
+                    <span class="page-link">...</span>
+                </li>
+            }
+        }
+
+        // Show page links around the current page
+        for (var i = Math.Max(1, pageNumber - pageRange); i <= Math.Min(totalPages, pageNumber + pageRange); i++)
+        {
+            if (i == pageNumber)
+            {
+                <li class="page-item active">
+                    <span class="page-link">@i</span>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link" href="#" 
+                    data-page-number="@i" 
+                    data-sort-order="@linkSortOrder" 
+                    data-current-filter="@linkCurrentFilter" 
+                    data-action-url="@actionUrl"
+                    onclick="linkFunction(this)">@i</a>
+                </li>
+            }
+        }
+
+        if (pageNumber < totalPages - pageRange)
+        {
+            if (pageNumber < totalPages - pageRange - 1)
+            {
+                <li class="page-item">
+                    <span class="page-link">...</span>
+                </li>
+            }
+
+            <li class="page-item">
+                <a class="page-link" href="#" 
+                data-page-number="@(totalPages)" 
+                data-sort-order="@linkSortOrder" 
+                data-current-filter="@linkCurrentFilter" 
+                data-action-url="@actionUrl"
+                onclick="linkFunction(this)">@totalPages</a>
+            </li>
+        }
+
+        if (pageNumber < totalPages)
+        {
+            <li class="page-item next">
+                <a class="page-link" href="#" 
+                data-page-number="@(pageNumber + 1)" 
+                data-sort-order="@linkSortOrder" 
+                data-current-filter="@linkCurrentFilter" 
+                data-action-url="@actionUrl"
+                onclick="linkFunction(this)">Next</a>
+            </li>
+        }
+    }
+</ul>
+@* End : Pagination *@

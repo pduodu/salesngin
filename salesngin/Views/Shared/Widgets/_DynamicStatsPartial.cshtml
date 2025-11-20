@@ -1,0 +1,86 @@
+﻿@model dynamic
+@functions {
+    public string GetRandomColorClass()
+    {
+        var colorClasses = new[] { "primary", "success", "info", "danger", "warning" };
+        var random = new Random();
+        return colorClasses[random.Next(colorClasses.Length)];
+    }
+}
+@{
+    // var colorClasses = new[] { "primary", "success", "info", "danger", "warning" };
+    // var random = new Random();
+    // var randomColorClass = colorClasses[random.Next(colorClasses.Length)];
+
+    <div class="d-flex flex-wrap align-items-end flex-stack my-3 pt-3">
+        <div class="d-flex flex-column flex-grow-1 py-2">
+            <div class="d-flex flex-wrap fs-4">
+
+                @{
+                    string labelStyle = $"fw-bold fs-5 text-gray-900";
+                    string counterStyle = $"fs-2x fw-bold";
+
+                    if (!string.IsNullOrEmpty(Model.TotalStatsOne))
+                    {
+                        <div class="border border-gray-600 border-solid rounded-3 min-w-130px p-8 me-6 mb-3 bg-light">
+                            <i class="ki-outline ki-abstract-46 fs-3x text-@GetRandomColorClass()"></i>
+                            @* <i class="ki-outline ki-archive"></i> *@
+                            @* <i class="ki-outline ki-parcel"></i> *@
+                            <div class="d-flex align-items-center mt-3">
+                                <div class="@counterStyle" data-kt-countup="true" data-kt-countup-value="@Model.TotalStatsOne" data-kt-countup-prefix="@Model.Currency" data-kt-initialized="1">
+                                    @Model.Currency @Model.TotalStatsOne
+                                </div>
+                            </div>
+                            <div class="@labelStyle">@Model.TotalStatsOneLabel</div>
+                        </div>
+                    }
+
+                    if (!string.IsNullOrEmpty(Model.TotalStatsTwo))
+                    {
+                        <div class="border border-gray-600 border-solid rounded-3 min-w-130px p-8 me-6 mb-3 bg-light">
+                            <i class="ki-outline ki-abstract-46 fs-3x text-@GetRandomColorClass()"></i>
+                            @* <i class="ki-outline ki-shield-tick"></i> *@
+                            <div class="d-flex align-items-center mt-4">
+                                <div class="@counterStyle" data-kt-countup="true" data-kt-countup-value="@Model.TotalStatsTwo" data-kt-countup-prefix="@Model.Currency" data-kt-initialized="1">
+                                    @Model.Currency  @Model.TotalStatsTwo
+                                </div>
+                            </div>
+                            <div class="@labelStyle">@Model.TotalStatsTwoLabel</div>
+                        </div>
+                    }
+
+                    if (!string.IsNullOrEmpty(Model.TotalStatsThree))
+                    {
+                        <div class="border border-gray-600 border-solid rounded-3 min-w-130px p-8 me-6 mb-3 bg-light">
+                            <i class="ki-outline ki-abstract-46 fs-3x text-@GetRandomColorClass()"></i>
+                            @* <i class="ki-outline ki-check-circle"></i> *@
+                            <div class="d-flex align-items-center mt-4">
+                                <div class="@counterStyle" data-kt-countup="true" data-kt-countup-value="@Model.TotalStatsThree" data-kt-countup-prefix="@Model.Currency" data-kt-initialized="1">
+                                    @Model.Currency @Model.TotalStatsThree
+                                </div>
+                            </div>
+                            <div class="@labelStyle">@Model.TotalStatsThreeLabel</div>
+                        </div>
+                    }
+
+                    if (!string.IsNullOrEmpty(Model.TotalStatsFour))
+                    {
+                        <div class="border border-gray-600 border-solid rounded-3 min-w-130px p-8 mb-3 bg-light">
+                            <i class="ki-outline ki-abstract-46 fs-3x text-@GetRandomColorClass()"></i>
+                            @* <i class="ki-outline ki-geolocation-home"></i> *@
+                            <div class="d-flex align-items-center mt-4">
+                                <div class="@counterStyle" data-kt-countup="true" data-kt-countup-value="@Model.TotalStatsFour" data-kt-countup-prefix="@Model.Currency" data-kt-initialized="1">
+                                    @Model.Currency @Model.TotalStatsFour
+                                </div>
+                            </div>
+                            <div class="@labelStyle">@Model.TotalStatsFourLabel</div>
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
+
+
+}

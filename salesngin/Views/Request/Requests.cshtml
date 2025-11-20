@@ -1,0 +1,259 @@
+﻿@model RequestViewModel
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Requests";
+    ViewData["MainMenu"] = "Item Management";
+    //ViewData["SubMenu"] = "Products";
+    ViewData["Page"] = "Requests";
+    var settings = await _dataService.GetSettings();
+
+    //Use this to configure the datatables toolbar
+    ViewBag.ToolBarDateFilter = true; //Table has a date column
+    ViewBag.ToolBarStatusFilter = true;//Table has a status filter column
+    ViewBag.ToolBarStatusFilterOptions = GlobalConstants.RequestStatuses;  //Status filter option items
+    ViewBag.ToolBarExportOptions = true;
+}
+
+
+<!--begin::Card-->
+<div class="card col-md-12 mx-auto mb-6 mb-xl-9">
+    <div class="card-header pt-5">
+        <div class="card-title">
+            <h2 class="d-flex align-items-center">
+                Requests
+                <span class="text-gray-600 fs-6 ms-1">(@Model.Requests?.Count)</span>
+            </h2>
+        </div>
+        <div class="card-toolbar">
+        </div>
+    </div>
+    <div class="card-header">
+        <div class="card-title">
+            @{
+                if (Model.ModulePermission.Create == true)
+                {
+                    <ul class="nav nav-pills nav-pills-custom mb-3 mt-3" role="tablist">
+
+                        @{
+                            if (Model.ModulePermission.Create)
+                            {
+                                <li class="nav-item mb-3 me-3 me-lg-6" role="presentation">
+                                    <a asp-controller="Request" asp-action="CreateRequest"
+                                        class="nav-link d-flex justify-content-between flex-column flex-center overflow-hidden active w-120px h-85px py-4">
+                                        <div class="nav-icon">
+                                            <i class="ki-duotone ki-plus-square fs-2qx mx-2 text-primary"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                        </div>
+                                        <span class="nav-text text-gray-700 fw-bold fs-6 lh-1">
+                                            New Request
+                                        </span>
+                                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                                    </a>
+                                </li>
+                            }
+                        }
+
+                    </ul>
+                }
+            }
+        </div>
+        <div class="card-toolbar">
+            @*
+            <div class="input-group mb-5 w-100">
+                <span class="input-group-text p-3 fs-3">
+                    <i class="ki-duotone ki-abstract-37 fs-2x me-2 text-primary">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    Year
+                </span>
+                <div class="overflow-hidden flex-grow-1">
+                    <form asp-controller="Stock" asp-action="Stock" method="get">
+                        <select asp-for="@Model.ActiveYear" onchange="this.form.submit()" class="form-select rounded-start-0 border-start fs-3" data-control="select2" data-hide-search="false" data-placeholder="Select Year..." data-allow-clear="true">
+                            <option value="">Select Year...</option>
+                            @foreach (int year in Model.ActiveYears.Take(30))
+                            {
+                                <option value="@year">@year</option>
+                            }
+                        </select>
+                    </form>
+                </div>
+            </div>
+            *@
+
+            <form method="get" asp-controller="Request" asp-action="Requests" class="w-100">
+                <div class="input-group w-100 float-end fs-6">
+
+                    <div class="me-3">
+                        <label for="monthSelect" class="visually-hidden">Month</label>
+                        <select id="monthSelect" name="month" class="form-select form-select-lg types-select">
+                            <option value="0">All Months</option>
+                            @foreach (var month in Model.ActiveMonths)
+                            {
+                                <option value="@month.value" selected="@(Model.ActiveMonth == month.value ? "selected" : null)">@month.name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="me-3">
+                        <label for="yearSelect" class="visually-hidden">Year</label>
+                        <select id="yearSelect" name="year" class="form-select form-select-lg types-select">
+                            <option value="0">All Years</option>
+                            @foreach (int year in Model.ActiveYears.Take(10))
+                            {
+                                <option value="@year" selected="@(Model.ActiveYear == year ? "selected" : null)">@year</option>
+                            }
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="ki-duotone ki-filter fs-2 me-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        Apply Filter
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    @await Html.PartialAsync("_TableToolbar")
+    <!--begin::Card header-->
+
+
+    <div id="divTbPlaceholder" class="card-body py-4">
+        <div class="table-responsive">
+            <table class="table align-middle table-row-dashed table-hover fs-6 gy-3 gs-3" id="tblStockRecords">
+                <thead>
+                    <tr class="text-start text-gray-700 fw-bolder fs-7 text-uppercase gs-0">
+                        <th>Reference</th>
+                        <th>Requested By</th>
+                        <th>Total Items</th>
+                        <th>Purpose</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-800 fw-semibold">
+
+                    @{
+                        if (Model.Requests.Count > 0)
+                        {
+                            int i = 0;
+                            foreach (var item in Model.Requests)
+                            {
+                                i++;
+                                <tr>
+                                    <td>
+                                        @{
+                                            if (Model.ModulePermission.Update)
+                                            {
+                                                <a asp-controller="Request" asp-action="RequestDetails" asp-route-id="@item.Id" class="badge badge-light-primary fs-5 p-3">@item.RequestCode</a>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-light-primary fs-5 p-2">@item.RequestCode</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td>@item.RequestedBy?.FullName</td>
+                                    <td style="text-align:center;">@item.RequestItems?.Count</td>
+                                    <td>@item.Purpose</td>
+                                    <td>@await Html.PartialAsync("Inventory/_RequestStatus", item.Status)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.RequestDate)</td>
+                                    <td class="text-end">
+                                        <div class="d-flex">
+                                            @{
+                                                // if (item.Status == RequestStatus.New && Model.ModulePermission.Update)
+                                                // {
+                                                //     <a class="btn btn-icon btn-active-light-primary w-30px h-30px mx-3" asp-controller="Facility" asp-action="UpdateRequest" asp-route-id="@item.Id" data-toggle="tooltip" title="Edit">
+                                                //         <i class="ki-duotone ki-eraser fs-2qx">
+                                                //             <i class="path1"></i>
+                                                //             <i class="path2"></i>
+                                                //             <i class="path3"></i>
+                                                //         </i>
+                                                //     </a>
+                                                // }
+
+                                                if (Model.ModulePermission.Update)
+                                                {
+                                                    <a class="btn btn-active-light-primary mx-2 px-1" asp-controller="Request" asp-action="RequestDetails" asp-route-id="@item.Id" data-toggle="tooltip" title="View Items">
+                                                        <i class="ki-duotone ki-eye fs-2qx"><i class="path1"></i><i class="path2"></i><i class="path3"></i></i>
+                                                    </a>
+                                                }
+
+                                                if (Model.ModulePermission.Delete)
+                                                {
+                                                    if (item.Status != RequestStatus.Delivered)
+                                                    {
+                                                        <button class="btn btn-active-light-danger px-1" type="submit" value="Delete" onclick="return swalConfirm('@item.Id', this)" data-toggle="tooltip" title="Delete">
+                                                            <i class="ki-duotone ki-trash fs-2qx">
+                                                                <span class="path1"></span>
+                                                                <span class="path2"></span>
+                                                                <span class="path3"></span>
+                                                                <span class="path4"></span>
+                                                                <span class="path5"></span>
+                                                            </i>
+                                                        </button>
+
+                                                        <form id="actionForm_@item.Id" asp-controller="Request" asp-action="DeleteRequest" asp-route-id="@item.Id" method="post">
+                                                        </form>
+                                                    }
+                                                }
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+
+                </tbody>
+                <!--end::Table body-->
+            </table>
+            <!--end::Table-->
+        </div>
+    </div>
+    <!--end::Card body-->
+
+</div>
+<!--end::Card-->
+@section Scripts {
+    @*<script src="~/assets/js/tableConfig.js"></script>*@
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            $('.types-select').select2({ width: 'resolve' });
+
+            KTUtil.onDOMContentLoaded(function () {
+                KTAppTableListing.init("tblStockRecords", "tbl_daterange_flatpickr",
+                    "searchInput", "tbl_status", [], "Date", "Status",
+                    "tbl_daterange_flatpickr_clear",
+                    "datatable_export_buttons", "datatable_table_export_menu");
+            });
+
+        });
+
+        function printRequest() {
+            var filteredData = getFilteredData(); // Implement this based on your filter logic
+            var printUrl = '@Url.Action("PrintRequest", "Facility")';
+
+            // Send the filtered data as parameters or via AJAX, depending on your setup.
+            window.open(printUrl + '?filteredItems=' + JSON.stringify(filteredData));
+        }
+        function GetTableData() {
+            //$("#div1").load('@Url.Content("~/")');
+            $.ajax({
+                type: 'GET',
+                cache: false,
+                url: '@Url.Action("GetEmployeesPartial", "Account")',
+                //data: { id: selectedOfficer },
+                success: function (response) {
+                    $("#divTbPlaceholder").empty();
+                    $("#divTbPlaceholder").html(response);
+                }
+            });
+        }
+    </script>
+}

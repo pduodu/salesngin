@@ -1,0 +1,84 @@
+﻿@model List<CartItem>
+
+@if (Model.Count > 0)
+{
+    int i = 0;
+    <!--begin::Table container-->
+    <div class="table-responsive mb-2 scroll pe-5"
+         data-kt-scroll="true"
+         data-kt-scroll-height="500px"
+         data-kt-scroll-wrappers="#tblListBody"
+         data-kt-scroll-dependencies="#tblListHeader, #tblListFooter"
+         data-kt-scroll-offset="100px">
+        <table id="tblPurchaseCart" class="table table-row-dashed table-row-gray-300 gy-3">
+            <thead id="tblListHeader">
+                <tr class="fw-bold fs-6 text-gray-800">
+                    <th class="">#</th>
+                    <th class="min-w-200px">Item</th>
+                    <th class="">Quantity</th>
+                    <th class=""></th>
+                </tr>
+            </thead>
+            <tbody id="tblListBody">
+                @foreach (var item in Model)
+                {
+                    i++;
+                    <tr data-kt-pos-element="item" data-kt-pos-item-price="0">
+                        <td>@i</td>
+                        <td class="pe-0">
+                            <div class="d-flex align-items-center">
+                                <span class="symbol symbol-50px">
+                                    <img src="@Url.Content(item.ItemPhoto)" class="rounded-3 mb-4 w-35px h-35px" alt="">
+                                </span>
+                                <div class="ms-5">
+                                    <div class="ms-3 text-gray-800 fs-4">@item.ItemName</div>
+                                    <div class="ms-3 badge badge-light-primary fs-6">@item.ItemCode</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="pe-0">
+                            <div class="position-relative d-flex align-items-center border border-secondary rounded-2 px-1" data-kt-dialer="true" data-kt-dialer-min="1" data-kt-dialer-max="100000" data-kt-dialer-step="1" data-kt-dialer-decimals="0">
+                                <a id="lnkDecrease_@i" href="javascript:void(0)" onclick="decreaseQuantityPartial(@item.ItemId);" class="btn btn-icon btn-sm btn-light-primary btn-icon-gray-400">
+                                    <i class="ki-duotone ki-minus fs-2"></i>
+                                </a>
+                                <input asp-for="@item.Quantity" type="number" onchange="updateQuantityPartial(@item.ItemId,this.value)" class="form-control border-0 text-center px-0 fs-4 fw-bold text-gray-800" data-kt-dialer-control="input" placeholder="Quantity">
+                                <a id="lnkAdd_@i" href="javascript:void(0)" onclick="increaseQuantityPartial(@item.ItemId);" class="btn btn-icon btn-sm btn-light-primary btn-icon-gray-400">
+                                    <i class="ki-duotone ki-plus fs-2"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <a id="remove_@item.ItemId" href="javascript:void(0)" onclick="removeFromCartPartial(@item.ItemId);" class="btn btn-icon btn-active-light-danger w-40px h-40px" value="Delete" data-toggle="tooltip" title="Delete">
+                                <i class="ki-duotone ki-trash fs-2x">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                    <span class="path5"></span>
+                                </i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot id="tblListFooter">
+                <tr class="pt-3">
+                    <td colspan="2" class="text-dark text-end"></td>
+                    <td colspan="2" class="text-dark text-end fw-bold"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert bg-light-danger d-flex flex-column flex-sm-row p-5 mb-10 mt-10">
+        <i class="ki-duotone ki-basket fs-3x text-danger me-4 mb-5 mb-sm-0"><i class="path1"></i><i class="path2"></i><i class="path3"></i><i class="path4"></i></i>
+        <div class="d-flex flex-column pe-0 pe-sm-10">
+            <h4 class="fw-semibold">Items Bag Empty</h4>
+            <span>Search and add items.</span>
+        </div>
+    </div>
+}
+
+

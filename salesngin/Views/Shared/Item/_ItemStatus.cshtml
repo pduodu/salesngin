@@ -1,0 +1,19 @@
+﻿@model string
+@{
+    if (Model == ItemStatus.Available)
+    {
+        <span class="badge badge-light-success fw-bold fs-6 px-4 py-3">
+            @ItemStatus.Available
+        </span>
+    }
+    else if (Model == ItemStatus.Unavailable)
+    {
+        <span class="badge badge-light-danger fw-bold fs-6 px-4 py-3">
+            @ItemStatus.Unavailable
+        </span>
+    }
+    else
+    {
+        <span class="badge badge-light-primary fw-bold fs-6 px-4 py-3">...</span>
+    }
+}

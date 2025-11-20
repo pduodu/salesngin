@@ -1,0 +1,44 @@
+﻿@model UserViewModel
+
+@{
+    // Many people use the words photo, picture, and image as if they mean the same thing.However, they have different meanings.
+    // A photo is short for photograph. It’s a picture taken by a camera.  
+    // The word picture is more general. It can be a drawing, painting, or a photo – anything that shows what something looks like.
+    // An image is even broader. It can be a physical picture or something you see in your mind, like when you imagine something.
+    // To make it simple, remember: all photos are pictures, but not all pictures are photos. And an image can be a picture or an idea in your head.
+
+    <div class="card card-dashed w-100">
+        <div class="card-body">
+            <div class="pb-8 pb-lg-8">
+                <h3 class="fw-bolder text-dark">Photo</h3>
+                <div class="text-muted fw-semibold fs-6">
+                    Upload passport size photo.
+                </div>
+            </div>
+            <div class="mb-0">
+                <div class="row mb-7">
+                    <div class="col">
+                        @{
+                            var defaultImage = !string.IsNullOrEmpty(Model.UserPhotoPath) ? Model.UserPhotoPath : FileStorePath.noUserPhotoPath;
+                        }
+                        <div class="image-input image-input-outline" data-kt-image-input="true" style="background-image: url('/assets/media/svg/avatars/blank.svg')">
+                            <div id="divImageHolder" class="image-input-wrapper" src="defaultImage" style="background-image: url('@Url.Content(defaultImage)'); width:150px !important; height:150px !important;"></div>
+                            <label id="divFileUploadPlaceholder" class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change Photo">
+                                @*<input type="file" asp-for="Photo" accept=".png, .jpg, .jpeg" />*@
+                                @await Html.PartialAsync("_FileUpload", Model)
+                            </label>
+                            <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel Photo">
+                                <i class="bi bi-x fs-2"></i>
+                            </span>
+                            <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove Photo">
+                                <i class="bi bi-x fs-2"></i>
+                            </span>
+                        </div>
+                        <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

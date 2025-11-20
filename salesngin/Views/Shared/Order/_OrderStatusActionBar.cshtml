@@ -1,0 +1,184 @@
+﻿@model OrderViewModel
+
+@{
+    var statusColor = "primary";
+    var statusName = "Pending";
+    if (@Model.Status == OrderStatus.New)
+    {
+        statusColor = "primary";
+        statusName = @OrderStatus.New;
+
+    }
+    else if (@Model.Status == OrderStatus.Preparing)
+    {
+        statusColor = "warning";
+        statusName = @OrderStatus.Preparing;
+    }
+    else if (@Model.Status == OrderStatus.Cancelled)
+    {
+        statusColor = "danger";
+        statusName = @OrderStatus.Cancelled;
+    }
+    else if (@Model.Status == OrderStatus.Ready)
+    {
+        statusColor = "success";
+        statusName = @OrderStatus.Ready;
+    }
+    else if (@Model.Status == OrderStatus.Delivered)
+    {
+        statusColor = "success";
+        statusName = @OrderStatus.Delivered;
+    }
+    else if (@Model.Status == OrderStatus.Hold)
+    {
+        statusColor = "info";
+        statusName = @OrderStatus.Hold;
+    }
+    else
+    {
+        statusColor = "primary";
+        statusName = "Pending";
+    }
+
+    <div class="dropdown">
+        <button class="btn btn-light-@statusColor btn-active-light-@statusColor pulse pulse-@statusColor fs-4 fw-semibold dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class='pulse-ring'></span>
+            <i class="ki-duotone ki-notification-on fs-2x mx-2 text-@statusColor"><i class="path1"></i><i class="path2"></i><i class="path3"></i><i class="path4"></i><i class="path5"></i></i>
+            @statusName
+        </button>
+        <ul class="dropdown-menu fw-semibold w-250px py-4 fs-6">
+            <li class="px-3 py-3">
+                <div class="text-muted pb-2 px-3 fs-7 text-uppercase">
+                    Actions
+                </div>
+            </li>
+            @{
+                if (Model.ModulePermission.Update)
+                {
+                    if (Model.Status == OrderStatus.Ready || Model.Status == OrderStatus.Hold)
+                    {
+                        <!--begin::Menu item-->
+                        <li class="menu-item px-3">
+                            <form id="frmCancel" asp-controller="Order" asp-action="UpdateOrderStatus" asp-route-id="@Model.Id" asp-route-status="@OrderStatus.Cancelled">
+                                <button id="btnCancel" type="submit" class="dropdown-item px-3 btn btn-active-light-danger fw-semibold fs-5">
+                                    <i class="ki-duotone ki-cross text-danger mx-2 fs-2x">
+                                        <i class="path1"></i>
+                                        <i class="path2"></i>
+                                    </i>Cancel Order
+                                </button>
+                            </form>
+                        </li>
+                        <!--end::Menu item-->
+                    }
+                    else if (Model.Status == OrderStatus.Cancelled)
+                    {
+                        <!--begin::Menu item-->
+                        // <li class="menu-item px-3">
+                        //     <form id="frmReady" asp-controller="Order" asp-action="UpdateOrderStatus" asp-route-id="@Model.Id" asp-route-status="@OrderStatus.Ready">
+                        //         <button id="btnReady" type="submit" class="dropdown-item px-3 btn btn-active-light-primary fw-semibold fs-5">
+                        //             <i class="ki-duotone ki-double-check text-success mx-2 fs-2x">
+                        //                 <i class="path1"></i>
+                        //                 <i class="path2"></i>
+                        //             </i>Order Ready
+                        //         </button>
+                        //     </form>
+                        // </li>
+                        <!--end::Menu item-->
+                    }
+                    else
+                    {
+
+                    }
+                }
+
+                // if (Model.Status != OrderStatus.Delivered)
+                // {
+                // if (Model.ModulePermission.Approve)
+                // {
+                //     if (Model.Status == OrderStatus.New)
+                //     {
+                //         <!--begin::Menu item-->
+                //         <li class="menu-item px-3">
+                //             <form id="frmPrepare" asp-controller="Order" asp-action="ApproveOrderStatus" asp-route-id="@Model.Id" asp-route-status="@OrderStatus.Preparing">
+                //                 <button id="btnPrepare" type="submit" class="dropdown-item px-3 btn btn-active-light-primary fw-semibold fs-5">
+                //                     <i class="ki-duotone ki-arrows-circle text-warning mx-2 fs-2x">
+                //                         <i class="path1"></i>
+                //                         <i class="path2"></i>
+                //                     </i>Prepare Order
+                //                 </button>
+                //             </form>
+                //         </li>
+                //         <!--end::Menu item-->
+                //     }
+                //     if (Model.Status == OrderStatus.Preparing)
+                //     {
+                //         <!--begin::Menu item-->
+                //         <li class="menu-item px-3">
+                //             <form id="frmReady" asp-controller="Order" asp-action="ApproveOrderStatus" asp-route-id="@Model.Id" asp-route-status="@OrderStatus.Ready">
+                //                 <button id="btnReady" type="submit" class="dropdown-item px-3 btn btn-active-light-primary fw-semibold fs-5">
+                //                     <i class="ki-duotone ki-double-check text-success mx-2 fs-2x">
+                //                         <i class="path1"></i>
+                //                         <i class="path2"></i>
+                //                     </i>Order Ready
+                //                 </button>
+                //             </form>
+                //         </li>
+                //         <!--end::Menu item-->
+                //     }
+                //     <li class="separator my-3"></li>
+                //     if (Model.Status == OrderStatus.New || Model.Status == OrderStatus.Preparing)
+                //     {
+
+                //         <!--begin::Menu item-->
+                //         <li class="menu-item px-3">
+                //             <form id="frmCancel" asp-controller="Order" asp-action="ApproveOrderStatus" asp-route-id="@Model.Id" asp-route-status="@OrderStatus.Cancelled">
+                //                 <button id="btnCancel" type="submit" class="dropdown-item px-3 btn btn-active-light-primary fw-semibold fs-5">
+                //                     <i class="ki-duotone ki-cross text-danger mx-2 fs-2x">
+                //                         <i class="path1"></i>
+                //                         <i class="path2"></i>
+                //                     </i>Cancel Order
+                //                 </button>
+                //             </form>
+                //         </li>
+                //         <!--end::Menu item-->
+                //     }
+                // }
+                <!--begin::Menu separator-->
+                // <li class="separator my-3"></li>
+                // if (Model.ModulePermission.Update)
+                // {
+                // if (Model.Status == OrderStatus.Ready)
+                // {
+                //     <!--begin::Menu item-->
+                //     <li class="menu-item px-3">
+                //         <form id="frmCancel" asp-controller="Order" asp-action="UpdateOrderStatus" asp-route-id="@Model.Id" asp-route-status="@OrderStatus.Delivered">
+                //             <button id="btnCancel" type="submit" class="dropdown-item px-3 btn btn-active-light-success fw-semibold fs-5">
+                //                 <i class="ki-duotone ki-double-check text-success mx-2 fs-2x">
+                //                     <i class="path1"></i>
+                //                     <i class="path2"></i>
+                //                 </i>Order Delivered
+                //             </button>
+                //         </form>
+                //     </li>
+                //     <!--end::Menu item-->
+                //     <li class="separator my-3"></li>
+                // }
+                // <!--begin::Menu item-->
+                // <li class="menu-item px-3">
+                //     <form id="frmCancel" asp-controller="Order" asp-action="UpdateOrderStatus" asp-route-id="@Model.Id" asp-route-status="@OrderStatus.Cancelled">
+                //         <button id="btnCancel" type="submit" class="dropdown-item px-3 btn btn-active-light-primary fw-semibold fs-5">
+                //             <i class="ki-duotone ki-cross text-danger mx-2 fs-2x">
+                //                 <i class="path1"></i>
+                //                 <i class="path2"></i>
+                //             </i>Cancel Order
+                //         </button>
+                //     </form>
+                // </li>
+                // <!--end::Menu item-->
+                //}
+                //}
+            }
+
+        </ul>
+    </div>
+}

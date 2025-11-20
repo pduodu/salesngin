@@ -1,0 +1,75 @@
+﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    // Get the radio checkbox element by id
+    // var radioDivs = document.querySelectorAll("div[data-kt-buttons='true']");
+    // $("div[data-kt-buttons='true'] label[data-kt-buttons='true']").each(function () {
+    //     var radio = $(this).find("input[type='radio']");
+    //     if (radio.prop("checked")) {
+    //         $(this).addClass("active");
+    //     } else {
+    //         $(this).removeClass("selected");
+    //     }
+    // });
+
+    // var radios = document.querySelectorAll("input[type='radio']");
+    // for (var i = 0; i < radios.length; i++) {
+    //     // radios[i].addEventListener("change", function () {
+    //     //     if (this.checked) {
+    //     //         this.classList.add("active");
+    //     //     } else {
+    //     //         this.classList.remove("active");
+    //     //     }
+    //     // });
+
+    //     // radios[i].addEventListener("change", function () {
+    //     //     var labels = document.querySelectorAll("label");
+    //     //     for (var j = 0; j < labels.length; j++) {
+    //     //         labels[j].classList.remove("active");
+    //     //     }
+    //     //     if (this.checked) {
+    //     //         this.parentElement.classList.add("active");
+    //     //     }
+    //     // });
+    // }
+
+</script>
+
+
+
+
+@*<script>
+    // Define form element
+    const form = document.getElementsByClassName('validate_form');
+
+    // Init form validation rules. For more info check the FormValidation plugin's official documentation:https://formvalidation.io/
+    var validator = FormValidation.formValidation(
+        form,
+        {
+            fields: {
+                'avatar': {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please select an image'
+                        },
+                        file: {
+                            extension: 'jpg,jpeg,png',
+                            type: 'image/jpeg,image/png',
+                            message: 'The selected file is not valid'
+                        },
+                    }
+                },
+            },
+
+            plugins: {
+                trigger: new FormValidation.plugins.Trigger(),
+                bootstrap: new FormValidation.plugins.Bootstrap5({
+                    rowSelector: '.fv-row',
+                    eleInvalidClass: '',
+                    eleValidClass: ''
+                })
+            }
+        }
+    );
+
+</script>*@

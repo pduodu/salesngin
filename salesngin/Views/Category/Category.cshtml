@@ -1,0 +1,352 @@
+﻿@model CategoryViewModel
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Category";
+    ViewData["MainMenu"] = "Product Management";
+    //ViewData["SubMenu"] = "Users";
+    ViewData["Page"] = "Category";
+}
+
+<div class="d-flex flex-column flex-lg-row">
+    <div class="flex-lg-row-fluid ms-lg-10">
+
+    </div>
+</div>
+
+<div class="card col-md-10 mb-6 mb-xl-9">
+    <div class="card-header py-5">
+                <div class="card-title">
+                    <h2 class="d-flex align-items-center"> Categories<span
+                            class="text-gray-600 fs-6 ms-1">(@Model.Categories.Count)</span></h2>
+                </div>
+                <div class="card-toolbar">
+                    @if (Model.ModulePermission.Create)
+                    {
+                        <a href="#" class="btn btn-light-primary fs-4" data-toggle="tooltip"
+                            onclick="OpenCategoryAddModal();" title="Add">
+                            <i class="ki-duotone ki-plus-circle fs-2x">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            Add
+                        </a>
+                    }
+                </div>
+    </div>
+    @await Html.PartialAsync("_TableToolbar")
+    <div class="card-body pt-0">
+
+                <div class="table-responsive">
+                    <table class="table align-middle table-row-dashed fs-5 gy-3 mb-0" id="categoryRecords">
+                        <thead>
+                            <tr class="text-start text-muted fw-bold fs-5 text-uppercase gs-0">
+                                <th>#</th>
+                                <th>Category</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="fw-semibold text-gray-600">
+                            @{
+                                if (Model.CategoryParents.Count > 0)
+                                {
+                                    int rowNo = 0;
+                                    foreach (var item in Model.CategoryParents)
+                                    {
+                                        rowNo++;
+                                        var listChildCategories = Model.Categories.Where(x => x.ParentId == item.Id).ToList();
+                                        var childrenCount = listChildCategories.Count;
+
+                                        <tr class="">
+                                            <td><h3 class="form-label text-primary fw-bolder text-uppercase">@rowNo</h3></td>
+                                            <td>
+                                                <h3 class="form-label text-primary fw-bolder text-uppercase">
+                                                    <i class="ki-duotone ki-flag fs-3 text-warning">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                    @item.CategoryName
+                                                </h3>
+                                            </td>
+                                            <td class="text-end">
+                                                @{
+                                                    @* if (item.IsDeletable == 1)
+                                                    { *@
+                                                        @if (Model.ModulePermission.Update)
+                                                        {
+                                                            <a href="#" class="btn btn-icon btn-active-light-primary w-30px h-30px mx-3" onclick="OpenPledgeEditModal(@item.Id)" data-toggle="tooltip" title="Edit">
+                                                                <i class="ki-duotone ki-pencil fs-2qx">
+                                                                    <i class="path1"></i>
+                                                                    <i class="path2"></i>
+                                                                </i>
+                                                            </a>
+                                                        }
+
+                                                        if (childrenCount > 0)
+                                                        {
+
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (Model.ModulePermission.Delete)
+                                                            {
+                                                                <button class="btn btn-icon btn-active-light-danger w-30px h-30px" type="submit" value="Delete" onclick="return swalConfirm('@item.Id', this)" data-toggle="tooltip" title="Delete">
+                                                                    <i class="ki-duotone ki-trash fs-2qx">
+                                                                        <span class="path1"></span>
+                                                                        <span class="path2"></span>
+                                                                        <span class="path3"></span>
+                                                                        <span class="path4"></span>
+                                                                        <span class="path5"></span>
+                                                                    </i>
+                                                                </button>
+                                                                <form id="actionForm_@item.Id" asp-controller="Category" asp-action="CategoryDelete" asp-route-id="@item.Id" method="post">
+                                                                </form>
+                                                            }
+                                                        }
+                                                    @* } *@
+                                                }
+
+                                            </td>
+                                        </tr>
+
+                                        int childRowNo = 0;
+                                        @foreach (var category in listChildCategories)
+                                        {
+                                            childRowNo++;
+                                            <tr>
+                                                <td>@rowNo.@childRowNo</td>
+                                                <td>
+                                                    <span class="ml-10">@Html.DisplayFor(modelItem => category.CategoryName)</span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <div>
+                                                        @if (Model.ModulePermission.Update)
+                                                        {
+                                                            <a href="#" class="btn btn-icon btn-active-light-primary w-30px h-30px mx-3" onclick="OpenPledgeEditModal(@category.Id)" data-toggle="tooltip" title="Edit">
+                                                                <i class="ki-duotone ki-pencil fs-2qx">
+                                                                    <i class="path1"></i>
+                                                                    <i class="path2"></i>
+                                                                </i>
+                                                            </a>
+                                                        }
+
+                                                        @if (Model.ModulePermission.Delete)
+                                                        {
+                                                            <button class="btn btn-icon btn-active-light-danger w-30px h-30px" type="submit" value="Delete" onclick="return swalConfirm('@category.Id', this)" data-toggle="tooltip" title="Delete">
+                                                                <i class="ki-duotone ki-trash fs-2qx">
+                                                                    <span class="path1"></span>
+                                                                    <span class="path2"></span>
+                                                                    <span class="path3"></span>
+                                                                    <span class="path4"></span>
+                                                                    <span class="path5"></span>
+                                                                </i>
+                                                            </button>
+                                                            <form id="actionForm_@category.Id" asp-controller="Category" asp-action="CategoryDelete" asp-route-id="@category.Id" method="post"></form>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+    </div>
+    <!--end::Card body-->
+</div>
+
+ 
+
+<div id="modal-add" tabindex="-1" class="modal fade">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Category</h3>
+                <div class="btn btn-icon btn-sm btn-active-light-danger ms-2" data-bs-dismiss="modal"
+                    aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+            </div>
+            
+            <div id='modal-add-content' class="p-5">
+            </div>
+                
+        </div>
+    </div>
+</div>
+
+<div id="modal-edit" tabindex="-1" class="modal fade">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Category</h3>
+                <div class="btn btn-icon btn-sm btn-active-light-danger ms-2" data-bs-dismiss="modal"
+                    aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+            </div>
+                <div id='modal-edit-content' class="p-5">
+                </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function ()
+        {
+
+            $('.types-select').select2({
+                width: 'resolve',
+                placeholder: 'Select an Option',
+                allowClear: true
+            });
+
+            KTUtil.onDOMContentLoaded(function ()
+            {
+                KTAppTableListing.init(
+                    "categoryRecords",
+                    "tbl_daterange_flatpickr",
+                    "searchInput",
+                    "tbl_status",
+                    [],
+                    "Date",
+                    "Status",
+                    "tbl_daterange_flatpickr_clear",
+                    "datatable_export_buttons",
+                    "datatable_table_export_menu");
+            });
+
+
+        });
+
+
+        function OpenCategoryAddModal()
+        {
+            $.ajax({
+                type: 'GET',
+                url: "@Url.Action("OpenCategoryAddModal", "Category")",
+                contentType: 'application/json',
+                success: function (result)
+                {
+                    $('#modal-add-content').html(result);
+                    $('#modal-add').modal('show');
+                    $('.parent-options').select2({
+                        width: '100%',
+                        allowClear: true,
+                        dropdownParent: $("#modal-add")
+                    });
+
+                    // Get the input element
+                    var categories = document.querySelector("#SubCategories");
+                    if (categories)
+                    {
+                        // Initialize Tagify on the input
+                        //var tagify = new Tagify(categories);
+                        var tagify = new Tagify(categories, {
+                            delimiters: ",",
+                            dropdown: {
+                                enabled: 0
+                            },
+                            //originalInputValueFormat: valuesArr => valuesArr.map(x => x.value).join(",")
+                        });
+                        // Optional: Handle form submission to ensure proper format
+                        // document.querySelector("CategoryForm").addEventListener("submit", function () {
+                        //     // Convert Tagify tags to a comma-separated string
+                        //     var tags = tagify.value.map(tag => tag.value).join(",");
+                        //     categories.value = tags; // Set the input value for submission
+                        // });
+                    }
+                },
+                error: function (er)
+                {
+                    alert(er);
+                }
+            });
+        }
+
+        function OpenPledgeEditModal(id)
+        {
+            var data = { id: id };
+            $.ajax({
+                type: 'GET',
+                url: "@Url.Action("OpenCategoryEditModal", "Category")",
+                contentType: 'application/json',
+                data: data,
+                success: function (result)
+                {
+                    $('#modal-edit-content').html(result);
+                    $('#modal-edit').modal('show');
+                    $('.parent-options').select2({
+                        width: '100%',
+                        allowClear: true,
+                        dropdownParent: $("#modal-edit")
+                    });
+                },
+                error: function (er)
+                {
+                    alert(er);
+                }
+            });
+        }
+
+        function submitForm()
+        {
+            event.preventDefault(); // stop default form submission
+            const formElement = document.getElementById('CategoryForm');
+            // Submit button handler
+            if (formElement)
+            {
+                // Perform your validation 
+                const input = document.querySelector("#SubCategories");
+                const tagify = window.tagifySubCategories; // get the Tagify instance
+                var isValid = true; // Change this based on your validation logic
+
+                if (tagify && tagify.value.length === 0) {
+                    toast_message("error", "Please enter at least one Category.", "Category Required!");
+                    isValid = false;                   
+                }
+
+                // If validation passes, submit the form
+                if (isValid)
+                {
+                    formElement.submit();
+                }
+
+            }
+        }
+
+        $(function ()
+        {
+            $('#btnImport').on('click', function ()
+            {
+                var fileExtension = ['xls', 'xlsx'];
+                var filename = $('#customFileExcel').val();
+                if (filename.length == 0)
+                {
+                    //alert("Please select a file.");
+                    Swal.fire('Oops!', 'Please select a file.', 'info');
+                    return false;
+                }
+                else
+                {
+                    var extension = filename.replace(/^.*\./, '');
+                    if ($.inArray(extension, fileExtension) == -1)
+                    {
+                        //alert("Please select only excel files.");
+                        Swal.fire('Oops!', 'Please select only excel files.', 'info');
+                        return false;
+                    }
+                }
+            })
+        });
+
+
+    </script>
+}

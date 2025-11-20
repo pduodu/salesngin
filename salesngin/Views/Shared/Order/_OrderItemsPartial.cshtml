@@ -1,0 +1,107 @@
+﻿@* @model List<OrderItem> *@
+@model OrderViewModel
+@inject IDataControllerService _dataService
+@{
+    var settings = await _dataService.GetSettings();
+    //@settings.Currency
+}
+
+@if (Model.OrderItems.Count > 0)
+{
+    int i = 0;
+    <!--begin::Table container-->
+    <div class="table-responsive mb-8">
+        <!--begin::Table-->
+        <table id="tblOrderCart" class="table align-middle table-row-dashed fs-6 gs-2 gy-2 my-0">
+            <!--begin::Table head-->
+            <thead>
+                <tr class="text-start text-gray-800 fw-bolder fs-7 text-uppercase gs-0">
+                    <th class=""></th>
+                    <th class="min-w-175px">Item</th>
+                    <th class="text-center min-w-100px">Unit Price @settings.Currency </th>
+                    <th class="text-center min-w-100px">Quantity</th>
+                    <th class="text-center min-w-100px">Total @settings.Currency </th>
+                    <th class=""></th>
+                </tr>
+            </thead>
+            <!--end::Table head-->
+            <!--begin::Table body-->
+            <tbody>
+                @foreach (var item in Model.OrderItems)
+                {
+                    i++;
+                    <tr>
+                        <td>@i</td>
+                        <td class="pe-0">
+                            <div class="d-flex align-items-center">
+                                <img src="@Url.Content(item.Item.ItemPhotoPath)" class="w-50px h-50px rounded-3 me-3" alt="">
+                                <span class="fw-bold text-gray-800 cursor-pointer text-hover-primary fs-6 me-1">@item.Item.ItemName</span>
+                            </div>
+                        </td>
+                        <td class="pe-0 text-center">
+                            <span class="fw-bold">@item.UnitPrice</span>
+                        </td>
+                        <td class="pe-0 text-center">
+                            <span class="fw-bold px-4 py-3">@item.Quantity</span>
+                        </td>
+                        <td class="pe-0 text-center">
+                            <span class="fw-bold">@item.TotalPrice</span>
+                        </td>
+                        <td>
+                            @{
+                                if (Model.OrderItems.Count > 1)
+                                {
+                                    if (Model.ModulePermission.Delete)
+                                    {
+                                        string[] editableOrderStatuses = [OrderStatus.New, OrderStatus.Ready, OrderStatus.Hold];
+                                        if (editableOrderStatuses.Contains(Model.Status))
+                                        {
+                                            <button class="btn btn-icon btn-active-light-danger w-40px h-40px" type="submit" value="Delete" onclick="return swalConfirm('@item.Id', this)" data-toggle="tooltip" title="Delete">
+                                                <i class="ki-duotone ki-trash fs-1">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                    <span class="path5"></span>
+                                                </i>
+                                            </button>
+                                            <form id="actionForm_@item.Id" asp-controller="Order" asp-action="RemoveOrderItem" asp-route-id="@item.Id" method="post">
+                                            </form>
+                                        }
+                                    }
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <!--end::Table body-->
+        </table>
+        <!--end::Table-->
+    </div>
+
+}
+else
+{
+    @* <h3 class="display-4 text-center">Your Item List is empty.</h3> *@
+    <!--begin::Alert-->
+    <div class="alert bg-light-danger d-flex flex-column flex-sm-row p-5 mb-10 mt-10">
+        <!--begin::Icon-->
+        @* <i class="ki-duotone ki-notification-bing fs-3x text-danger me-4 mb-5 mb-sm-0"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i> *@
+        <i class="ki-duotone ki-basket fs-3x text-danger me-4 mb-5 mb-sm-0"><i class="path1"></i><i class="path2"></i><i class="path3"></i><i class="path4"></i></i>
+        <!--end::Icon-->
+        <!--begin::Wrapper-->
+        <div class="d-flex flex-column pe-0 pe-sm-10">
+            <!--begin::Title-->
+            <h4 class="fw-semibold">Order Cart Empty</h4>
+            <!--end::Title-->
+            <!--begin::Content-->
+            <span>Search and add items.</span>
+            <!--end::Content-->
+        </div>
+        <!--end::Wrapper-->
+    </div>
+    <!--end::Alert-->
+}
+
+

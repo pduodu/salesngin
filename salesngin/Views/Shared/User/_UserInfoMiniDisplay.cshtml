@@ -1,0 +1,29 @@
+﻿@model ApplicationUser
+
+@{
+    if (Model != null)
+    {
+        <div class="d-flex flex-stack rounded-3 bg-light border border-gray-400 border-dashed">
+            <div class="d-flex align-items-center p-2">
+                <div class="symbol  symbol-35px symbol-circle ">
+                    <img alt="Pic" src="@Url.Content(@Model.UserPhotoPath)">
+                </div>
+                <div class="ms-4">
+                    <div class="fs-6 fw-semibold text-gray-900 text-hover-primary pb-1">@Model.FullName</div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        var userPhoto = $"/{FileStorePath.noUserPhotoPath}?c=" + DateTime.UtcNow;
+        <div class="col align-content-center">
+            <div class="info-box">
+                <span class="info-box-icon"> <img src="@Url.Content(@userPhoto)" alt="..." class="img-circle img-fluid img-size-50"></span>
+                <div class="info-box-content">
+                    <span class="info-box-text"><b class="fs-5">None</b></span>
+                </div>
+            </div>
+        </div>
+    }
+}

@@ -1,0 +1,138 @@
+﻿@model ItemViewModel
+@{
+    <div class="card card-flush py-1 h-150px overflow-hidden">
+        <div class="card-body p-1">
+            <div class="d-flex align-items-center justify-content-between h-100">
+
+                <!-- Item Photo Section -->
+                <div class="d-flex flex-column align-items-center w-80px">
+                    <div class="image-input image-input-outline" data-kt-image-input="true" style="background-image: url('@Url.Content(Model.PhotoPath)');">
+                        <div class="image-input-wrapper w-70px h-70px" style="background-image: url('@Url.Content(Model.PhotoPath)');"></div>
+                    </div>
+                </div>
+
+                <!-- General Details Section -->
+                <div class="d-flex flex-column flex-grow-1 fs-6 ms-3">
+                    <div>
+                        <span><strong>Name:</strong> @Model.ItemName</span>
+                    </div>
+                    <div>
+                        <span><strong>Categories:</strong> @Model.CategoryId</span>
+                    </div>
+                    <div>
+                        <span><strong>Description:</strong> @Model.ItemDescription</span>
+                    </div>
+                </div>
+
+                <!-- Inventory Section -->
+                <div class="d-flex flex-column flex-grow-1 fs-6 ms-3">
+                    <div>
+                        <span><strong>Quantity:</strong> @Model.Quantity</span>
+                    </div>
+                    <div>
+                        <span><strong>Restock:</strong> @Model.RestockLevel</span>
+                    </div>
+                    <div>
+                        <span><strong>Notes:</strong> @Model.Notes</span>
+                    </div>
+                </div>
+
+                <!-- Item Status Section -->
+                <div class="d-flex flex-column align-items-center w-80px me-3">
+                    <strong>Status</strong>
+                    <div class="pt-0 fs-7">
+                        @await Html.PartialAsync("Inventory/_InventoryStatus", Model.Status)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @await Html.PartialAsync("_TableToolbar")
+    <div id="divTbPlaceholder" class="card-body py-4">
+        <div class="table-responsive">
+            @if (Model.Requests != null && Model.Requests.Any()) 
+            {
+                <table class="table align-middle table-row-dashed fs-6 gy-5 gs-5" id="ItemRecordsTable">
+                    <thead>
+                        <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                            <th class="text-center">QTY Requested</th>
+                            <th class="text-center">Requested By</th>
+                            <th class="text-center">Unit</th>
+                            <th class="text-center">Date Requested</th>
+                            <th class="text-center">Approved By</th>
+                            <th class="text-center">Received By</th>
+                            <th class="text-center">Delivered By</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-600 fw-bold">
+                        @foreach (var requestItem in Model.RequestItems)
+                        {
+                            <tr>
+                                <td class="text-center">@requestItem.Quantity</td>
+                                <td class="text-center">@requestItem.Request.RequestedBy?.FullName</td>
+                                <td class="text-center">@requestItem.Request.RequestedBy.Unit?.UnitName</td>
+                                <td class="text-center">@requestItem.Request.RequestDate?.ToString("dd-MMM-yyyy")</td>
+                                <td class="text-center">@requestItem.Request.ApprovedBy?.FullName</td>
+                                <td class="text-center">@requestItem.Request.ReceivedBy?.FullName</td>
+                                <td class="text-center">@requestItem.Request.SuppliedBy?.FullName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted">No requests found for this item.</p>
+            }
+        </div>
+    </div>
+}
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            $('.types-select').select2({ width: 'resolve' });
+
+            KTUtil.onDOMContentLoaded(function () {
+                KTAppTableListing.init("ItemRecordsTable", "tbl_daterange_flatpickr",
+                    "searchInput", "tbl_status", [], "Date", "Status",
+                    "tbl_daterange_flatpickr_clear",
+                    "datatable_export_buttons", "datatable_table_export_menu");
+            });
+        });
+
+        function OpenProductStatusUpdateModal(id) {
+            var data = { id: id };
+            $.ajax({
+                type: 'GET',
+                url: "@Url.Action("GetProductStatusUpdateModal", "Product")",
+                contentType: 'application/json',
+                data: data,
+                success: function (result) {
+                    $('#modal-update-status-content').html(result);
+                    $('#modal-update-status').modal('show');
+                    $('.types-select').select2({
+                        width: 'resolve',
+                        dropdownParent: $("#modal-update-status")
+                    });
+                },
+                error: function (er) {
+                    alert(er);
+                }
+            });
+        }
+
+        function GetTableData() {
+            $.ajax({
+                type: 'GET',
+                cache: false,
+                url: '@Url.Action("GetEmployeesPartial", "Account")',
+                success: function (response) {
+                    $("#divTbPlaceholder").empty();
+                    $("#divTbPlaceholder").html(response);
+                }
+            });
+        }
+    </script>
+}
+

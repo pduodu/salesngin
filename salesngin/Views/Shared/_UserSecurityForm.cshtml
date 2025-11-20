@@ -1,0 +1,16 @@
+﻿@model UserViewModel
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
+@inject IDataControllerService _dataService
+
+@{
+    <div class="row g-6 p-0 mb-0">
+        <div class="col-md-6">
+            @await Html.PartialAsync("_UserPassword", Model)
+        </div>
+        <div class="col-md-6">
+            @await Html.PartialAsync("_UserRole", Model)
+        </div>
+    </div>
+}
+

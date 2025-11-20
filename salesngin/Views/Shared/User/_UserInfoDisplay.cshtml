@@ -1,0 +1,40 @@
+﻿@model ApplicationUser
+
+@{
+    if (Model != null)
+    {
+        <div class="d-flex flex-stack rounded-3 bg-white border border-active active">
+            <!--begin::Details-->
+            <div class="d-flex align-items-center px-3 py-3">
+                <!--begin::Avatar-->
+                <div class="symbol  symbol-60px symbol-circle ">
+                    <img alt="Pic" src="@Url.Content(@Model.UserPhotoPath)">
+                    @* <div class="symbol-badge bg-success start-100 top-100 border-4 h-15px w-15px ms-n2 mt-n2">
+                    </div> *@
+                </div>
+                <!--end::Avatar-->
+                <!--begin::Details-->
+                <div class="ms-4">
+                    <div class="fs-4 fw-bold text-gray-900 text-hover-primary pb-1">@Model.FullName</div>
+                    <div class="fw-semibold fs-6 text-muted pb-1">@Model.Email</div>
+                    <div class="fw-semibold fs-6 text-muted">@Model.JobTitle</div>
+                </div>
+                <!--end::Details-->
+            </div>
+            <!--end::Details-->
+        </div>
+
+    }
+    else
+    {
+        var userPhoto = $"/{FileStorePath.noUserPhotoPath}?c=" + DateTime.UtcNow;
+        <div class="col align-content-center">
+            <div class="info-box">
+                <span class="info-box-icon"> <img src="@Url.Content(@userPhoto)" alt="..." class="img-circle img-fluid img-size-50"></span>
+                <div class="info-box-content">
+                    <span class="info-box-text"><b class="fs-5">None</b></span>
+                </div>
+            </div>
+        </div>
+    }
+}

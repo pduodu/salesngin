@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "boxicons@2.1.4",
+      "destination": "wwwroot/lib/boxicons/"
+    },
+    {
+      "library": "jquery-ajax-unobtrusive@3.2.6",
+      "destination": "wwwroot/lib/jquery-ajax-unobtrusive/"
+    },
+    {
+      "library": "summernote@0.8.20",
+      "destination": "wwwroot/lib/summernote/"
+    },
+    {
+      "library": "ckeditor5@41.1.0",
+      "destination": "wwwroot/lib/ckeditor5/"
+    },
+    {
+      "library": "html2canvas@1.4.1",
+      "destination": "wwwroot/lib/html2canvas/"
+    },
+    {
+      "library": "jspdf@2.5.1",
+      "destination": "wwwroot/lib/jspdf/"
+    },
+    {
+      "library": "printThis@1.15.0",
+      "destination": "wwwroot/lib/printThis/"
+    },
+    {
+      "library": "print-js@1.6.0",
+      "destination": "wwwroot/lib/print-js/"
+    }
+  ]
+}

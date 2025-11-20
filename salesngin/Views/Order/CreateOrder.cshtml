@@ -1,0 +1,676 @@
+﻿@model OrderViewModel
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Create";
+    ViewData["MainMenu"] = "Order Management";
+    ViewData["Page"] = "Create";
+
+    var settings = await _dataService.GetSettings();
+
+    string isActiveRetail = Model.SelectedOrderType == OrderType.Retail ? "active" : "";
+    string isActiveWholesale = Model.SelectedOrderType == OrderType.Wholesale ? "active" : "";
+}
+
+<div class="row">
+    <div class="col-md-6">
+
+        <div id="posStoreProductsList" class="card card-flush card-p-0 bg-transparent border-0">
+            <div class="card-header">
+                <div class="col fv-row ">
+                    <!--begin::Radio group-->
+                    <div class="d-flex flex-equal gap-4 gap-xxl-4 px-0 mb-5" data-kt-buttons="true"
+                        data-kt-buttons-target="[data-kt-button='true']" data-kt-initialized="1">
+                        <!--begin::Radio-->
+                        <label
+                            class="btn bg-light btn-active-text-gray-800 border border-2 border-solid border-gray-400 border-active-primary btn-active-light-primary w-200px px-4 @isActiveRetail"
+                            data-kt-button="true">
+                            <input asp-for="@Model.SelectedOrderType" class="form-check-input order-type-radio mt-5"
+                                type="radio" value="@OrderType.Retail" onchange="OrderTypeChanged();"><br />
+                            <i class="ki-duotone ki-package text-dark fs-3x my-2 pe-0">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                            <span class="fs-4 fw-bold d-block">@OrderType.Retail</span>
+                        </label>
+                        <!--end::Radio-->
+                        <!--begin::Radio-->
+                        <label
+                            class="btn bg-light btn-active-text-gray-800 border border-2 border-solid border-gray-400 border-active-primary btn-active-light-primary w-200px px-4 @isActiveWholesale"
+                            data-kt-button="true">
+                            <input asp-for="@Model.SelectedOrderType" class="form-check-input order-type-radio mt-5"
+                                type="radio" value="@OrderType.Wholesale" onchange="OrderTypeChanged();"><br />
+                            <i class="ki-duotone ki-lots-shopping text-dark fs-3x mb-2 mt-2 pe-0">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                                <span class="path4"></span>
+                                <span class="path5"></span>
+                                <span class="path6"></span>
+                                <span class="path7"></span>
+                                <span class="path8"></span>
+                            </i>
+                            <span class="fs-4 fw-bold d-block">@OrderType.Wholesale</span>
+                        </label>
+                        <!--end::Radio-->
+                    </div>
+                    <!--end::Radio group-->
+                </div>
+            </div>
+            <div class="card-header">
+                <div class="col fv-row">
+                    <div class="d-flex align-items-center position-relative">
+                        <i class="ki-duotone ki-magnifier fs-1 position-absolute ms-4 text-primary">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        <input id="searchInput" type="text" class="form-control fs-2 ps-12" autocomplete="off"
+                            placeholder="Search...">
+                        <button id="btnClear" type="button" class="btn btn-primary fs-2 mx-2">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <div id="productsContainer" class="">
+                    @await Html.PartialAsync("Order/_FormItemsList", Model)
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+
+        <div class="card card-flush bg-body ">
+            <div class="card-header py-5">
+                <h4 class="card-title fw-bold text-gray-800 fs-3">Current Order </h4>
+                <div class="card-toolbar">
+                    <button id="btnHoldOrder" type="button" form="formCreateOrder"
+                        class="btn btn-light-primary fs-4 py-4 mx-3">
+                        <i class="ki-duotone ki-bookmark-2 fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        Hold Order
+                    </button>
+                    <a href="javascript:void(0)" onclick="clearCartPartial();"
+                        class="btn btn-light-danger fs-4 fw-bold py-4">Clear Cart</a>
+                </div>
+            </div>
+            <div class="separator separator-dashed"></div>
+            <!--begin::Body-->
+            <div class="card-body pt-0">
+                <div id="divCartItemsDisplay">
+                    @await Html.PartialAsync("Inventory/_CartItemsPartial", Model.CartItems)
+                </div>
+                <div class="separator separator-dotted border-primary my-10"></div>
+                <form id="formCreateOrder" asp-controller="Order" asp-action="CreateOrder" method="post" class="form">
+                    @Html.AntiForgeryToken()
+                    @* <input type="hidden" asp-for="ShopId" /> *@
+                    <input type="hidden" asp-for="OrderType" value="@Model.OrderType" />
+                    <input type="hidden" asp-for="Status" value="" />
+                    <!--begin::Customer Info-->
+                    <div class="m-0">
+                        <div class="mb-10 fv-row fv-plugins-icon-container">
+                            <!--begin::Label-->
+                            @* <h4 class="fw-bold text-gray-800 mb-5">Customer</h4> *@
+                            <div class="col fv-row mb-5">
+                                @* <select asp-for="@Model.CustomerId"
+                                    asp-items="@(new SelectList(Model.Customers, "Id", "CustomerName"))"
+                                    onchange="getCustomer();" class="form-select form-select-lg form-select-solid"
+                                    data-control="select2" data-hide-search="false" data-placeholder="Select Customer"
+                                    data-allow-clear="true">
+                                    <option value="0" selected>Enter Customer...</option>
+                                </select> *@
+                            </div>
+                            <div class="col fv-row mb-5">
+                                <div id="customerContainer" class="mt-7">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Customer Info-->
+                    <!--begin::Payment Method-->
+                    <!--end::Payment Method-->
+                    <div class="m-0 g-5">
+                        <!--begin::Actions-->
+                        <button type="submit" id="submitOrder" class="btn btn-primary fs-1 float-end py-4 mx-3 ">
+                            <i class="ki-duotone ki-wallet fs-3x text-white">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                                <span class="path4"></span>
+                            </i>
+                            <span class="indicator-label">
+                                Checkout
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                        <!--end::Actions-->
+                    </div>
+                    <!--end::Payment Method-->
+                </form>
+            </div>
+            <!--end: Card Body-->
+        </div>
+
+
+    </div>
+</div>
+
+<div class="d-flex flex-column flex-lg-row w-100">
+
+    <div class="d-flex flex-row-fluid me-xl-9 mb-10 mb-xl-0 bg-transparent">
+        <!--begin::Pos Store Products list-->
+
+
+    </div>
+
+    <div class="flex-row-auto w-500px">
+    </div>
+
+</div>
+
+<!-- modal placeholders-->
+<div id="modal-add" tabindex="-1" class=" modal fade">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+
+            <div id='modal-add-content'></div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+        var lastInputTime = 0;
+        var inputTimer;
+        let debounceTimer;
+        let scanBuffer = ''; // track scanner input
+        var searchInputField = document.getElementById("searchInput");
+        var orderTypeInputField = document.getElementById("OrderType");
+        var hfControllerAdd = document.getElementById("hfControllerAdd");
+        var hfSearchReset = document.getElementById("hfResetSearch");
+        var invalidMessageBox = document.getElementById("divInvalidMessageBox");
+
+        document.addEventListener('DOMContentLoaded', function ()
+        {
+            
+            $('.types-select').select2({ width: 'resolve' });
+
+            var defaultOrderType = "@Model.SelectedOrderType";
+            orderTypeInputField.value = defaultOrderType;
+            console.log("Default Order Type : ", defaultOrderType);
+            //initializeSelect2();
+            searchInputField.focus();
+            //getCustomer();
+
+            // Barcode or manual typing detection
+            document.addEventListener('keydown', e =>
+            {
+                if (e.key === 'Enter' && searchInputField === document.activeElement)
+                {
+                    e.preventDefault();
+                    triggerSearch();
+                    scanBuffer = '';
+                } else if (e.key.length === 1 && searchInputField === document.activeElement)
+                {
+                    scanBuffer += e.key;
+                }
+            });
+
+            // Auto search when typing manually
+            searchInputField.addEventListener('input', function ()
+            {
+                const text = this.value.trim();
+                if (text.length >= 3)
+                {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(triggerSearch, 300);
+                } else if (text.length === 0)
+                {
+                    loadItemsPage(1);
+                }
+            });
+
+            //var checkoutSubmitButton = document.querySelector("#submitOrder");
+            //if (checkoutSubmitButton)
+            //{
+            //    triggerButtonIndicator(checkoutSubmitButton);
+            //}
+
+            // Format numbers to 2 decimal places
+            const formatMoney = (value) =>
+            {
+                return parseFloat(value || 0).toFixed(2);
+            };
+
+            document.getElementById('btnHoldOrder').addEventListener('click', function ()
+            {
+                document.getElementById("Status").value = 'Hold';
+                var status = document.getElementById("Status").value;
+                console.log("Status: " + status);
+                document.getElementById('formCreateOrder').submit();
+            });
+
+            // Add event listeners for the search input
+            //document.getElementById('SearchString').addEventListener('input', debouncedSearchRecord);
+
+            // Event listener for clear button
+            document.getElementById('btnClear').addEventListener('click', clearSearch);
+
+        });
+
+
+        function loadItemsPage(page = 1)
+        {
+            var selectedRadio = document.querySelector('.order-type-radio:checked');
+            var selectedOrderType = selectedRadio.value;
+            const orderType = selectedOrderType || 'Retail';
+            //const orderType = $('input[name="orderTypeRadio"]:checked').val() || 'Retail';
+            const search = $('#searchInput').val();
+            //const categoryId = $('#categoryFilter').val();
+            const categoryId = "";
+
+            $.get('/Order/GetItemsPartialView', {
+                orderType: orderType,
+                pageNumber: page,
+                search: search,
+                categoryId: categoryId
+            }, function (html)
+            {
+                $('#productsContainer').html(html);
+                $('#searchInput').focus(); // re-focus for barcode scanning
+            });
+        }
+
+        // Trigger search — works for both barcode & typing
+        function triggerSearch(fromScanner = false)
+        {
+            var selectedRadio = document.querySelector('.order-type-radio:checked');
+            var selectedOrderType = selectedRadio.value;
+            const orderType = selectedOrderType || 'Retail';
+            //const orderType = $('input[name="orderTypeRadio"]:checked').val() || 'Retail';
+            const search = searchInputField.value;
+            const categoryId = "";
+            //const categoryId = $('#categoryFilter').val();
+
+            $.ajax({
+                url: '/Order/GetItemsPartialView',
+                data: { orderType, pageNumber: 1, search, categoryId },
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                success: function (response)
+                {
+                    // Replace grid HTML
+                    $('#productsContainer').html(response.html);
+                    searchInputField.focus();
+
+                    if (fromScanner && response.count === 1 && response.singleItemId)
+                    {
+                        // Auto-add item to cart
+                        addProductToCart(response.singleItemId);
+                        clearSearch(true);
+                    }
+                }
+            });
+
+
+            loadItemsPage(1);
+        }
+
+        function addSearchItemToCart(productId, productName, orderType)
+        {
+            //validation result
+            validateSelectedProduct(productId, 1, function (result)
+            {
+                if (result)
+                {
+                    $.ajax({
+                        type: "GET",
+                        url: "@Url.Action("AddPartial", "Order")",
+                        data: { id: productId, ot: orderType },
+                        success: function (result)
+                        {
+                            console.log('Item added to cart : ', productName);
+                            searchInputField.value = ''; // Clear the search input
+                            searchInputField.focus();
+                            $("#divCartItemsDisplay").html(result);
+                        }
+                    });
+                }
+            });
+        }
+
+        function clearSearch(reload = false)
+        {
+            const searchBox = document.getElementById("searchInput");
+            if (reload) loadItemsPage(1);
+            searchBox.value = '';
+            searchBox.focus();
+            //loadItemsPage(1);
+        }
+
+        function debounce(func, delay)
+        {
+            var timeout;
+            return function ()
+            {
+                var context = this;
+                var args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(function ()
+                {
+                    func.apply(context, args);
+                }, delay);
+            };
+        }
+
+        function OrderTypeChanged()
+        {
+            var selectedRadio = document.querySelector('.order-type-radio:checked');
+            if (selectedRadio)
+            {
+                var selectedOrderType = selectedRadio.value;
+                console.log("Selected Order Type : ", selectedOrderType);
+                orderTypeInputField.value = selectedOrderType;
+                clearCartPartial();
+                loadItemsPage(1);
+            } else
+            {
+                console.log("No order type selected");
+            }
+        }
+
+        function isZeroNullOrEmpty(value)
+        {
+            return value === "0" || value === 0 || value === null || value === "" || value === undefined || Number.isNaN(value);
+        }
+
+        function isNotZeroNullOrEmpty(value)
+        {
+            return value !== "0" && value !== 0 && value !== null && value !== "" && value !== undefined && !Number.isNaN(value);
+        }
+
+        function getCustomer()
+        {
+            var customerId = $("#CustomerId").val();
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetCustomerPartialView", "Order")",
+                data: { id: customerId },
+                success: function (response)
+                {
+                    $("#customerContainer").html(response);
+                }
+            });
+        }
+
+        // Search products using Fetch API
+        async function searchProducts()
+        {
+            const orderType = document.getElementById('OrderType').value;
+            const searchTerm = document.getElementById('searchInput').value;
+            const container = document.getElementById('productsContainer');
+            //const loading = document.getElementById('loadingIndicator');
+
+            try
+            {
+                //loading.classList.remove('hidden');
+                container.classList.add('opacity-50');
+                container.innerHTML = "";
+
+                const response = await fetch(`/Order/SearchProducts?term=${encodeURIComponent(searchTerm)}`);
+                const html = await response.text();
+
+                container.innerHTML = html;
+            } catch (error)
+            {
+                console.error('Error loading items:', error);
+                alert('Error loading items');
+            } finally
+            {
+                //loading.classList.add('hidden');
+                container.classList.remove('opacity-50');
+            }
+        }
+
+        function updateCartView()
+        {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("UpdateCartView", "Order")",
+                success: function (result)
+                {
+                    $("#divCartItemsDisplay").html(result);
+                    //clearSearchBox();
+                }
+            });
+        }
+
+        function validateSelectedProduct(id, quantity, callback)
+        {
+            quantity = parseInt(quantity); // ensure numeric
+
+            if (!quantity || quantity <= 0)
+            {
+                toast_message("error", "Quantity cannot be 0.", "Invalid Quantity");
+                return;
+            }
+
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("ValidateOrderQuantity", "Order")",
+                data: { id: id, quantity: quantity },
+                success: function (result)
+                {
+                    toggleInvalidMessageBox(result);
+                    callback(result);
+                },
+                error: function (error)
+                {
+                    console.error("Error during AJAX request:", error);
+                }
+            });
+
+        }
+
+        function toggleInvalidMessageBox(condition)
+        {
+            if (condition)
+            {
+                //hide
+                $("#divInvalidMessageBox").addClass("d-none");
+            } else
+            {
+                //show
+                $("#divInvalidMessageBox").removeClass("d-none");
+                toast_message("error", "Quantity requested not available in store.", "Invalid Quantity");
+            }
+        }
+
+        function addProductToCart(id)
+        {
+            var selectedRadio = document.querySelector('.order-type-radio:checked');
+            var selectedOrderType = selectedRadio.value;
+            console.log("Selected Order type:", selectedOrderType);
+            //const orderType = $("#OrderType").val() || $("input[name='orderTypeRadio']:checked").val() || "Retail";
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("AddPartial", "Order")",
+                data: { id: id, orderType: selectedOrderType },
+                beforeSend: function ()
+                {
+                    $("#divCartItemsDisplay").addClass("loading");
+                },
+                success: function (result)
+                {
+                    $("#divCartItemsDisplay").html(result.html);
+                    initializeCartSummary();
+                    //toast_message("success", "Item added to cart", "Success");
+                    $("#searchBox").val("").focus(); // ready for next scan
+                },
+                error: function (xhr)
+                {
+                    console.error("Error adding item to cart:", xhr);
+                    toast_message("error", response.message, "Error");
+                    //toast_message("error", "Unable to add item to cart.", "Error");
+                },
+                complete: function ()
+                {
+                    $("#divCartItemsDisplay").removeClass("loading");
+                }
+            });
+
+        }
+
+        function updateProductQuantity(id, storeQuantity, inputElement)
+        {
+            var maxAllowedQuantity = parseInt(storeQuantity);
+            var quantityEntered = parseInt(inputElement.value);
+            console.log(quantityEntered);
+            if (quantityEntered === NaN || quantityEntered == 0)
+            {
+                removeFromCartPartial(id);
+                toast_message("error", "Product removed.", "Zero Quantity");
+            } else if (quantityEntered > maxAllowedQuantity)
+            {
+                toast_message("error", "Quantity cannot be more than Store Qunatity.", "Invalid Quantity");
+                // Reset the input value to the maximum allowed quantity
+                inputElement.value = maxAllowedQuantity;
+            } else
+            {
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("UpdateCartProductQuantity", "Order")",
+                    data: { id: id, quantity: quantityEntered },
+                    success: function (response)
+                    {
+                        $("#divCartItemsDisplay").html(response.html);
+                        if (response.success)
+                        {
+                            //toastr.success(response.message, "Success");
+                        } else
+                        {
+                            toastr.error(response.message, "Failed");
+                        }
+                    }
+                });
+            }
+        }
+
+        function updatePricePartial(id, price)
+        {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("UpdatePricePartial", "Order")",
+                data: { id: id, price: price },
+                success: function (data)
+                {
+                    $("#divCartItemsDisplay").html(data);
+                }
+            });
+        }
+
+        function removeFromCartPartial(id)
+        {
+            if (isZeroNullOrEmpty(id))
+            {
+                toast_message("error", "Invalid product selected.", "Error");
+                return;
+            }
+            else
+            {
+                // Proceed with AJAX request if both values are valid
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("RemoveCartItemPartial", "Order")",
+                    data: { id: id },
+                    success: function (response)
+                    {
+                        $("#divCartItemsDisplay").html(response.html);
+                        searchInputField.focus();
+                        if (response.success)
+                        {
+                            //toastr.success(response.message, "Success");
+                        } else
+                        {
+                            toastr.error(response.message, "Failed");
+                        }
+                    }
+                });
+            }
+        }
+
+        function decreaseQuantityPartial(id)
+        {
+            if (isZeroNullOrEmpty(id))
+            {
+                toast_message("error", "Invalid product selected.", "Error");
+                return;
+            }
+            else
+            {
+                // Proceed with AJAX request if both values are valid
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("DecreaseQuantityPartial", "Order")",
+                    data: { id: id },
+                    success: function (response)
+                    {
+                        $("#divCartItemsDisplay").html(response.html);
+                        if (response.success)
+                        {
+                            //toastr.success(response.message, "Success");
+                        } else
+                        {
+                            toastr.error(response.message, "Failed");
+                        }
+                    }
+                });
+            }
+        }
+
+        function increaseQuantityPartial(id)
+        {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("IncreaseQuantityPartial", "Order")",
+                data: { id: id },
+                success: function (response)
+                {
+                    $("#divCartItemsDisplay").html(response.html);
+                    if (response.success)
+                    {
+                        //toastr.success(response.message, "Success");
+                    } else
+                    {
+                        toastr.error(response.message, "Failed");
+                    }
+                }
+            });
+        }
+
+        function clearCartPartial()
+        {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("ClearCartPartial", "Order")",
+                success: function (response)
+                {
+                    $("#divCartItemsDisplay").html(response.html);
+                    searchInputField.focus();
+
+                }
+            });
+        }
+
+
+    </script>
+}

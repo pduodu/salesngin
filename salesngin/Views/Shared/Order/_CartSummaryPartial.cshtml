@@ -1,0 +1,104 @@
+﻿@model List<CartItem>
+@{
+    var settings = await _dataService.GetSettings();
+    string currency = settings.Currency;
+}
+
+@if (Model.Count > 0)
+{
+
+    decimal? subtotal = Model.Sum(x => x.TotalAmount);
+    //decimal? discount = 0;
+    //decimal? Tax = 0;
+    //var grandTotal = (subtotal - discount) + Tax;
+    <input type="hidden" id="subTotal" value="@subtotal" />
+    <input type="hidden" id="grandTotal" />
+    <div class="d-flex flex-wrap gap-5 my-3">
+        <div class="fv-row w-100 flex-md-root">
+            <label class="form-label">Discount (%)</label>
+            <input id="discountPercent" type="number" class="form-control border-1 border-gray-500 mb-2" placeholder="0" />
+            @* <div class="text-muted fs-7">Set the product VAT about.</div> *@
+        </div>
+        <div class="fv-row w-100 flex-md-root">
+            <label class="form-label">Discount Amount (@currency)</label>
+            <input id="discountAmount" type="number" class="form-control border-1 border-gray-500 mb-2" placeholder="0" />
+            @* <div class="text-muted fs-7">Set the product VAT about.</div> *@
+        </div>
+    </div>
+    <!--begin::Summary-->
+    <div class="d-flex flex-stack bg-light-success rounded-1 p-6 mb-11">
+        <!--begin::Content-->
+        <div class="fs-4 fw-bold text-success">
+            <span class="d-block lh-1 mb-5">Subtotal</span>
+            <span class="d-block mb-2">Discount</span>
+            @* <span class="d-block mb-9">Tax(12%)</span> *@
+            <span class="d-block fs-2qx lh-1">Total</span>
+        </div>
+        <!--end::Content-->
+        <!--begin::Content-->
+        <div class="fs-4 fw-bold text-success text-end">
+            <span class="d-block lh-1 mb-5" data-kt-pos-element="total">@currency @subtotal</span>
+            <span id="discountDisplay" class="d-block mb-2" data-kt-pos-element="discount">@currency</span>
+            @* <span class="d-block mb-9" data-kt-pos-element="tax">GHC Ȼ @Tax</span> *@
+            <span id="grandTotalDisplay" class="d-block fs-2qx lh-1" data-kt-pos-element="grant-total">@currency</span>
+        </div>
+        <!--end::Content-->
+    </div>
+    <!--end::Summary-->
+}
+
+<script>
+    
+    // Self-contained partial script
+    function initializeCartSummary() {
+
+        const subTotalField = document.getElementById("subTotal");
+        const grandTotalField = document.getElementById("grandTotal");
+        const discountPercentField = document.getElementById("discountPercent");
+        const discountAmountField = document.getElementById("discountAmount");
+
+        const subtotalDisplay = document.getElementById("subtotalDisplay");
+        const discountDisplay = document.getElementById("discountDisplay");
+        const grandTotalDisplay = document.getElementById("grandTotalDisplay");
+
+        if (!subTotalField) return; // stop if partial empty
+
+        const currencySymbol = "@currency";
+        const formatMoney = value => parseFloat(value || 0).toFixed(2);
+
+        function updateTotals(source) {
+            let subtotal = parseFloat(subTotalField.value) || 0;
+            let discountPercent = parseFloat(discountPercentField.value) || 0;
+            let discountAmount = parseFloat(discountAmountField.value) || 0;
+
+            if (subtotal <= 0) return;
+
+            if (source === "percent") {
+                discountAmount = subtotal * (discountPercent / 100);
+                discountAmountField.value = formatMoney(discountAmount);
+            }
+            if (source === "amount") {
+                discountPercent = (discountAmount / subtotal) * 100;
+                discountPercentField.value = formatMoney(discountPercent);
+            }
+            if (discountAmount > subtotal) {
+                discountAmount = subtotal;
+                discountPercent = 100;
+                discountAmountField.value = formatMoney(discountAmount);
+                discountPercentField.value = formatMoney(discountPercent);
+            }
+
+            const grandTotal = subtotal - discountAmount;
+
+            // update hidden and visible
+            grandTotalField.value = formatMoney(grandTotal);
+            discountDisplay.textContent = `${currencySymbol} ${formatMoney(discountAmount)}`;
+            grandTotalDisplay.textContent = `${currencySymbol} ${formatMoney(grandTotal)}`;
+        }
+
+        // event bindings
+        discountPercentField.addEventListener("input", () => updateTotals("percent"));
+        discountAmountField.addEventListener("input", () => updateTotals("amount"));
+    };
+    
+</script>

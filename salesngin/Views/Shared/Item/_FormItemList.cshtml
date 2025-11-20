@@ -1,0 +1,181 @@
+﻿@model RequestViewModel
+@inject IDataControllerService _dataService
+@{
+    var settings = await _dataService.GetSettings();
+
+
+    <div class="table-responsive">
+        <style>
+            .table-grid {
+                display: grid;
+                gap: 20px;
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+
+                .table-grid .grid-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 5px;
+                    padding: 15px;
+                    /* background-color:white; */
+                }
+
+                    .table-grid .grid-item img {
+                        width: 100px;
+                        height: 100px;
+                    }
+
+                    .table-grid .grid-item .btn {
+                        margin-top: 2px;
+                    }
+
+                /* Hide the header row */
+                .table-grid thead {
+                    display: none;
+                }
+
+                .table-grid tbody {
+                    display: contents;
+                }
+
+                .table-grid td {
+                    display: block;
+                    width: 100%;
+                }
+
+            /* Apply zero padding to all td elements */
+            #productTable td {
+                padding: 0;
+            }
+        </style>
+        <table id="productTable" class="table table-grid background-transparent" style="padding:0 !important;">
+            <thead>
+                <tr class="d-none">
+                    <th>Image</th>
+                    <th>Code</th>
+                    <th>Category</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody class="">
+                @if (Model.StoreItems.Count > 0)
+                {
+                    int i = 0;
+                    foreach (Inventory product in Model.StoreItems)
+                    {
+                        i++;
+                        int storeQuantity = product.Quantity;
+                        <tr data-id="@product.Id" class="grid-item cursor-pointer bg-light rounded-3 ribbon ribbon-top mw-100 mh-100"
+                            data-productId="@product.Item?.Id"
+                            data-productPhoto="@product.Item?.ItemPhotoPath"
+                            data-productName="@product.Item?.ItemName"
+                            onclick="addProductToCart(@product.Item?.Id);">
+                            <td>
+                                <div class="ribbon-label bg-success fs-3 fw-semibold "> QTY : @storeQuantity </div>
+                                <img src="@Url.Content(product.Item?.ItemPhotoPath)" class="rounded-3 " alt="">
+                                <div class="separator separator-dashed border-primary my-2"></div>
+                            </td>
+                            <td><span class="fw-bold text-gray-800 fs-5">@product.Item?.ItemName</span></td>
+                            <td><span class="badge badge-light-primary fs-7 fw-semibold px-3 py-2 mt-1">@product.Item?.ItemCode</span></td>
+                            <td>
+                                <span class="text-gray-700 d-block fs-7 mt-1">@product.Item?.Category?.CategoryName</span>
+                            </td>
+                            <td>
+                                <span class="text-gray-700 d-block fs-7 mt-1 productQuantity">Qty. Avail. : @storeQuantity </span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="grid-item">
+                            <span></span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        $('.types-select').select2({ width: 'resolve' });
+        // Initialize DataTables
+        const table = $('#productTable').DataTable({
+            "paging": true, // Enable pagination
+            "pageLength": 10, // Set the default number of records per page
+            "searching": true, // Disable default searching to use custom search input
+            "info": false // Disable the info display at the bottom
+        });
+
+        // Function to handle search
+        function handleSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            console.log('Search term:', searchTerm);
+
+            table.search(searchTerm).draw();
+
+            if (table.rows({ search: 'applied' }).count() === 1) {
+                const row = table.row({ search: 'applied' }).node();
+                console.log(row);
+                // Use jQuery to access data attributes
+                const productId = $(row).data('productid');
+                const productName = $(row).data('productname');
+
+                // Example: Log the extracted data
+                console.log("Item ID:", productId);
+                console.log("Item Name:", productName);
+
+                //addProductToCart(productId);
+                addSearchItemToCart(productId, productName, orderTypeInputField.value);
+                searchInputField.value = ''; // Clear the search input
+                searchInputField.focus();
+                table.search('').draw(); // Clear the search results
+            }
+        }
+
+        // Add event listeners for the search input
+        document.getElementById('searchInput').addEventListener('keyup', handleSearch);
+        //document.getElementById('searchInput').addEventListener('change', handleSearch);
+        //document.getElementById('searchInput').addEventListener('paste', handleSearch);
+
+        // Function to clear the search box
+        function clearSearchBox() {
+            const searchBox = document.getElementById("searchInput");
+            searchBox.value = '';
+            searchBox.focus();
+            table.search('').draw();
+
+            //document.getElementById('searchInput').value = '';
+            //searchInputField.focus();
+        }
+
+        // Event listener for clear button
+        document.getElementById('btnClear').addEventListener('click', clearSearchBox);
+
+        function addSearchItemToCart(productId, productName) {
+            //validation result
+            validateSelectedProduct(productId, 1, function (result) {
+                if (result) {
+                    $.ajax({
+                        type: "GET",
+                        url: "@Url.Action("AddPartial", "Facility")",
+                        data: { id: productId },
+                        success: function (result) {
+                            console.log('Item added to cart : ', productName);
+                            searchInputField.value = ''; // Clear the search input
+                            searchInputField.focus();
+                            $("#divCartItemsDisplay").html(result);
+                        }
+                    });
+                }
+            });
+        }
+
+    });
+</script>

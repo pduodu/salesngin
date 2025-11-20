@@ -1,0 +1,93 @@
+﻿@model RoleViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Roles";
+    ViewData["MainMenu"] = "User Management";
+    ViewData["SubMenu"] = "";
+    ViewData["Page"] = "Roles";
+}
+
+<!--begin::Row-->
+<div class="row col-md-10 mx-auto row-cols-1 row-cols-md-2 row-cols-xl-3 g-5 g-xl-9">
+
+    @{
+        if (Model.Roles.Count() > 0)
+        {
+            foreach (var role in Model.Roles)
+            {
+                <!--begin::Col-->
+                <div class="col-md-4">
+                    <!--begin::Card-->
+                    <div class="card card-flush h-md-100">
+                        <!--begin::Card header-->
+                        <div class="card-header">
+                            <!--begin::Card title-->
+                            <div class="card-title">
+                                <h2>@role.RoleDisplayText</h2>
+                            </div>
+                            <!--end::Card title-->
+                        </div>
+                        <!--end::Card header-->
+                        <!--begin::Card body-->
+                        <div class="card-body pt-1">
+                            <!--begin::Users-->
+                            <div class="fw-bolder text-gray-600 mb-5">Total users with this role: 5</div>
+                            <!--end::Users-->
+                            <!--begin::Permissions-->
+                            <div class="d-flex flex-column text-gray-600">
+                                <div class="d-flex align-items-center py-2">
+                                    <span class="bullet bg-primary me-3"></span>@role.RoleDescription
+                                </div>
+                            </div>
+                            <!--end::Permissions-->
+                        </div>
+                        <!--end::Card body-->
+                        <!--begin::Card footer-->
+                        <div class="card-footer flex-wrap pt-0">
+                            <a href="#" class="btn btn-light btn-active-primary my-1 me-2">View Users</a>
+                            <a href="#" class="btn btn-light btn-active-primary my-1 me-2">View Permissions</a>
+                        </div>
+                        <!--end::Card footer-->
+                    </div>
+                    <!--end::Card-->
+                </div>
+                <!--end::Col-->
+            }
+        }
+        else
+        {
+            <!--begin::Add new card-->
+            <div class="ol-md-4">
+                <!--begin::Card-->
+                <div class="card h-md-100">
+                    <!--begin::Card body-->
+                    <div class="card-body d-flex flex-center">
+                        <!--begin::Button-->
+                        <span class="btn btn-clear d-flex flex-column flex-center">
+                            <!--begin::Illustration-->
+                            <img src="~/assets/media/illustrations/sketchy-1/4.png" alt="" class="mw-100 mh-150px mb-7">
+                            <!--end::Illustration-->
+                            <!--begin::Label-->
+                            <span class="fw-bolder fs-3 text-gray-600 text-hover-primary">Add New Role</span>
+                            <!--end::Label-->
+                        </span>
+                        <!--begin::Button-->
+                    </div>
+                    <!--begin::Card body-->
+                </div>
+                <!--begin::Card-->
+            </div>
+            <!--begin::Add new card-->
+        }
+    }
+
+</div>
+<!--end::Row-->
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.types-select').select2({ width: 'resolve' });
+            $('#tableRecords').DataTable();
+        });
+    </script>
+}

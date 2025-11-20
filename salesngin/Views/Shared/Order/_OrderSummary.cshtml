@@ -1,0 +1,123 @@
+﻿@model OrderViewModel
+@inject IDataControllerService _dataService
+@{
+    var settings = await _dataService.GetSettings();
+    string currency = settings.Currency;
+
+    //decimal? subtotal = Model.SubTotal;
+    decimal? subtotal = Model.OrderItems.Sum(x => x.TotalPrice);
+
+    //decimal? discount = Model.DiscountAmount;
+    //decimal? Tax = Model.TaxAmount;
+    decimal? grandTotal = subtotal;
+    //var AmtPaid = subtotal - grandTotal;
+
+}
+<input type="hidden" id="subTotal" value="@subtotal" />
+<input type="hidden" id="grandTotal" value="@grandTotal" />
+
+@* <div class="separator separator-dotted border-primary my-5"></div> *@
+<div class="d-flex flex-wrap gap-5 my-3">
+    <div class="fv-row w-100 flex-md-root">
+        <label class="form-label">Discount (%)</label>
+        <input id="discountPercent" type="number" class="form-control border-1 border-gray-500 mb-2" placeholder="0" />
+        @* <div class="text-muted fs-7">Set the product VAT about.</div> *@
+    </div>
+    <div class="fv-row w-100 flex-md-root">
+        <label class="form-label">Discount Amount (@currency)</label>
+        @* <input asp-for="DiscountAmount" type="number" class="form-control border-1 border-gray-500 mb-2" placeholder="0" /> *@
+        <input id="discountAmount" type="number" class="form-control border-1 border-gray-500 mb-2" placeholder="0" />
+        @* <div class="text-muted fs-7">Set the product VAT about.</div> *@
+    </div>
+</div>
+<!--begin::Summary-->
+<div class="d-flex flex-stack bg-light-success rounded-1 p-6 mb-11">
+    <!--begin::Content-->
+    <div class="fs-4 fw-bold text-success">
+        <span class="d-block lh-1 mb-5">Subtotal :</span>
+        <span class="d-block mb-5">Discount : </span>
+        @* <span class="d-block mb-9">Tax(12%)</span> *@
+        @if (Model.SalesStatus == "Partial Payment")
+        {
+            <span class="d-block mb-2">Amount Paid :</span>
+        }
+        <span class="d-block fs-2qx lh-1">Total :</span>
+    </div>
+    <!--end::Content-->
+    <!--begin::Content-->
+    <div class="fs-4 fw-bold text-success text-end">
+        <span id="subtotalDisplay" class="d-block lh-1 mb-5" data-kt-pos-element="total">@currency @subtotal</span>
+        <span id="discountDisplay" class="d-block mb-5" data-kt-pos-element="discount">@currency</span>
+        @* <span class="d-block mb-9" data-kt-pos-element="tax">GHC Ȼ @Tax</span> *@
+        @if (Model.SalesStatus == "Partial Payment")
+        {
+            var AmtPaid = subtotal - grandTotal;
+            <span id="paidAmountDisplay" class="d-block mb-3" data-kt-pos-element="discount">@currency @AmtPaid</span>
+        }
+        <span id="grandTotalDisplay" class="d-block fs-2qx lh-1" data-kt-pos-element="grant-total">@currency @grandTotal</span>
+    </div>
+    <!--end::Content-->
+</div>
+@*<div class="card card-dashed bg-light rounded-3 px-5 py-3 my-5">
+    <div class="table-responsive">
+        <table id="tblCartSummary" class="table align-middle gs-0 gy-1 my-0 fw-bold text-dark fs-6 w-100">
+            <thead>
+                <tr>
+                    <th class="min-w-150px"></th>
+                    <th class="min-w-150px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="">
+                    <td class="text-start">
+                        <span class="fs-4">Subtotal :</span>
+                    </td>
+                    <td class="text-end">
+                        <span class="fs-3">@settings.Currency @subtotal</span>
+                    </td>
+                </tr>
+                <tr class="">
+                    <td class="pe-0 text-start">
+                        <span class="">VAT Inclusive :</span>
+                    </td>
+                    <td class="text-end">
+                        <span class=""></span>
+                    </td>
+                </tr> 
+                @if (Model.SalesStatus == "Partial Payment")
+                {
+                    <tr class="">
+                        <td class="pe-0 text-start">
+                            <span class="fs-3 fw-bold">Amount Paid:</span>
+                        </td>
+                        <td class="text-end">
+                            <span class="fs-1 fw-bolder">@settings.Currency @AmtPaid </span>
+                        </td>
+                    </tr>
+                }
+
+                <tr class="">
+                    <td class="pe-0 text-start">
+                        <span class="fs-3 fw-bolder"> Total Amount:</span>
+                    </td>
+                    <td class="text-end">
+                        <span class="fs-1 fw-bolder">@settings.Currency @grandTotal</span>
+                    </td>
+                </tr>
+
+
+
+            </tbody>
+        </table>
+    </div>
+</div>*@
+
+<script>
+    // Format numbers to 2 decimal places
+    const formatMoney = (value) =>
+    {
+        return parseFloat(value || 0).toFixed(2);
+    };
+    
+
+</script>

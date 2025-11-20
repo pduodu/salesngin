@@ -1,0 +1,290 @@
+﻿@model ItemViewModel
+@inject IDataControllerService _dataService
+@inject UserManager<ApplicationUser> _userManager
+@{
+    ViewData["Title"] = "Operational Items";
+    ViewData["MainMenu"] = "Item Management";
+    //ViewData["SubMenu"] = "Products";
+    ViewData["Page"] = "Operational Items";
+    var settings = await _dataService.GetSettings();
+
+    //Use this to configure the dataTables toolbar
+    ViewBag.ToolBarDateFilter = false; //Table has a date column
+    ViewBag.ToolBarStatusFilter = true;//Table has a status filter column
+    ViewBag.ToolBarStatusFilterOptions = GlobalConstants.ItemStatuses;  //Status filter option items
+    ViewBag.ToolBarExportOptions = true;
+    int itemCount = Model.InventoryItems?.Count ?? 0;
+}
+
+
+<!--begin::Card-->
+<div class="card col-md-12 mx-auto mb-6 mb-xl-9">
+    <div class="card-header py-5">
+        <div class="card-title">
+            <h2 class="d-flex align-items-center">
+                Operational Items
+                <span class="text-gray-600 fs-6 ms-1">(@itemCount)</span>
+            </h2>
+        </div>
+        <div class="card-toolbar">
+            @{
+                if (Model.ModulePermission.Create)
+                {
+                    <a asp-controller="Items" asp-action="OperationalItem" class="btn btn-primary px-3 mx-2">
+                        <i class="ki-duotone ki-plus fs-2x">
+                        </i>
+                        <span class="">Add New Item</span>
+                    </a>
+                }
+
+                if (Model.ModulePermission.Configure)
+                {
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ItemsExcelImportModal">
+                        <i class="ki-duotone ki-file-up fs-2x">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        Excel Import
+                    </button>
+                    <div class="modal fade" tabindex="-1" id="ItemsExcelImportModal">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 class="modal-title">Excel Data Import</h3>
+                                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                                    </div>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <form asp-controller="Items" asp-action="ImportItems" enctype="multipart/form-data" method="post">
+                                        <div class="text-gray-600 fs-5 my-2">
+                                            Download
+                                            <a asp-controller="Product" asp-action="DownloadItemsTemplate" class="btn btn-light-primary py-1 px-2">
+                                                <i class="ki-duotone ki-file-down fs-2x">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                                Template
+                                            </a>, insert the data and upload below.
+                                        </div>
+                                        <div class="separator separator-dashed border-primary my-5"></div>
+                                        <div class="input-group">
+                                            <input asp-for="ExcelFile" type="file" class="form-control" aria-describedby="btnUploadExcel" aria-label="Upload">
+                                            <button id="btnUploadExcel" class="btn btn-primary" type="submit">Upload</button>
+                                        </div>
+                                    </form>
+
+                                </div>
+
+                                @*<div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                        </div> *@
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    @await Html.PartialAsync("_TableToolbar")
+    <div id="divTbPlaceholder" class="card-body py-4">
+        <div class="table-responsive">
+            <table class="table align-middle table-row-dashed table-hover fs-6 gy-3 gs-5" id="ItemRecordsTable">
+                <thead>
+                    <tr class="text-start text-gray-800 fw-bolder fs-7 text-uppercase gs-0">
+                        <th style="">Item code</th>
+                        <th style="">Item</th>
+                        @* <th style="">Tag</th> *@
+                        <th style="">Category</th>
+                        <th style="">Quantity Available</th>
+                        <th style="">Status</th>
+                        <th style=""></th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-900 fw-bold">
+                    @{
+                        if (itemCount > 0)
+                        {
+                            int i = 0;
+                            foreach (var item in Model.InventoryItems)
+                            {
+                                i++;
+                                <tr class="cursor-pointer" data-url="@Url.Action("ItemDetails", "Items", new { id = @item.Id })" onclick="navigateToRowLink(this);">
+                                    <td>
+                                        @{
+                                            if (Model.ModulePermission.Configure)
+                                            {
+                                                <a asp-controller="Items" asp-action="UpdateItem" asp-route-id="@item.Id">
+                                                    <div class="fw-semibold fs-5 text-primary badge badge-light-primary p-2">@item.Item?.ItemCode</div>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <div class="fw-semibold fs-5 text-primary badge badge-light-primary p-2">@item.Item?.ItemCode</div>
+                                            }
+                                        }
+                                       
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-5 position-relative">
+                                                @{
+                                                    if (Model.ModulePermission.Configure)
+                                                    {
+                                                        <a asp-controller="Items" asp-action="UpdateItem" asp-route-id="@item.Id">
+                                                            <div class="symbol symbol-35px symbol-circle">
+                                                                <img alt="@item.Item?.ItemName" src="@Url.Content(item.Item?.ItemPhotoPath)">
+                                                            </div>
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="symbol symbol-35px symbol-circle">
+                                                            <img alt="@item.Item?.ItemName" src="@Url.Content(item.Item?.ItemPhotoPath)">
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+                                            <div class="d-flex flex-column justify-content-center">
+                                                @{
+                                                    if (Model.ModulePermission.Configure)
+                                                    {
+                                                        <a asp-controller="Items" asp-action="UpdateItem" asp-route-id="@item.Id" class="text-gray-800 fs-5 text-hover-primary mb-1">@item.Item?.ItemName</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a href="#" class="text-gray-800 fs-5 text-hover-secondary mb-1">@item.Item?.ItemName</a>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                    @* <td><span class="text-gray-800 mb-1">@item.Tag</span></td> *@
+                                    <td style="">@item.Item?.Category?.CategoryName</td>
+                                    <td>
+                                        @item.UnitOfMeasurement.UnitDisplayWithQuantity(item.Quantity)
+                                    </td>
+                                    <td>
+                                        @{
+                                            // string originPage = "Inventory";
+                                            // var statusParameters = new { ItemId = @item.Item?.Id, ItemStatus = item.Item?.Status, ModulePermission = Model.ModulePermission, Origin = @originPage };
+                                            @await Html.PartialAsync("Inventory/_InventoryStatus", item.Status)
+                                        }
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <div style="text-align:center;">
+                                            @{
+                                                // if (Model.ModulePermission.Update)
+                                                // {
+                                                //     <a class="btn btn-light-primary btn-active-light-primary mx-2 p-3" asp-controller="Items" asp-action="UpdateItem" asp-route-id="@item.Id" data-toggle="tooltip" title="Edit">
+                                                //         <i class="ki-duotone ki-pencil fs-2x">
+                                                //             <i class="path1"></i>
+                                                //             <i class="path2"></i>
+                                                //         </i>
+                                                //     </a>
+                                                // }                                                
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="modal-update-status" tabindex="-1" class=" modal fade">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Update Item Status</h3>
+
+                <!--begin::Close-->
+                <div class="btn btn-icon btn-sm btn-active-light-danger ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+                <!--end::Close-->
+            </div>
+
+            <div id='modal-update-status-content'></div>
+
+        </div>
+    </div>
+</div>
+<!--end::Card-->
+@section Scripts {
+    @*<script src="~/assets/js/tableConfig.js"></script>*@
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            $('.types-select').select2({ width: 'resolve' });
+
+            KTUtil.onDOMContentLoaded(function () {
+                KTAppTableListing.init("ItemRecordsTable", "tbl_daterange_flatpickr",
+                    "searchInput", "tbl_status", [], "Date", "Status",
+                    "tbl_daterange_flatpickr_clear",
+                    "datatable_export_buttons", "datatable_table_export_menu");
+            });
+
+        });
+
+
+        function OpenProductStatusUpdateModal(id) {
+            var data = { id: id };
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: "@Url.Action("GetProductStatusUpdateModal", "Product")",
+                    contentType: 'application/json',
+                    data: data,
+                    success: function (result) {
+                        $('#modal-update-status-content').html(result);
+                        $('#modal-update-status').modal('show');
+                        $('.types-select').select2({
+                            width: 'resolve',
+                            dropdownParent: $("#modal-update-status")
+                        });
+                    },
+                    error: function (er) {
+                        alert(er);
+                    }
+                });
+        }
+
+        function GetTableData() {
+            //$("#div1").load('@Url.Content("~/")');
+            $.ajax({
+                type: 'GET',
+                cache: false,
+                url: '@Url.Action("GetEmployeesPartial", "Account")',
+                //data: { id: selectedOfficer },
+                success: function (response) {
+                    $("#divTbPlaceholder").empty();
+                    $("#divTbPlaceholder").html(response);
+                }
+            });
+        }
+
+        function navigateToRowLink(element)
+        {
+            var url = $(element).data('url');
+            console.log(url); // This should log the correct URL
+            if (url)
+            {
+                window.location.href = url;
+            }
+            
+            //const href = element.getAttribute("data-href");
+            //console.log(href);
+            //if (href)
+            //{
+            //    window.location.href = href;
+            //}
+        }
+    </script>
+}

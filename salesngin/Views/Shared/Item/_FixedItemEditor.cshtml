@@ -1,0 +1,231 @@
+﻿@model ItemViewModel
+@{
+    <div class="d-flex flex-column flex-lg-row ">
+        <div class="d-flex flex-column gap-7 gap-lg-10 w-100 w-lg-300px mb-7 me-lg-10">
+            <div class="card card-flush py-4">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h2>Item Photo</h2>
+                    </div>
+                </div>
+                <div class="card-body text-center pt-0">
+                    <div class="image-input image-input-outline" data-kt-image-input="true"
+                        style="background-image: url('@Url.Content(Model.ItemPhotoPath) ')">
+                        <div class="image-input-wrapper" src="defaultImage"
+                            style="background-image: url('@Url.Content(Model.ItemPhotoPath)'); width:150px !important; height:150px !important;">
+                        </div>
+                        <label class="btn btn-icon btn-circle btn-active-color-primary w-35px h-35px bg-body shadow"
+                            data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change Photo">
+                            <i class="ki-duotone ki-pencil fs-1"><span class="path1"></span><span class="path2"></span></i>
+                            <input type="file" asp-for="Photo" accept=".png, .jpg, .jpeg" />
+                            <input type="hidden" name="avatar_remove" />
+                        </label>
+                        <span class="btn btn-icon btn-circle btn-active-color-primary w-35px h-35px bg-body shadow"
+                            data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel Photo">
+                            <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                        </span>
+                    </div>
+                    <div class="text-muted fs-7">Set the Item thumbnail image. Only *.png, *.jpg and *.jpeg image files are
+                        accepted</div>
+                </div>
+            </div>
+            @* @{
+                if (ViewBag.ActionType == "UPDATE")
+                {
+                    <div class="card card-flush py-4">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h2>Item Status</h2>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            <select asp-for="@Model.Status" asp-items="Model.ItemStatuses" class="form-select"
+                                data-control="select2" data-hide-search="false" data-placeholder="Select Option"
+                                data-allow-clear="true">
+                                <option>Select Option...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                }
+            } *@
+        </div>
+
+        <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10">
+
+            <div class="card card-flush py-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+
+                            <label class="fs-5 fw-bold form-label"> </label>
+                            <div class="form-control fs-5">
+                                <label class="form-check form-switch form-check-custom form-check-solid">
+                                    <span class="form-check-label fs-5 fw-bold text-dark ">
+                                        Existing Item
+                                    </span>
+                                    <input class="form-check-input toggle-check-input mx-3" type="checkbox"
+                                        asp-for="IsNewItem" onchange="toggleItemType()">
+                                    <span class="form-check-label fs-5 fw-bold text-primary">
+                                        New Item
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card card-flush py-4" id="existingItemPlaceHolder" style="display:none;">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <label class="fs-6 fw-bold my-3">Select Item:</label>
+                            <div class="form-group pb-8">
+                                <select asp-for="ItemId"
+                                    class="form-control form-control-lg form-select border border-solid border-gray-400">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label fs-6 fw-semibold">Serial Number:</label>
+                            <input asp-for="@Model.SerialNumber" type="text" class="form-control mb-2"
+                                placeholder="Item Code" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fs-6 fw-semibold">Tag:</label>
+                            <input asp-for="@Model.Tag" type="text" class="form-control mb-2" placeholder="" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="newItemPlaceHolder" class="card card-flush py-4" style="display:none;">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h2>Item Details</h2>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="row mb-10">
+                        <div class="col">
+                            <label class="form-label fs-6 fw-semibold">Item Code:</label>
+                            <input asp-for="@Model.ItemCode" type="text" class="form-control mb-2"
+                                placeholder="Item Code" />
+                            @* <div class="text-muted fs-7">Item code should be unique.</div> *@
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Categories</label>
+                            <select asp-for="@Model.CategoryId"
+                                asp-items="@(new SelectList(Model.Categories, "Id", "CategoryName"))" class="form-select"
+                                data-control="select2" data-hide-search="false" data-placeholder="Select Option"
+                                data-allow-clear="true">
+                                <option value="0" selected>Select Option...</option>
+                            </select>
+                            @* <div class="text-muted fs-7">Add Item to a category.</div> *@
+                        </div>
+                    </div>
+                    <div class="mb-10 row">
+                        <div class="col-md-6">
+                            <label class="form-label fs-6 fw-semibold">Serial Number:</label>
+                            <input asp-for="@Model.SerialNumber" type="text" class="form-control mb-2"
+                                placeholder="Item Code" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fs-6 fw-semibold">Tag:</label>
+                            <input asp-for="@Model.Tag" type="text" class="form-control mb-2" placeholder="" />
+                        </div>
+                    </div>
+                    <div class="mb-10 fv-row">
+                        <label class="required form-label fs-6 fw-semibold">Item Name</label>
+                        <input asp-for="@Model.ItemName" type="text" class="form-control mb-2" placeholder="Item name" />
+                        @* <div class="text-muted fs-7">Item name is required and recommended to be unique.</div> *@
+                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                    </div>
+                    <div class="mb-10 fv-row">
+                        <label class="form-label fs-6 fw-semibold">Description</label>
+                        <textarea rows="3" asp-for="@Model.ItemDescription" type="" class="form-control mb-2" placeholder=""
+                            value=""></textarea>
+                        @* <div class="text-muted fs-7">Set a description to the Item.</div> *@
+                    </div>
+                </div>
+            </div>
+            <div class="card card-flush py-4">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h2>Inventory</h2>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="fv-row mb-5 mt-10" id="toggleStockManagementDiv">
+                        <div class="row mt-5 g-5">
+                            @{
+                                if (Model.InventoryItem == null)
+                                {
+                                    <div class="col">
+                                        <label class="form-label">Quantity Available</label>
+                                        <input asp-for="@Model.Quantity" type="number" class="form-control mb-2"
+                                            placeholder="Quantity" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col">
+                                        <label class="form-label">Quantity Available</label>
+                                        <label class="form-control form-control-solid mb-2"
+                                            placeholder="Quantity">@Model.Quantity</label>
+                                    </div>
+                                }
+                                <div class="col">
+                                    <label class="form-label">Unit of Measurement</label>
+                                    <select asp-for="@Model.UnitOfMeasurement"
+                                        asp-items="@(new SelectList(Model.UnitOfMeasurements, "CategoryName", "CategoryName"))"
+                                        class="form-select" data-control="select2" data-hide-search="false"
+                                        data-placeholder="Select Option" data-allow-clear="true">
+                                        <option value="0" selected>Select...</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label class="form-label">Restock Alert Quantity</label>
+                                    <input asp-for="@Model.RestockLevel" type="number" class="form-control mb-2"
+                                        placeholder="" />
+                                </div>
+                            }
+                            @*<div class="row g-5">
+                                    <div class="col">
+                                        <label class="form-label">Current Restock Level</label>
+                                        <label class="form-control form-control-solid mb-2" placeholder="Stock Alert">@Model.RestockLevel</label>
+                                    </div>
+                                </div>*@
+                        </div>
+                        <div class="row mt-5 g-5">
+                            <div class="col">
+                                <label class="form-label">Location</label>
+                                @* <select asp-for="@Model.LocationId"
+                                    asp-items="@(new SelectList(Model.Locations, "Id", "LocationName"))" class="form-select"
+                                    data-control="select2" data-hide-search="false" data-placeholder="Select Option"
+                                    data-allow-clear="true">
+                                    <option value="0" selected>Select...</option>
+                                </select> *@
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Condition</label>
+                                <select asp-for="@Model.Condition" asp-items="Model.FixedItemStatuses" class="form-select"
+                                    data-control="select2" data-hide-search="false" data-placeholder="Select Option"
+                                    data-allow-clear="true">
+                                    <option value="0" selected>Select...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-5 mt-5 fv-row">
+                            <label class="form-label fs-6 fw-semibold">Additional Notes</label>
+                            <textarea rows="3" asp-for="@Model.Notes" type="" class="form-control mb-2" placeholder=""
+                                value=""></textarea>
+                            <div class="text-muted fs-7">Add notes concerning this Item.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

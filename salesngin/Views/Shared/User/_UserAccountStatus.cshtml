@@ -1,0 +1,47 @@
+﻿@model dynamic
+
+@{
+    var i = Model.UserId;
+    if (Model.ModulePermission.Update)
+    {
+
+        string statusColor = Model.UserStatus == true ? "success" : "danger";
+        string statusName = Model.UserStatus == true ? @UserStatus.Active : @UserStatus.Inactive;
+        bool statusValue = Model.UserStatus == true ? false : true;
+
+        <div class="dropdown my-0">
+            <button id="btnUserStatus_@i" class="btn btn-light-@statusColor btn-active-light-@statusColor pulse pulse-@statusColor fs-6 fw-semibold dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                @statusName
+            </button>
+            <ul class="dropdown-menu fw-semibold w-250px py-2 fs-6">
+                <li class="menu-item px-3">
+                    @{
+                        string actionButtonText = Model.UserStatus == true ? @UserStatus.Inactive : @UserStatus.Active;
+                        string actionColor = Model.UserStatus == true ? "danger" : "success";
+                        string actionIcon = Model.UserStatus == true ? "ki-cross" : "ki-double-check";
+
+                        <form id="formUpdateUserStatus_@i" asp-controller="Account" asp-action="UpdateUserStatus" asp-route-id="@Model.UserId" asp-route-status="@statusValue" method="post">
+                            <button id="btnUpdateUserStatus_@i" type="submit" class="dropdown-item px-3 btn btn-active-light-@actionColor fw-semibold fs-6">
+                                <i class="ki-duotone @actionIcon text-@actionColor mx-2 fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>Make @actionButtonText
+                            </button>
+                        </form>
+                    }
+                </li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        if (Model.UserStatus == true)
+        {
+            <span class="badge badge-light-success fw-semibold fs-6 px-4 py-3">Active</span>
+        }
+        else
+        {
+            <span class="badge badge-light-danger fw-semibold fs-6 px-4 py-3">InActive</span>
+        }
+    }
+}

@@ -1,0 +1,154 @@
+﻿@model UserViewModel
+
+
+<div class="d-flex flex-column scroll-y me-n7 pe-7" id="kt_modal_update_role_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_role_header" data-kt-scroll-wrappers="#kt_modal_update_role_scroll" data-kt-scroll-offset="300px">
+    <div class="fv-row mb-10">
+        <label class="fs-5 fw-bolder form-label mb-2">
+            <span class="">Selected Role</span>
+        </label>
+        <input class="form-control" placeholder="" readonly="readonly" value="@Model.UserRole?.RoleDisplayText" />
+        <input type="hidden" asp-for="RoleName" value="@Model.UserRole?.Name" />
+    </div>
+    <!--end::Input group-->
+    <!--begin::Permissions-->
+    <div class="fv-row">
+        <label class="fs-5 fw-bolder form-label mb-2">Role Permissions</label>
+        <!--begin::Table wrapper-->
+        <div class="table-responsive">
+            <!--begin::Table-->
+            <table class="table align-middle table-row-dashed fs-6 gy-4">
+                <tr class="">
+                    <th style="min-width:300px;"></th>
+                    <th></th>
+                </tr>
+                <!--begin::Table body-->
+                <tbody class="text-gray-600 fw-bold">
+                    <!--begin::Table row-->
+                    <tr>
+                        <td class="text-gray-800">
+                            <span>Administrator Access</span>
+                            <i class="fas fa-exclamation-circle ms-1 fs-7" data-bs-toggle="tooltip" title="Allows a full access to the system"></i>
+                        </td>
+                        <td>
+                            <label class="form-check form-check-sm form-check-custom form-check-solid me-9">
+                                <input class="form-check-input" type="checkbox" value="" onclick="toggleCheckBox(this,'chkPer')" id="roles_select_all" />
+                                <span class="form-check-label" for="roles_select_all">Select all</span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-gray-800">
+                            <span>Select All</span>
+                            <i class="fas fa-exclamation-circle ms-1 fs-7" data-bs-toggle="tooltip" title="Allows access to the all actions of each module"></i>
+                        </td>
+                        <td>
+                            <div class="d-flex">
+                                <label class="form-check form-check-sm form-check-custom form-check-solid me-9">
+                                    <input class="form-check-input" type="checkbox" value="" onclick="toggleCheckBox(this,'chkPerCreate')" id="create_select_all" />
+                                    <span class="form-check-label" for="create_select_all">Create</span>
+                                </label>
+                                <label class="form-check form-check-sm form-check-custom form-check-solid me-9">
+                                    <input class="form-check-input" type="checkbox" value="" onclick="toggleCheckBox(this,'chkPerRead')" id="read_select_all" />
+                                    <span class="form-check-label" for="read_select_all">Read</span>
+                                </label>
+                                <label class="form-check form-check-sm form-check-custom form-check-solid me-9">
+                                    <input class="form-check-input" type="checkbox" value="" onclick="toggleCheckBox(this,'chkPerUpdate')" id="update_select_all" />
+                                    <span class="form-check-label" for="update_select_all">Update</span>
+                                </label>
+                                <label class="form-check form-check-sm form-check-custom form-check-solid me-9">
+                                    <input class="form-check-input" type="checkbox" value="" onclick="toggleCheckBox(this,'chkPerDelete')" id="delete_select_all" />
+                                    <span class="form-check-label" for="delete_select_all">Delete</span>
+                                </label>
+                                <label class="form-check form-check-sm form-check-custom form-check-solid me-9">
+                                    <input class="form-check-input" type="checkbox" value="" onclick="toggleCheckBox(this,'chkPerConfigure')" id="export_select_all" />
+                                    <span class="form-check-label" for="export_select_all">Export</span>
+                                </label>
+                                <label class="form-check form-check-sm form-check-custom form-check-solid me-9">
+                                    <input class="form-check-input" type="checkbox" value="" onclick="toggleCheckBox(this,'chkPerConfigure')" id="configure_select_all" />
+                                    <span class="form-check-label" for="configure_select_all">Configure</span>
+                                </label>
+                                <label class="form-check form-check-sm form-check-custom form-check-solid me-9">
+                                    <input class="form-check-input" type="checkbox" value="" onclick="toggleCheckBox(this,'chkPerApprove')" id="approve_select_all" />
+                                    <span class="form-check-label" for="approve_select_all">Approve</span>
+                                </label>
+                                <label class="form-check form-check-sm form-check-custom form-check-solid me-9">
+                                    <input class="form-check-input" type="checkbox" value="" onclick="toggleCheckBox(this,'chkPerApprove')" id="appoint_select_all" />
+                                    <span class="form-check-label" for="appoint_select_all">Appoint</span>
+                                </label>
+                                <label class="form-check form-check-sm form-check-custom form-check-solid me-9">
+                                    <input class="form-check-input" type="checkbox" value="" onclick="toggleCheckBox(this,'chkPerReport')" id="report_select_all" />
+                                    <span class="form-check-label" for="report_select_all">Report</span>
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                    <!--end::Table row-->
+                    <!--begin::Table row-->
+                    @{
+                        if (Model.RoleModulePermissions?.Count() > 0)
+                        {
+                            int modCount = Model.RoleModulePermissions.Count();
+                            for (int i = 0; i < modCount; i++)
+                            {
+                                <tr>
+                                    <td class="text-gray-800">@Model.RoleModulePermissions[i].Module.ModuleDisplay</td>
+                                    <td>
+                                        <!--begin::Wrapper Welcome123 -->
+                                        <div class="d-flex">
+                                            <input type="hidden" asp-for="RoleModulePermissions[i].ModuleId" />
+                                            <input type="hidden" asp-for="RoleModulePermissions[i].RoleId" />
+                                            <label class="form-check form-check-sm form-check-custom form-check-solid me-5 me-lg-20">
+                                                <input asp-for="RoleModulePermissions[i].Create" class="form-check-input chkPer chkPerCreate" onclick="roleClick(this);" type="checkbox" value="" />
+                                                <span class="form-check-label">Create</span>
+                                            </label>
+                                            <label class="form-check form-check-custom form-check-solid me-5 me-lg-20">
+                                                <input asp-for="RoleModulePermissions[i].Read" class="form-check-input chkPer chkPerRead" onclick="roleClick(this);" type="checkbox" value="" />
+                                                <span class="form-check-label">Read</span>
+                                            </label>
+                                            <label class="form-check form-check-custom form-check-solid me-5 me-lg-20">
+                                                <input asp-for="RoleModulePermissions[i].Update" class="form-check-input chkPer chkPerUpdate" onclick="roleClick(this);" type="checkbox" value="" />
+                                                <span class="form-check-label">Update</span>
+                                            </label>
+                                            <label class="form-check form-check-custom form-check-solid me-5 me-lg-20">
+                                                <input asp-for="RoleModulePermissions[i].Delete" class="form-check-input chkPer chkPerDelete" onclick="roleClick(this);" type="checkbox" value="" />
+                                                <span class="form-check-label">Delete</span>
+                                            </label>
+                                            <label class="form-check form-check-custom form-check-solid me-5 me-lg-20">
+                                                <input asp-for="RoleModulePermissions[i].Export" class="form-check-input chkPer chkPerExport" onclick="roleClick(this);" type="checkbox" value="" />
+                                                <span class="form-check-label">Export</span>
+                                            </label>
+                                            <label class="form-check form-check-custom form-check-solid me-5 me-lg-20">
+                                                <input asp-for="RoleModulePermissions[i].Configure" class="form-check-input chkPer chkPerConfigure" onclick="roleClick(this);" type="checkbox" value="" />
+                                                <span class="form-check-label">Configure</span>
+                                            </label>
+                                            <label class="form-check form-check-custom form-check-solid me-5 me-lg-20">
+                                                <input asp-for="RoleModulePermissions[i].Approve" class="form-check-input chkPer chkPerApprove" onclick="roleClick(this);" type="checkbox" value="" />
+                                                <span class="form-check-label">Approve</span>
+                                            </label>
+                                            <label class="form-check form-check-custom form-check-solid me-5 me-lg-20">
+                                                <input asp-for="RoleModulePermissions[i].Appoint" class="form-check-input chkPer chkPerAppoint" onclick="roleClick(this);" type="checkbox" value="" />
+                                                <span class="form-check-label">Appoint</span>
+                                            </label>
+                                            <label class="form-check form-check-custom form-check-solid me-5 me-lg-20">
+                                                <input asp-for="RoleModulePermissions[i].Report" class="form-check-input chkPer chkPerReport" onclick="roleClick(this);" type="checkbox" value="" />
+                                                <span class="form-check-label">Report</span>
+                                            </label>
+                                        </div>
+                                        <!--end::Wrapper-->
+                                    </td>
+                                    <!--end::Input group-->
+                                </tr>
+                            }
+                        }
+                    }
+
+                    <!--end::Table row-->
+                </tbody>
+                <!--end::Table body-->
+            </table>
+            <!--end::Table-->
+        </div>
+        <!--end::Table wrapper-->
+    </div>
+    <!--end::Permissions-->
+</div>

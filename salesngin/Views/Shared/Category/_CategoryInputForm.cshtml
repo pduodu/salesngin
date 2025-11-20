@@ -1,0 +1,76 @@
+﻿@model CategoryViewModel
+
+<form id="CategoryForm" asp-action="CategoryPost" asp-controller="Category" asp-route-id="@Model.Id" method="Post">
+    <input type="hidden" asp-for="@Model.Id" />
+    @{
+
+        bool showParentSelection = Model.OperationType == "Create" || (Model.OperationType == "Update" && !Model.IsParent);
+        @* bool showMarkAsParent = Model.OperationType == "Create" || (Model.OperationType == "Update" && !Model.IsParent); *@
+        bool isParentChecked = Model.IsParent;
+        bool isDeletable = Model.IsDeletable;
+
+
+        if (showParentSelection)
+        {
+            <div class="row mb-5">
+                <div class="col fv-row">
+                    <label class="fs-6 fw-bold mb-2">
+                        Select Base Parent Category<i class="fa fa-asterisk px-2 text-danger"></i>
+                    </label>
+                    <select asp-for="@Model.ParentId" asp-items="@(new SelectList(Model.CategoryParents, "Id", "CategoryName"))"
+                            class="form-select form-select-solid parent-options" data-control="select2" data-hide-search="false"
+                            data-placeholder="Select..." data-allow-clear="true">
+                        <option value="">Select...</option>
+                    </select>
+                </div>
+            </div>
+        }
+
+        @*Category Name Input for Update and SubCategories Input for Create*@
+        if (Model.OperationType == "Update")
+        {
+
+            <div class="row mb-5">
+                <div class="col fv-row mb-3">
+                    <label class="fs-6 fw-bold mb-2">Category Name<i class="fa fa-asterisk px-2 text-danger"></i></label>
+                    <input asp-for="@Model.CategoryName" class="form-control" placeholder="" type="text" />
+                    <span asp-validation-for="@Model.CategoryName" class="text-danger"></span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row mb-5">
+                <div class="col">
+                    <label asp-for="SubCategories" class="form-label fw-bold">Enter Category Name(s) </label>
+                    <input asp-for="SubCategories" class="form-control rounded-2 mb-3" />
+                    <small class="fs-7 bg-light p-3"> Enter comma-separated values or hit <kbd>Enter</kbd> to add.</small>
+                </div>
+            </div>
+        }
+
+        @* <div class="row mb-5">
+        <label class="form-label fw-semibold">Make Parent Category:</label>
+        <div class="form-check form-switch form-switch-sm form-check-custom">
+            <label class="form-check-label text-gray-400 mx-3 fw-bold ">No</label>
+            <input class="form-check-input " asp-for="@Model.IsParent" type="checkbox" />
+            <label class="form-check-label text-primary fw-bold ">Yes</label>
+        </div>
+    </div> *@
+
+        <div class="modal-footer">
+            <button id="btnSaveCategory"
+                    type="button"
+                    form="CategoryForm"
+                    class="btn btn-primary float-end fs-3"
+                    onclick="submitForm(this);">
+                <i class="ki-duotone ki-save-2 fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                Save
+            </button>
+        </div>
+    }
+
+</form>

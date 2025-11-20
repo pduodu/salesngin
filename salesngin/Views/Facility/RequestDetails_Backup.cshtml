@@ -1,0 +1,851 @@
+﻿@model RequestViewModel
+@inject UserManager<ApplicationUser> _userManager
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Request Details";
+    ViewData["MainMenu"] = "Facility Management";
+    ViewData["Page"] = "Request Details";
+
+    var currentDate = DateTime.UtcNow.Date.ToShortDateString();
+    var currentTime = DateTime.UtcNow.ToString("t");
+    var settings = await _dataService.GetSettings();
+    string statusColor = Model.Status switch
+    {
+        RequestStatus.New => "primary",
+        RequestStatus.Approved => "success",
+        RequestStatus.Delivered => "success",
+        RequestStatus.Cancelled => "danger",
+        _ => "light"
+    };
+}
+
+<div class="row g-5 g-xl-5 mb-5 mb-xl-10">
+    <!--begin::Col-->
+    <div class="col-xxl-4">
+
+        <div class="card card-flush h-md-100" dir="ltr">
+            <div class="card-header ribbon ribbon-top">
+                <div class="ribbon-label bg-light-@statusColor">
+                    @await Html.PartialAsync("Inventory/_RequestStatus", Model.Status)
+                </div>
+                <div class="card-title">
+                    <span class="card-label fw-bold text-gray-900">Request Details</span>
+                </div>
+            </div>
+            <div class="separator separator-dashed border-primary my-3"></div>
+            <div class="card-header">
+                <div class="card-toolbar">
+                    @{
+                        if (Model.Request?.Status == RequestStatus.Delivered)
+                        {
+                            <a asp-controller="Facility" asp-action="PrintRequest" asp-route-id="@Model.Id" class="btn btn-primary px-3 mx-2">
+                                <i class="ki-duotone ki-printer fs-2x">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                <span class="">Print Preview</span>
+                            </a>
+                        }
+
+                        if (Model.Request?.Status == RequestStatus.New)
+                        {
+                            if (Model.ModulePermission.Update)
+                            {
+                                <a asp-controller="Facility" asp-action="UpdateRequest" asp-route-id="@Model.Id" class="btn btn-primary mx-2">
+                                    <i class="ki-duotone ki-eraser fs-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                    Update
+                                </a>
+                            }
+
+                            if (Model.ModulePermission.Approve)
+                            {
+                                <form id="formApproveRequest" method="post" asp-controller="Facility" asp-action="RequestApproval" asp-route-id="@Model.Id" asp-route-rs="@RequestStatus.Approved">
+                                </form>
+                                <button type="submit" class="btn btn-success mx-2" data-bs-toggle="modal" data-bs-target="#commentModal">
+                                    <i class="ki-duotone ki-bookmark fs-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Approve
+                                </button>
+
+                                <button id="cancelButton" type="button" class="btn btn-danger mx-2" data-bs-toggle="modal" data-bs-target="#commentModal">
+                                    <i class="ki-duotone ki-abstract-11 fs-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Cancel
+                                </button>
+
+                                <div class="modal fade" tabindex="-1" id="commentModal">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title">Comment</h3>
+                                                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                                                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                                                </div>
+                                            </div>
+                                            <form id="formCancelRequest" method="post" asp-controller="Facility" asp-action="RequestApproval" asp-route-id="@Model.Id" asp-route-rs="@RequestStatus.Cancelled">
+
+                                                <div class="modal-body">
+
+                                                    <div class="mb-10 fv-row">
+                                                        <textarea rows="6" asp-for="@Model.SummaryRemarks" type="" class="form-control mb-2" placeholder="" value=""></textarea>
+                                                        <div class="text-muted fs-7">Add a comment for action selected.</div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" id="confirmModalBtn" class="btn btn-primary">Request</button>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+
+                        }
+                    }
+                </div>
+            </div>
+            <div class="separator separator-dashed border-primary my-3"></div>
+            <!--begin::Body-->
+            <div class="card-body d-flex flex-column">
+                <div class="mb-5">
+                    <span class="badge badge-light-info fs-5 fw-bold p-3">Request Number : @Model.Request?.RequestCode</span>
+                </div>
+                <div class="mb-5">
+
+                    <div class="d-flex flex-column flex-grow-1 pe-8">
+                        <div class="d-flex flex-wrap">
+                            <div class="border border-gray-400 border-dashed text-info rounded py-3 px-4 me-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="fs-5 fw-bold counted" data-kt-countup="true" data-kt-countup-value="4500" data-kt-countup-prefix="$" data-kt-initialized="1">
+                                        @Html.DisplayFor(modelItem => Model.Request.RequestDate)
+                                    </div>
+                                </div>
+                                <div class="fw-semibold fs-6 text-gray-900">Date Requested:</div>
+                            </div>
+                            <div class="border border-gray-400 border-dashed text-info rounded py-3 px-4 me-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="fs-5 fw-bold counted" data-kt-countup="true" data-kt-countup-value="@Model.RequestItems?.Count" data-kt-initialized="1">
+                                        @Model.RequestItems?.Count
+                                    </div>
+                                </div>
+                                <div class="fw-semibold fs-6 text-gray-900">Request Items : </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="mb-5">
+                    <span class="fw-bold fs-6 mb-2">Purpose:</span>
+                    <p class="border border-gray-400 border-dashed rounded p-2">@Model.Purpose</p>
+                </div>
+
+                <div class="timeline timeline-border-dashed">
+                    <!--begin::Timeline item-->
+                    <div class="timeline-item">
+                        <!--begin::Timeline line-->
+                        <div class="timeline-line"></div>
+                        <!--end::Timeline line-->
+                        <!--begin::Timeline icon-->
+                        <div class="timeline-icon">
+                            <i class="ki-duotone ki-message-text-2 fs-2x text-primary">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                        </div>
+                        <!--end::Timeline icon-->
+                        <!--begin::Timeline content-->
+                        <div class="timeline-content mb-10 mt-n1">
+                            <!--begin::Timeline heading-->
+                            <div class="pe-3 mb-1">
+                                <!--begin::Title-->
+                                <div class="fs-5 fw-semibold mb-2">Items Requested By:</div>
+                                <!--end::Title-->
+                                <!--begin::Description-->
+                                @*<div class="d-flex align-items-center mt-1 fs-6">
+                                    <!--begin::Info-->
+                                    <div class="text-muted me-2 fs-7">Added at 4:23 PM </div>
+                                    <!--end::Info-->
+                                    <!--begin::User-->
+                                 <div class="symbol symbol-circle symbol-25px" data-bs-toggle="tooltip" data-bs-boundary="window" data-bs-placement="top" aria-label="Nina Nilson" data-bs-original-title="Nina Nilson" data-kt-initialized="1">
+                                        <img src="/metronic8/demo1/assets/media/avatars/300-14.jpg" alt="img">
+                                    </div> 
+                                    <!--end::User-->
+                                </div>*@
+                                <!--end::Description-->
+                            </div>
+                            <!--end::Timeline heading-->
+                            <!--begin::Timeline details-->
+                            <div class="overflow-auto pb-5">
+                                <!--begin::Record-->
+                                @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Request?.RequestedBy)
+                                <!--end::Record-->
+                            </div>
+                            <!--end::Timeline details-->
+                        </div>
+                        <!--end::Timeline content-->
+                    </div>
+                    <!--end::Timeline item-->
+                    <!--begin::Timeline item-->
+                    <div class="timeline-item">
+                        <!--begin::Timeline line-->
+                        <div class="timeline-line"></div>
+                        <!--end::Timeline line-->
+                        <!--begin::Timeline icon-->
+                        <div class="timeline-icon me-4">
+                            <i class="ki-duotone ki-flag fs-2 text-gray-500"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        <!--end::Timeline icon-->
+                        <!--begin::Timeline content-->
+                        <div class="timeline-content mb-10 mt-n2">
+                            <!--begin::Timeline heading-->
+                            <div class="overflow-auto pe-3">
+                                <!--begin::Title-->
+                                <div class="fs-5 fw-semibold mb-2">Invitation for crafting engaging designs that speak human workshop</div>
+                                <!--end::Title-->
+                                <!--begin::Description-->
+                                <div class="d-flex align-items-center mt-1 fs-6">
+                                    <!--begin::Info-->
+                                    <div class="text-muted me-2 fs-7">Sent at 4:23 PM by</div>
+                                    <!--end::Info-->
+                                    <!--begin::User-->
+                                    <div class="symbol symbol-circle symbol-25px" data-bs-toggle="tooltip" data-bs-boundary="window" data-bs-placement="top" aria-label="Alan Nilson" data-bs-original-title="Alan Nilson" data-kt-initialized="1">
+                                        <img src="/metronic8/demo1/assets/media/avatars/300-1.jpg" alt="img">
+                                    </div>
+                                    <!--end::User-->
+                                </div>
+                                <!--end::Description-->
+                            </div>
+                            <!--end::Timeline heading-->
+                        </div>
+                        <!--end::Timeline content-->
+                    </div>
+                    <!--end::Timeline item-->
+                </div>
+
+                <div class="timeline mb-10">
+                    <!--begin::Timeline item-->
+                    <div class="timeline-item align-items-center mb-7">
+                        <!--begin::Timeline line-->
+                        <div class="timeline-line mt-1 mb-n6 mb-sm-n7"></div>
+                        <!--end::Timeline line-->
+                        <!--begin::Timeline icon-->
+                        <div class="timeline-icon">
+                            <i class="ki-duotone ki-cd fs-2 text-primary"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        <!--end::Timeline icon-->
+                        <!--begin::Timeline content-->
+                        <div class="timeline-content m-0">
+                            <!--begin::Title-->
+                            <span class="fs-6 text-gray-500 fw-semibold d-block">Items Requested By</span>
+                            <!--end::Title-->
+                            <!--begin::Title-->
+                            <span class="fs-6 fw-bold text-gray-800">@await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Request?.RequestedBy)</span>
+                            <!--end::Title-->
+                        </div>
+                        <!--end::Timeline content-->
+                    </div>
+                    <!--end::Timeline item-->
+                    <!--begin::Timeline item-->
+                    <div class="timeline-item align-items-center">
+                        <!--begin::Timeline line-->
+                        <div class="timeline-line"></div>
+                        <!--end::Timeline line-->
+                        <!--begin::Timeline icon-->
+                        <div class="timeline-icon">
+                            <i class="ki-duotone ki-geolocation fs-2 text-success"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        <!--end::Timeline icon-->
+                        <!--begin::Timeline content-->
+                        <div class="timeline-content m-0">
+                            <!--begin::Title-->
+                            <span class="fs-6 text-gray-500 fw-semibold d-block">27 Drydock Boston</span>
+                            <!--end::Title-->
+                            <!--begin::Title-->
+                            <span class="fs-6 fw-bold text-gray-800">@await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Request?.RequestedBy)</span>
+                            <!--end::Title-->
+                        </div>
+                        <!--end::Timeline content-->
+                    </div>
+                    <!--end::Timeline item-->
+                </div>
+
+                @{
+                    if (Model.Request?.RequestedBy != null)
+                    {
+                        <div class="mb-5">
+                            <span class="fw-bold fs-6 mb-2">Items Requested By:</span>
+                            @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Request?.RequestedBy)
+                        </div>
+                    }
+
+                    if (Model.Request?.ApprovedBy != null)
+                    {
+                        <div class="mb-5">
+                            <span class="fw-bold fs-6 ">Approved By:</span>
+                            @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Request?.ApprovedBy)
+                        </div>
+                    }
+
+                    if (Model.ReceivedBy != null)
+                    {
+                        <div class="mb-5">
+                            <span class="fw-bold fs-6 ">Received By:</span>
+                            @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.ReceivedBy)
+                        </div>
+                    }
+
+                    if (Model.Request?.SuppliedBy != null)
+                    {
+                        <div class="mb-5">
+                            <span class="fw-bold fs-6 ">Supplied By:</span>
+                            @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Request?.SuppliedBy)
+                        </div>
+                    }
+                }
+
+            </div>
+            <!--end::Body-->
+        </div>
+
+    </div>
+    <!--end::Col-->
+    <!--begin::Col-->
+    <div class="col-xxl-8">
+
+        <div class="card card-flush overflow-hidden h-md-100">
+            <div class="card-header">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold text-gray-900">Requested Items</span>
+                    <span class="text-gray-500 mt-1 fw-semibold fs-6">(@Model.RequestItems?.Count) items on list.</span>
+                </h3>
+                <div class="card-toolbar">
+                    @{
+                        if (Model.Status == RequestStatus.Approved || Model.Status == RequestStatus.Delivered)
+                        {
+                            <button id="deliveryButton" type="button" class="btn btn-light-primary mx-2" data-bs-toggle="modal" data-bs-target="#deliveryModal">
+                                <i class="ki-duotone ki-courier fs-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                Delivery
+                            </button>
+                            <div class="modal fade" tabindex="-1" id="deliveryModal">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3 class="modal-title">Delivery</h3>
+                                            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                                                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                                            </div>
+                                        </div>
+                                        <form id="formDeliverRequest" method="post" asp-controller="Facility" asp-action="RequestDelivery" asp-route-id="@Model.Id">
+
+                                            <div class="modal-body">
+                                                <div class="mb-5">
+                                                    <label class="fs-4 fw-bold mb-2">Delivered By</label>
+                                                    <div class="input-group mb-5 input-group-solid flex-nowrap">
+                                                        <span class="input-group-text p-3">
+                                                            <i class="ki-duotone ki-user fs-2 me-2 text-primary">
+                                                                <span class="path1"></span>
+                                                                <span class="path2"></span>
+                                                            </i>
+                                                        </span>
+                                                        <div class="overflow-hidden flex-grow-1">
+                                                            <select asp-for="@Model.SuppliedById" asp-items="@(new SelectList(Model.Users,"Id","FullName"))"
+                                                                    onchange="getStaffForRole(this);"
+                                                                    class="form-select form-select-solid rounded-start-0 border-start"
+                                                                    data-control="select2"
+                                                                    data-hide-search="false"
+                                                                    data-placeholder="Select Staff"
+                                                                    data-allow-clear="true"
+                                                                    data-role="delivery">
+                                                                <option value="">Select Staff...</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="separator separator-dashed border-secondary my-3"></div>
+                                                <div id="divDeliveryStaffDisplay" class="my-5"></div>
+                                                <div class="mb-5">
+                                                    <label class="fs-4 fw-bold mb-2">Received By</label>
+                                                    <div class="input-group mb-5 input-group-solid flex-nowrap">
+                                                        <span class="input-group-text p-3">
+                                                            <i class="ki-duotone ki-user fs-2 me-2 text-primary">
+                                                                <span class="path1"></span>
+                                                                <span class="path2"></span>
+                                                            </i>
+                                                        </span>
+                                                        <div class="overflow-hidden flex-grow-1">
+                                                            <select asp-for="@Model.ReceivedById" asp-items="@(new SelectList(Model.Users,"Id","FullName"))"
+                                                                    onchange="getStaffForRole(this);"
+                                                                    class="form-select form-select-solid rounded-start-0 border-start"
+                                                                    data-control="select2"
+                                                                    data-hide-search="false"
+                                                                    data-placeholder="Select Staff"
+                                                                    data-allow-clear="true"
+                                                                    data-role="receiving">
+                                                                <option value="">Select Staff...</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="separator separator-dashed border-secondary my-3"></div>
+                                                <div id="divReceivingStaffDisplay" class="my-5"></div>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Save</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    <a asp-controller="Facility" asp-action="Requests" class="btn btn-icon btn-primary me-3">
+                        <i class="ki-duotone ki-left fs-1">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </a>
+                </div>
+            </div>
+            <div class="separator separator-dashed border-primary my-3"></div>
+            <div>
+            </div>
+            @await Html.PartialAsync("_TableToolbar")
+            <div id="divTbPlaceholder" class="card-body pt-4">
+                <div class="table-responsive">
+                    <table class="table align-middle table-row-dashed fs-6 gy-3 gs-3" id="requestItemsRecords">
+                        <thead>
+                            <tr class="text-start text-gray-800 fw-bolder fs-7 text-uppercase gs-0">
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Remarks</th>
+                                <th>Status</th>
+                                @*<th>Date</th>*@
+                                <th class="text-end"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-600 fw-semibold">
+
+                            @{
+                                if (Model.RequestItems.Count > 0)
+                                {
+                                    int i = 0;
+                                    foreach (var product in Model.RequestItems)
+                                    {
+                                        i++;
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-5 position-relative">
+                                                        @{
+                                                            if (Model.ModulePermission.Configure)
+                                                            {
+                                                                <a asp-controller="Facility" asp-action="ItemDetails" asp-route-id="@product.Item?.Id">
+                                                                    <div class="symbol symbol-40px symbol-circle">
+                                                                        <img alt="@product.Item?.ItemName" src="@Url.Content(product.Item?.ItemPhotoPath)">
+                                                                    </div>
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="symbol symbol-40px symbol-circle">
+                                                                    <img alt="@product.Item?.ItemName" src="@Url.Content(product.Item?.ItemPhotoPath)">
+                                                                </div>
+                                                            }
+                                                        }
+                                                    </div>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        @{
+                                                            if (Model.ModulePermission.Configure)
+                                                            {
+                                                                <a asp-controller="Facility" asp-action="ItemDetails" asp-route-id="@product.Item?.Id" class="text-gray-800 text-hover-primary mb-1">@product.Item?.ItemName</a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a href="#" class="text-gray-800 text-hover-secondary mb-1">@product.Item?.ItemCode</a>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge badge-light-primary fs-5 fw-bold px-3 py-3">@product.Quantity</span></td>
+                                            <td><span class="fs-7">@product.Remarks</span></td>
+                                            <td>
+                                                @await Html.PartialAsync("Inventory/_RequestStatus", product.Status)
+                                            </td>
+                                            @* <td>@Html.DisplayFor(modelItem => product.DateCreated)</td> *@
+                                            <td class="text-end">
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer pt-5">
+                <div class="d-flex flex-wrap mb-4">
+                    <p class="fw-bold text-dark fs-6">Remarks: </p><br>
+                    <span class="fs-7 text-gray-600"> @Html.Raw(Model.Remarks)</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!--end::Col-->
+</div>
+
+<div class="card mb-6 mb-xl-9">
+    <div class="card-body pt-9 pb-0">
+        <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
+
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center mb-1">
+                            <a href="#" class="text-gray-800 text-hover-primary fs-2 fw-bold me-3">Request # @Model.Request?.RequestCode</a>
+                            @{
+                                // if (Model.Request?.Status == PurchaseStatus.Pending)
+                                // {
+                                //     <span class="badge badge-light-primary me-auto fs-5 py-3">@Model.Stock?.Status</span>
+                                // }
+                                // else if (Model.Request?.Status == PurchaseStatus.Received)
+                                // {
+                                //     <span class="badge badge-light-success me-auto fs-5 py-3">@Model.Stock?.Status</span>
+                                // }
+                                // else if (Model.Request?.Status == PurchaseStatus.Cancelled)
+                                // {
+                                //     <span class="badge badge-light-danger me-auto fs-5 py-3">@Model.Stock?.Status</span>
+                                // }
+                                // else
+                                // {
+                                //     <span class="badge badge-light-primary me-auto">...</span>
+                                // }
+
+                                @await Html.PartialAsync("Inventory/_RequestStatus", Model.Status)
+
+                            }
+                        </div>
+                        <div class="d-flex flex-wrap my-4 fs-5">
+                            <p class="fw-semibold text-dark">Purpose: </p>
+                            <span class="text-gray-800 mx-3">@Model.Purpose</span>
+                        </div>
+                    </div>
+                    <div class="d-flex my-4">
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap flex-stack">
+
+                    <div class="d-flex justify-content-between">
+                        @{
+                            if (Model.Request?.RequestedBy != null)
+                            {
+                                <div class="d-flex align-items-center flex-column mt-3 mx-2">
+                                    <span class="fw-semibold fs-6 text-gray-500">Requested By:</span>
+                                    @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Request?.RequestedBy)
+                                </div>
+                            }
+
+                            if (Model.Request?.ApprovedBy != null)
+                            {
+                                <div class="d-flex align-items-center flex-column mt-3 mx-2">
+                                    <span class="fw-semibold fs-6 text-gray-500">Approved By:</span>
+                                    @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Request?.ApprovedBy)
+                                </div>
+                            }
+
+                            if (Model.ReceivedBy != null)
+                            {
+                                <div class="d-flex align-items-center flex-column mt-3 mx-2">
+                                    <span class="fw-semibold fs-6 text-gray-500">Received By:</span>
+                                    @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.ReceivedBy)
+                                </div>
+                            }
+
+                            if (Model.Request?.SuppliedBy != null)
+                            {
+                                <div class="d-flex align-items-center flex-column mt-3 mx-2">
+                                    <span class="fw-semibold fs-6 text-gray-500">Supplied By:</span>
+                                    @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Request?.SuppliedBy)
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="card col-md-12 mx-auto mb-6 mb-xl-9">
+    <div class="card-header">
+        <div class="card-title d-flex align-items-center justify-content-between">
+            <div class="flex-grow-1">
+                <h2 class="d-flex align-items-center">
+                    Requested Items
+                    <span class="text-gray-600 fs-6 ms-1">(@Model.RequestItems?.Count)</span>
+                </h2>
+            </div>
+
+        </div>
+
+
+
+        <div class="card-toolbar">
+        </div>
+    </div>
+
+
+</div>
+
+
+<!-- modal placeholders-->
+<div id="modal-add" tabindex="-1" class=" modal fade">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+
+            <div id='modal-add-content'></div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            $('.types-select').select2({ width: 'resolve' });
+
+            // $("#searchInput").keyup(function () {
+            //     loadProducts();
+            // });
+
+             const commentModal = document.getElementById('commentModal');
+             const confirmBtn = document.getElementById('confirmModalBtn');
+
+             commentModal.addEventListener('show.bs.modal', function (event) {
+                 const button = event.relatedTarget; // Button that triggered the modal
+                 const actionText = button.textContent.trim(); // Get button text (e.g., "Approve")
+             
+                 // Set the text inside the modal
+                 //document.getElementById('modalActionText').textContent = `You selected: ${actionText}`;
+
+                 // Set text to button inside the modal
+                 confirmBtn.textContent = `${actionText} Request`;
+             });
+
+            scrollToBottom();
+
+            document.getElementById("btnPrintSalesReceipt").addEventListener("click", function () {
+                printJS({
+                    printable: "sectionToPrint", // ID of the div to print
+                    type: "html", // Type of content: "html", "image", or "pdf"
+                    documentTitle: "Sales Receipt", // Title for the print document
+                    //css: "/lib/pint.js/css/print.min.css",
+                    //css: ["/css/site.css", "/assets/css/style.bundle.css"]
+                    css: ["/assets/plugins/global/plugins.bundle.css", "/assets/css/style.bundle.css", "/lib/pint.js/css/print.min.css",]
+                });
+            });
+
+            KTUtil.onDOMContentLoaded(function () {
+                KTAppTableListing.init("requestItemsRecords", "tbl_daterange_flatpickr",
+                    "searchInput", "tbl_status", [2,], "Date", "Status",
+                    "tbl_daterange_flatpickr_clear",
+                    "datatable_export_buttons", "datatable_table_export_menu");
+            });
+
+        });
+
+
+        function initializeDataTables() {
+
+            KTUtil.onDOMContentLoaded(function () {
+                KTAppTableListing.init("requestItemsRecords", "tbl_daterange_flatpickr",
+                    "searchInput", "tbl_status", [2,], "Date", "Status",
+                    "tbl_daterange_flatpickr_clear",
+                    "datatable_export_buttons", "datatable_table_export_menu");
+            });
+
+        }
+
+
+        // $(function () {
+        //     //submit event handler to the form
+        //     $("#addCommentForm").submit(function (e) {
+        //         e.preventDefault(); // Prevent the default form submission.
+
+        //         // Serialize form data
+        //         var formData = $(this).serialize();
+
+        //         // Use AJAX to send the serialized data to the server
+        //         $.ajax({
+        //             type: "POST",
+        //             url: $(this).attr("action"), // Use the form's action attribute
+        //             data: formData, // Send serialized form data
+        //             success: function (data) {
+        //                 // Handle the success response
+        //                 $("#div_chat_container").html(data);
+        //                 $("#Comment").html("");
+        //                 scrollToBottom();
+        //             },
+        //             error: function () {
+        //                 // Handle errors, if any
+        //             }
+        //         });
+        //     });
+        // });
+
+        //Get staff details
+        function getSelectedStaff(selectedValue, displaybox) {
+            if (selectedValue) {
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("GetStaffPartial", "Facility")',
+                    contentType: 'application/json;',
+                    data: { id: selectedValue },
+                    success: function (response) {
+                        $(displaybox).html(response);
+                        initializeSelect2();
+                        //initializeDataTables();
+                    },
+                    error: function (er) {
+                        console.error('Error fetching staff details:', error);
+                    }
+                });
+            }
+        }
+
+        // Get staff for a specific role
+        function getStaffForRole(selectElement) {
+            const selectedValue = selectElement.value;
+            const role = selectElement.getAttribute('data-role');
+            if (selectedValue) {
+                let displayBox;
+                if (role === 'delivery') {
+                    displayBox = '#divDeliveryStaffDisplay';
+                } else if (role === 'receiving') {
+                    displayBox = '#divReceivingStaffDisplay';
+                } else {
+                    console.error('Unknown role:', role);
+                    return;
+                }
+                getSelectedStaff(selectedValue, displayBox);
+            }
+        }
+
+        // Scroll to the bottom of the div
+        function scrollToBottom() {
+            var chatBox = document.getElementById("div_chat_container");
+            chatBox.scrollTop = parseInt(chatBox.scrollHeight);
+        }
+
+        // Scroll to the top of div
+        function scrollToTop() {
+            var chatBox = document.getElementById("div_chat_container");
+            chatBox.scrollTop = 0;
+        }
+
+        function OpenUpdateOrderQuantityModal(id) {
+            var data = { id: id };
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: '@Url.Action("GetUpdateOrderQuantityModal", "Order")',
+                    contentType: 'application/json; charset=utf=8',
+                    data: data,
+                    success: function (result) {
+                        $('#modal-add-content').html(result);
+                        $('#modal-add').modal('show');
+                        $('.types-select').select2({
+                            width: 'resolve',
+                            dropdownParent: $("#modal-add")
+                        });
+                    },
+                    error: function (er) {
+                        alert(er);
+                    }
+                });
+        }
+
+
+
+        const Options = document.getElementsByClassName('mb-10 fv-row');
+        const FormOptions = document.getElementsByClassName('form-check-input');
+
+
+
+        var handleCash = function () {
+            // Show
+            if (FormOptions) {
+                FormOptions[0].addEventListener('click', function () {
+                    Options[0].classList.remove('d-none');
+                    Options[1].classList.add('d-none');
+                    Options[2].classList.add('d-none');
+                });
+            }
+        }
+
+        var handleCard = function () {
+            // Show
+            if (FormOptions) {
+                FormOptions[1].addEventListener('click', function () {
+                    Options[1].classList.remove('d-none');
+                    Options[0].classList.add('d-none');
+                    Options[2].classList.add('d-none');
+                });
+            }
+        }
+
+        var handleEWallet = function () {
+            // Show
+            if (FormOptions) {
+                FormOptions[2].addEventListener('click', function () {
+                    Options[2].classList.remove('d-none');
+                    Options[1].classList.add('d-none');
+                    Options[0].classList.add('d-none');
+                });
+            }
+        }
+
+        // On document ready
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", function () {
+                handleCash();
+                handleCard();
+                handleEWallet();
+            });
+        }
+        else {
+            handleCash();
+            handleCard();
+            handleEWallet();
+
+
+        }
+
+    </script>
+}

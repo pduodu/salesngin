@@ -1,0 +1,50 @@
+﻿@model ItemViewModel
+@{
+    <div class="card card-flush py-4">
+        <div class="card-header">
+            <div class="card-title">
+                <h2>Item Details</h2>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            <div class="row mb-10">
+                <div class="col">
+                    <label class="form-label fs-6 fw-semibold">Item Code:</label>
+                    <input asp-for="@Model.ItemCode" type="text" class="form-control mb-2" placeholder="eg. GFI02XXX" />
+                </div>
+                <div class="col">
+                    <label class="form-label">Categories</label>
+                    <select asp-for="@Model.CategoryId"
+                        asp-items="@(new SelectList(Model.Categories, "Id", "CategoryName"))" class="form-select"
+                        data-control="select2" data-hide-search="false" data-placeholder="Select Option"
+                        data-allow-clear="true">
+                        <option value="0" selected>Select Option...</option>
+                    </select>
+                    @* <div class="text-muted fs-7">Add Item to a category.</div> *@
+                </div>
+            </div>
+            <div class="mb-10 row">
+                <div class="col-md-6">
+                    <label class="form-label fs-6 fw-semibold">Serial Number:</label>
+                    <input asp-for="@Model.SerialNumber" type="text" class="form-control mb-2" placeholder="" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fs-6 fw-semibold">Tag:</label>
+                    <input asp-for="@Model.Tag" type="text" class="form-control mb-2" placeholder="" />
+                </div>
+            </div>
+            <div class="mb-10 fv-row">
+                <label class="required form-label fs-6 fw-semibold">Item Name</label>
+                <input asp-for="@Model.ItemName" type="text" class="form-control mb-2" placeholder="" />
+                @* <div class="text-muted fs-7">Item name is required and recommended to be unique.</div> *@
+                <div class="fv-plugins-message-container invalid-feedback"></div>
+            </div>
+            <div class="mb-10 fv-row">
+                <label class="form-label fs-6 fw-semibold">Description</label>
+                <textarea rows="3" asp-for="@Model.ItemDescription" type="" class="form-control mb-2" placeholder=""
+                    value=""></textarea>
+                <div class="text-muted fs-7">Short description of the Item.</div>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,52 @@
+﻿@model dynamic
+
+@{
+    var i = Model.ItemId;
+    if (Model.ModulePermission.Update)
+    {
+
+        var statusColor = Model.ItemStatus == ProductStatus.Available ? "success" : "danger";
+        var statusName = Model.ItemStatus == ProductStatus.Available ? ProductStatus.Available : ProductStatus.Unavailable;
+        var statusValue = Model.ItemStatus == ProductStatus.Available ? ProductStatus.Unavailable : ProductStatus.Available;
+
+        <div class="dropdown">
+            <button id="btnItemStatus_@i" class="btn btn-light-@statusColor btn-active-light-@statusColor pulse pulse-@statusColor fs-6 fw-semibold dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                @statusName
+            </button>
+            <ul class="dropdown-menu fw-semibold w-250px py-2 fs-6">
+                <li class="menu-item px-3">
+                    @{
+                        var actionButtonText = Model.ItemStatus == ProductStatus.Available ? ProductStatus.Unavailable : ProductStatus.Available;
+                        var actionButtonColor = Model.ItemStatus == ProductStatus.Unavailable ? "success" : "danger";
+                        <form id="updateStatusForm_@i"
+                              asp-controller="Product"
+                              asp-action="UpdateItemStatus"
+                              asp-route-id="@Model.ItemId"
+                              asp-route-status="@statusValue"
+                              asp-route-origin="@Model.Origin"
+                              method="post">
+                            @Html.AntiForgeryToken()
+                            <button id="btnUpdateItemStatus_@i" type="submit" class="dropdown-item px-3 btn btn-active-light-@actionButtonColor fw-semibold fs-6">
+                                <i class="ki-duotone ki-double-check text-@actionButtonColor mx-2 fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>Item @actionButtonText
+                            </button>
+                        </form>
+                    }
+                </li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        if (Model.ItemStatus == ProductStatus.Available)
+        {
+            <span class="badge badge-light-success fw-semibold fs-6 px-4 py-3">@ProductStatus.Available</span>
+        }
+        else
+        {
+            <span class="badge badge-light-danger fw-semibold fs-6 px-4 py-3">@ProductStatus.Unavailable</span>
+        }
+    }
+}

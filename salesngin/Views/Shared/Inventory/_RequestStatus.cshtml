@@ -1,0 +1,24 @@
+﻿@model string 
+
+@{
+    if (@Model == RequestStatus.New)
+    {
+        <span class="badge badge-light-primary fw-bold fs-6 px-4 py-3">@RequestStatus.New</span>
+    }
+    else if (@Model == RequestStatus.Approved)
+    {
+        <span class="badge badge-light-success fw-bold fs-6 px-4 py-3">@RequestStatus.Approved</span>
+    }
+    else if (@Model == RequestStatus.Delivered)
+    {
+        <span class="badge badge-light-success fw-bold fs-6 px-4 py-3">@RequestStatus.Delivered</span>
+    }
+    else if (@Model == RequestStatus.Cancelled)
+    {
+        <span class="badge badge-light-danger fw-bold fs-6 px-4 py-3">@RequestStatus.Cancelled</span>
+    }
+    else
+    {
+        <span class="badge badge-light-danger fw-bold fs-6 px-4 py-3">...</span>
+    }
+}

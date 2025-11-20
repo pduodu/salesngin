@@ -1,0 +1,25 @@
+﻿@model UserViewModel
+@{
+    <div class="card card-dashed">
+        <div class="col-body p-3">
+            <div class="d-flex align-items-center">
+                <!--begin::Wrapper-->
+                <div class="me-5 position-relative">
+                    <!--begin::Avatar-->
+                    <div class="symbol symbol-50px symbol-circle">
+                        <img alt="@Model.User?.UserInitials" src="@Url.Content(Model.User?.UserPhotoPath)">
+                    </div>
+                    <!--end::Avatar-->
+                </div>
+                <!--end::Wrapper-->
+                <!--begin::Info-->
+                <div class="d-flex flex-column justify-content-center">
+                    <a href="#" class="text-gray-800 mb-1 fs-5">@Model.User?.FullName</a>
+                    <div class="fs-6 text-gray-400">@Model.User?.Email</div>
+                </div>
+                <!--end::Info-->
+            </div>
+        </div>
+    </div>
+}
+

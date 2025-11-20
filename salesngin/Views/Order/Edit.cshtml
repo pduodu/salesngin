@@ -1,0 +1,621 @@
+﻿@model OrderViewModel
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Edit Order";
+    ViewData["MainMenu"] = "Order Management";
+    ViewData["Page"] = "Edit Order";
+}
+
+
+<div class="d-flex flex-column flex-lg-row w-100">
+
+    <div class="d-flex flex-row-fluid me-xl-9 mb-10 mb-xl-0">
+        <!--begin::Pos Store Products list-->
+        <div class="card card-flush card-p-0 bg-transparent border-0 w-100">
+
+            <div class="card-header">
+                <div class="col fv-row ">
+                    <!--begin::Radio group-->
+                    <div class="d-flex flex-equal gap-5 gap-xxl-9 px-0 mb-3" data-kt-buttons="true" 
+                         data-kt-buttons-target="[data-kt-button='true']" data-kt-initialized="1">
+                        <!--begin::Radio-->
+                        <label class="btn bg-light btn-active-text-gray-800 border border-1 border-dashed border-dark border-active-primary btn-active-light-primary w-100 px-4" data-kt-button="true">
+                            <!--begin::Input-->
+                            <input asp-for="@Model.SelectedOrderType" class="form-check-input" type="radio" value="@OrderType.Retail" onchange="orderTypeChanged();"><br />
+                            <!--end::Input-->
+                            <!--begin::Icon-->
+                            <i class="ki-duotone ki-package fs-3x mb-2 mt-2 pe-0">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                            <!--end::Icon-->
+                            <!--begin::Title-->
+                            <span class="fs-4 fw-bold d-block">@OrderType.Retail</span>
+                            <!--end::Title-->
+                        </label>
+                        <!--end::Radio-->
+                        <!--begin::Radio-->
+                        <label class="btn bg-light btn-active-text-gray-800 border border-1 border-dashed border-dark border-active-primary btn-active-light-primary w-100 px-4 " data-kt-button="true">
+                            <!--begin::Input-->
+                            @*<input asp-for="@Model.PaymentMethod" class="form-check-input" type="radio" value="@PaymentMethod.Card"><br />*@
+                            <input asp-for="@Model.SelectedOrderType" class="form-check-input" type="radio" value="@OrderType.Wholesale" onchange="orderTypeChanged();"><br />
+
+                            <!--end::Input-->
+                            <!--begin::Icon-->
+                            <i class="ki-duotone ki-lots-shopping fs-3x mb-2 mt-2 pe-0">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                                <span class="path4"></span>
+                                <span class="path5"></span>
+                                <span class="path6"></span>
+                                <span class="path7"></span>
+                                <span class="path8"></span>
+                            </i>
+                            <!--end::Icon-->
+                            <!--begin::Title-->
+                            <span class="fs-4 fw-bold d-block">@OrderType.Wholesale</span>
+                            <!--end::Title-->
+                        </label>
+                        <!--end::Radio-->
+                    </div>
+                    <!--end::Radio group-->
+                </div>
+            </div>
+@* 
+            <div class="card-header">
+                <div class="col fv-row">
+                    <div class="input-group flex-nowrap">
+                        <span class="input-group-text fs-3">
+                            <i class="ki-duotone ki-shop text-primary fs-2x mr-3">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                                <span class="path4"></span>
+                                <span class="path5"></span>
+                            </i>
+                        </span>
+                        <div class="overflow-hidden flex-grow-1">
+                            <select asp-for="@Model.SelectedShopId" asp-items="@(new SelectList(Model.Shops,"Id","Name"))"
+                                    onchange="shopChanged();" class="form-select rounded-start-0 form-select-lg form-select-solid fs-3 "
+                                    data-control="select2" data-hide-search="false" data-placeholder="Select Shop" data-allow-clear="true">
+                                <option value="0" selected>Select Shop...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div> *@
+
+            <div class="card-header">
+                <div class="col fv-row">
+                    <div class="d-flex align-items-center position-relative">
+                        <i class="ki-duotone ki-magnifier fs-1 position-absolute ms-4 text-primary">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        <input id="searchInput" type="text" class="form-control form-control-solid fs-2 ps-12" autocomplete="off" placeholder="Search...">
+                        <button id="btnClear" type="button" class="btn btn-primary fs-2 mx-2">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!--begin::Body-->
+            <div class="card-body">
+
+                <div id="productsContainer" class="">
+                    @*@await Html.PartialAsync("_FormProductList", Model)*@
+                    @await Html.PartialAsync("Order/_FormProductList", Model)
+                </div>
+            </div>
+        </div>
+        <!--end::Pos order-->
+    </div>
+
+
+    <div class="flex-row-auto w-xl-500px">
+        <!--begin::Pos order-->
+        <div class="card card-flush bg-body ">
+            <!--begin::Header-->
+            <div class="card-header pt-5">
+                <h3 class="card-title fw-bold text-gray-800 fs-2qx">Order Cart</h3>
+                <!--begin::Toolbar-->
+                <div class="card-toolbar">
+                    <button id="btnHoldOrder" type="button" form="formCreateOrder" class="btn btn-info fs-4 py-4 mx-3">
+                        <i class="ki-duotone ki-bookmark-2 fs-2">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        Hold
+                    </button>
+                    <a href="javascript:void(0)" onclick="clearCartPartial();"
+                       class="btn btn-light-danger fs-4 fw-bold py-4">Clear All</a>
+                </div>
+                <!--end::Toolbar-->
+            </div>
+            <!--end::Header-->
+            <!--begin::Body-->
+            <div class="card-body pt-2">
+                <h2 class="card-title fw-bold text-gray-800">Order # : @Model.OrderCode</h2>
+                <!--begin::Alert-->
+                <div id="divInvalidMessageBox" class="d-none">
+                    <div class="alert alert-danger d-flex align-items-center p-5">
+                        <i class="ki-duotone ki-search-list fs-2hx text-danger me-4">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                        </i>
+                        <div class="d-flex flex-column">
+                            <h4 class="mb-1 text-danger">Cannot Add More!</h4>
+                            <span>Item quantity requested not available in store.</span>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Alert-->
+                <!--begin::Table container-->
+                <div id="divCartItemsDisplay">
+                    @await Html.PartialAsync("_CartItemsPartial", Model.CartItems)
+                </div>
+                <!--end::Table container-->
+                <div class="separator separator-dotted border-primary my-10"></div>
+                @* <form asp-controller="Order" asp-action="CreateOrder" method="post" class="form"> *@
+                <form id="orderForm" asp-controller="Order" asp-action="EditOrder" asp-route-id="@Model.Id" class="form">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" value="@Model.Id" />
+                    <input type="hidden" asp-for="OrderCode" value="@Model.OrderCode" />
+                    <input type="hidden" asp-for="ShopId" />
+                    <input type="hidden" asp-for="OrderType" value="@Model.SelectedOrderType" />
+                    <input type="hidden" asp-for="Status" value="" />
+                    <!--begin::Customer Info-->
+                    <div class="m-0">
+                        <div class="mb-10 fv-row fv-plugins-icon-container">
+                            <!--begin::Label-->
+                            <h4 class="fw-bold text-gray-800 mb-5">Customer</h4>
+                            <div class="col fv-row mb-5">
+                                <select asp-for="@Model.CustomerId" asp-items="@(new SelectList(Model.Customers,"Id","CustomerName"))"
+                                        onchange="getCustomer();" class="form-select form-select-lg form-select-solid"
+                                        data-control="select2" data-hide-search="false"
+                                        data-placeholder="Select Customer"
+                                        data-allow-clear="true">
+                                    <option value="0" selected>Enter Customer...</option>
+                                </select>
+                            </div>
+                            <div class="col fv-row mb-5">
+                                <div id="customerContainer" class="mt-7">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Customer Info-->
+                    <!--begin::Payment Method-->
+                    <div class="m-0">
+                        <!--begin::Actions-->
+                        <button type="submit" id="SubmitButton" class="btn btn-primary fs-1 w-100 py-4 mx-3 ">
+                            <span class="indicator-label">
+                                <i class="ki-duotone ki-mouse-square fs-3x">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            Save Order
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                        <!--end::Actions-->
+                    </div>
+                    <!--end::Payment Method-->
+                </form>
+            </div>
+            <!--end: Card Body-->
+        </div>
+        <!--end::Pos order-->
+    </div>
+
+</div>
+
+<div id="NothingContainer">
+
+    @* @await Html.PartialAsync("_DoNothing"); *@
+</div>
+
+<!-- modal placeholders-->
+<div id="modal-add" tabindex="-1" class=" modal fade">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+
+            <div id='modal-add-content'></div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            //var shop = "@Model.SelectedShopId";
+            //var selectedOrdeType = '@Model.SelectedOrderType';
+            var defaultOrderType = "@Model.SelectedOrderType";
+            //console.log("Selected Shop Id: " + shop);
+
+            //shopInputField.value = shop;
+            orderTypeInputField.value = defaultOrderType;
+
+            initializeSelect2();
+            searchInputField.focus();
+            getCustomer();
+
+            var checkoutSubmitButton = document.querySelector("#SubmitButton");
+            if(checkoutSubmitButton){
+                triggerButtonIndicator(checkoutSubmitButton);
+            }
+
+            if (defaultOrderType) {
+                var orderTypeField = document.getElementById("OrderType");
+                orderTypeField.value = defaultOrderType;
+                console.log("Loaded Order Type:", defaultOrderType);
+            }
+
+            // var selectedShopId = $("#SelectedShopId").val();
+            // if (selectedShopId) {
+            //     ShopChanged();
+            // }
+
+            document.getElementById('btnHoldOrder').addEventListener('click', function () {
+                document.getElementById("Status").value = 'Hold';
+                var status = document.getElementById("Status").value;
+                console.log("Status: " + status);
+                document.getElementById('orderForm').submit();
+            });
+
+        });
+
+        var lastInputTime = 0;
+        var inputTimer;
+        var searchInputField = document.getElementById("searchInput");
+        var orderTypeInputField = document.getElementById("OrderType");
+        var selectedOrderTypeInputField = document.getElementById("SelectedOrderType");
+        var hfControllerAdd = document.getElementById("hfControllerAdd");
+        var hfSearchReset = document.getElementById("hfResetSearch");
+        var invalidMessageBox = document.getElementById("divInvalidMessageBox");
+        var customerField = document.getElementById("CustomerId");
+
+        function rebindTableScript() {
+            // Initialize DataTables
+            const table = $('#productTable').DataTable({
+                "paging": true, // Enable pagination
+                "pageLength": 10, // Set the default number of records per page
+                "searching": true, // Disable default searching to use custom search input
+                "info": false // Disable the info display at the bottom
+            });
+
+            // Function to handle search
+            function handleSearch() {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                console.log('Search term:', searchTerm);
+
+                table.search(searchTerm).draw();
+
+                if (table.rows({ search: 'applied' }).count() === 1) {
+                    const row = table.row({ search: 'applied' }).node();
+                    console.log(row);
+                    // Use jQuery to access data attributes
+                    const productId = $(row).data('productid');
+                    const productName = $(row).data('productname');
+                    const productPrice = $(row).data('productprice');
+
+                    //addProductToCart(productId);
+                    addSearchItemToCart(productId, productName, orderTypeInputField.value);
+                    searchInputField.value = ''; // Clear the search input
+                    searchInputField.focus();
+                    table.search('').draw(); // Clear the search results
+                }
+            }
+
+            // Add event listeners for the search input
+            document.getElementById('searchInput').addEventListener('keyup', handleSearch);
+            //document.getElementById('searchInput').addEventListener('change', handleSearch);
+            //document.getElementById('searchInput').addEventListener('paste', handleSearch);
+
+            // Function to clear the search box
+            function clearSearchBox() {
+                const searchBox = document.getElementById("searchInput");
+                searchBox.value = '';
+                searchBox.focus();
+                table.search('').draw();
+            }
+
+            // Event listener for clear button
+            document.getElementById('btnClear').addEventListener('click', clearSearchBox);
+
+            function addSearchItemToCart(productId, productName, orderType) {
+                //validation result
+                validateSelectedProduct(productId, 1, function (result) {
+                    if (result) {
+                        $.ajax({
+                            type: "GET",
+                            url: "@Url.Action("AddPartial", "Order")",
+                            data: { id: productId, ot: orderType },
+                            success: function (result) {
+                                console.log('Product added to cart : ', productName);
+                                searchInputField.value = ''; // Clear the search input
+                                searchInputField.focus();
+                                $("#divCartItemsDisplay").html(result);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        function addSearchItemToCart(item, orderType) {
+            var productId = item.getAttribute("data-productId");
+            var productName = item.getAttribute("data-productName");
+            validateSelectedProduct(productId, 1, function (result) {
+                if (result) {
+                    $.ajax({
+                        type: "GET",
+                        url: "@Url.Action("AddPartial", "Order")",
+                        data: { id: productId, ot: orderType },
+                        success: function (result) {
+                            $("#divCartItemsDisplay").html(result);
+                            console.log('Product added to cart : ', productName);
+                        }
+                    });
+                }
+            });
+        }
+
+        function orderTypeChanged() {
+            // Get all radio inputs within the radio group
+            var radioInputs = document.querySelectorAll('[data-kt-buttons-target="[data-kt-button=\'true\']"] input[type="radio"]');
+
+            // Flag to check if at least one radio option is selected
+            var isAtLeastOneSelected = false;
+
+            // Loop through each radio input
+            radioInputs.forEach(function (radioInput) {
+                // Check if the radio input is checked
+                if (radioInput.checked) {
+                    // Set the checked attribute on the selected radio input
+                    radioInput.setAttribute('checked', 'checked');
+
+                    // Get the value of the selected radio input
+                    var selectedValue = radioInput.value;
+                    orderTypeInputField.value = selectedValue;
+                    // Now you can use the selectedValue as needed
+                    //console.log("Selected OrderType:", selectedValue);
+
+                    shopInputField.value = selectedShop;
+                    //console.log("Selected Shop:", shopInputField.value);
+
+                    clearCartPartial();
+                    GetProducts();
+                    // Set the flag to true since at least one option is selected
+                    isAtLeastOneSelected = true;
+
+                } else {
+                    // Remove the checked attribute on non-selected radio inputs
+                    radioInput.removeAttribute('checked');
+                }
+            });
+
+            // Check the flag and display an error message if no option is selected
+            if (!isAtLeastOneSelected) {
+                //alert("Please select at least one option.");
+                toast_message("error", "Select option wholesale or Retail", "Order Type Required!")
+                // You can take other actions like preventing form submission or displaying a validation message
+            }
+        }
+
+        function isZeroNullOrEmpty(value) {
+            return value === "0" || value === 0 || value === null || value === "" || value === undefined || Number.isNaN(value);
+        }
+
+        function isNotZeroNullOrEmpty(value) {
+            return value !== "0" && value !== 0 && value !== null && value !== "" && value !== undefined && !Number.isNaN(value);
+        }
+
+        function getCustomer() {
+            var customerId = $("#CustomerId").val();
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetCustomerPartialView", "Order")",
+                data: { id: customerId },
+                success: function (response) {
+                    $("#customerContainer").html(response);
+                }
+            });
+        }
+
+        function GetProducts() {
+            var orderType = $("#OrderType").val();
+            $("#productsContainer").html("");
+
+            orderTypeInputField.value = orderType;
+
+            if (isZeroNullOrEmpty(orderType)) {
+                //toast_message("error", "Please select an order type.", "Select Order type!")
+            }
+            else if (isZeroNullOrEmpty(shop)) {
+                //toast_message("error", "Please select a valid shop.", "Select a Shop!")
+            }
+            else {
+                // Proceed with AJAX request if both values are valid
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("GetItemsPartialView", "Order")",
+                    data: { id: shop, ot: orderType },
+                    success: function (result) {
+                        $("#productsContainer").html(result);
+                        rebindTableScript();
+                    }
+                });
+            }
+        }
+
+        function updateCartView() {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("UpdateCartView", "Order")",
+                success: function (result) {
+                    $("#divCartItemsDisplay").html(result);
+                    //clearSearchBox();
+                }
+            });
+        }
+
+        function validateSelectedProduct(id, quantity, callback) {
+            //if (quantity === '0') {
+            if (isZeroNullOrEmpty(quantity)) {
+                toast_message("error", "Quantity cannot be 0.", "Invalid Quantity");
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("ValidateOrderQuantity", "Order")",
+                    data: { id: id, quantity: quantity },
+                    success: function (result) {
+                        toggleInvalidMessageBox(result);
+                        callback(result);
+                    },
+                    error: function (error) {
+                        console.error("Error during AJAX request:", error);
+                    }
+                });
+            }
+        }
+
+        function toggleInvalidMessageBox(condition) {
+            if (condition) {
+                //hide
+                $("#divInvalidMessageBox").addClass("d-none");
+            } else {
+                //show
+                $("#divInvalidMessageBox").removeClass("d-none");
+                toast_message("error", "Quantity requested not available in store.", "Invalid Quantity");
+            }
+        }
+
+        function clearSearchBox() {
+            $("#searchInput").val("");
+            //searchProducts();
+            searchInputField.focus();
+        }
+
+        function addProductToCart(id) {
+            //validation result
+            validateSelectedProduct(id, 1, function (result) {
+                if (result) {
+                    //Add if result returns true
+                    var orderType = $("#OrderType").val();
+                    $.ajax({
+                        type: "GET",
+                        url: "@Url.Action("AddPartial", "Order")",
+                        data: { id: id, ot: orderType },
+                        success: function (result) {
+                            $("#divCartItemsDisplay").html(result);
+                        }
+                    });
+                }
+            });
+        }
+
+        function removeFromCartPartial(id) {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("RemovePartial", "Order")",
+                data: { id: id },
+                success: function (data) {
+                    $("#divCartItemsDisplay").html(data);
+                    searchInputField.focus();
+                }
+            });
+        }
+
+        function decreaseQuantityPartial(id) {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("DecreasePartial", "Order")",
+                data: { id: id },
+                success: function (data) {
+                    $("#divCartItemsDisplay").html(data);
+                }
+            });
+        }
+
+        //Todo : Not done
+        function updateProductQuantity(id, storeQuantity, inputElement) {
+            var maxAllowedQuantity = parseInt(storeQuantity);
+            var quantityEntered = parseInt(inputElement.value);
+            console.log(quantityEntered);
+            if (quantityEntered === NaN || quantityEntered == 0) {
+                removeFromCartPartial(id);
+                toast_message("error", "Product removed.", "Zero Quantity");
+            } else if (quantityEntered > maxAllowedQuantity) {
+                toast_message("error", "Quantity cannot be more than Store Qunatity.", "Invalid Quantity");
+                // Reset the input value to the maximum allowed quantity
+                inputElement.value = maxAllowedQuantity;
+            } else {
+
+                validateSelectedProduct(id, quantityEntered, function (result) {
+                    if (result) {
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("UpdateCartProductQuantity", "Order")",
+                            data: { id: id, quantity: quantityEntered },
+                            success: function (data) {
+                                $("#divCartItemsDisplay").html(data);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        function updatePricePartial(id, price) {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("UpdatePricePartial", "Order")",
+                data: { id: id, price: price },
+                success: function (data) {
+                    $("#divCartItemsDisplay").html(data);
+                }
+            });
+        }
+
+        function clearCartPartial() {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("ClearPartial", "Order")",
+                // data: { id: id },
+                success: function (data) {
+                    $("#divCartItemsDisplay").html(data);
+                    searchInputField.focus();
+                }
+            });
+        }
+
+        function addToCart(productId) {
+            fetch('/Order/AddToCart/${productId}', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Item added to cart');
+                    updateCartPartial();
+                });
+        }
+
+        function updateCartPartial() {
+            fetch('/Order/CartItemsPartial')
+                .then(response => response.text())
+                .then(data => {
+                    const cartItemsPartialDiv = document.getElementById('cartItemsPartial');
+                    cartItemsPartialDiv.innerHTML = data;
+                });
+        }
+
+    </script>
+}

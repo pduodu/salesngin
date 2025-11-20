@@ -1,0 +1,18 @@
+﻿@model UserViewModel
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
+@inject IDataControllerService _dataService
+
+@{
+
+    <div class="row mb-8">
+        <div class="col-md-4">
+           @await Html.PartialAsync("_PhotoUpload", Model)
+        </div>
+        <div class="col-md-4">
+           @await Html.PartialAsync("_WebcamUpload", Model)
+        </div>
+    </div>
+
+}
+

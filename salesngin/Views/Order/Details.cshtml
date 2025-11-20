@@ -1,0 +1,843 @@
+﻿@model OrderViewModel
+@inject IDataControllerService _dataService
+@inject UserManager<ApplicationUser> _userManager
+@{
+    ViewData["Title"] = "Details";
+    ViewData["MainMenu"] = "Order Management";
+    ViewData["Page"] = "Details";
+
+    var currentDate = DateTime.UtcNow.Date.ToFriendlyDateString();
+    var currentTime = DateTime.UtcNow.ToString("t");
+    var settings = await _dataService.GetSettings();
+    string currency = settings.Currency;
+}
+
+<div class="row g-5 gy-5 g-xl-5">
+
+    <div class="col-xxl-7">
+
+        <div class="card card-flush mb-xxl-10">
+            <div class="card-header pt-5">
+                <h2 class="card-title align-items-start flex-column">
+                    <span class="card-label fs-2 fw-bold text-dark">Order <b class="text-primary fs-3"> @Model.OrderCode
+                        </b> Details </span>
+                    <span class="text-gray-500 pt-2 fw-semibold fs-6"> Current order details</span>
+                </h2>
+                <div class="card-toolbar">
+                <a class="btn btn-primary fs-5 fw-bold mx-3" asp-controller="Order" asp-action="Orders">
+                        <i class="ki-duotone ki-arrow-left fs-2x">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        Back to Orders
+                    </a>
+                </div>
+            </div>
+            <div class="separator separator-dotted border-primary my-3"></div>
+            <div class="card-header">
+                <div class="card-title">
+                </div>
+                <div class="card-toolbar">
+                    @{
+                        if (Model.ModulePermission.Update)
+                        {
+                            string[] editableOrderStatuses = [OrderStatus.New, OrderStatus.Ready, OrderStatus.Hold];
+                            if (editableOrderStatuses.Contains(Model.Status))
+                            {
+                                <a class="btn btn-primary mx-3" asp-controller="Order" asp-action="Edit" asp-route-id="@Model.Id">
+                                    <i class="ki-duotone ki-pencil fs-2x">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Edit Order
+                                </a>
+                            }
+                        }
+                    }
+                    <div id="divOrderStatusPanel">
+                        @await Html.PartialAsync("Order/_OrderStatusActionBar", Model)
+                    </div>
+
+                </div>
+            </div>
+            <div class="separator separator-dotted border-primary my-3"></div>
+            <div class="card-body">
+                @await Html.PartialAsync("Order/_OrderItemsPartial", Model)
+                @* @await Html.PartialAsync("Order/_CartSummaryPartial", Model) *@
+            </div>
+        </div>
+
+    </div>
+    <!--end::Col-->
+    <!--begin::Col-->
+    <div class="col-xxl-5 mb-5 mb-xl-10">
+        @{
+            if (Model.ModulePermission.Create)
+            {
+                string statusColor = Model.SalesStatus switch
+                {
+                    SalesStatus.Paid => "success",
+                    SalesStatus.Unpaid => "danger",
+                    SalesStatus.Part => "info",
+                    _ => "light"
+                };
+
+                if (Model.SalesStatus != SalesStatus.Paid)
+                {
+
+                    <!--begin::Order Summary -->
+                    <div class="card card-flush mb-3">
+                        <div class="card-header pt-5 ribbon ribbon-end ribbon-clip">
+                            <div class="ribbon-label text-@statusColor">
+                                @await Html.PartialAsync("Order/_SalesStatus", Model.SalesStatus)
+                                <span class="ribbon-inner bg-light-@statusColor"></span>
+                            </div>
+                            <!--begin::Title-->
+                            <h2 class="card-title align-items-start flex-column">
+                                <span class="card-label fs-2 fw-bold text-dark">Payment</span>
+                                <span class="text-gray-600 pt-2 fs-6">Make payment for the order</span>
+                            </h2>
+                            <!--end::Title-->
+                            <!--begin::Toolbar-->
+                            <div class="card-toolbar">
+                            </div>
+                        </div>
+                        <div class="separator separator-dotted border-primary my-3"></div>
+                        <div class="card-body pt-0">
+                            <!--begin::Table Order Summary-->
+                            @*<div class="table-responsive mb-1">
+                                <table id="tblOrderSummary" class="table align-middle gy-1 my-0 mt-0 fw-bold text-dark fs-6">
+                                    <tbody>
+                                        <tr class="">
+                                            <td class="pe-0 w-100px">
+                                                <span class="float-end">Order # : </span>
+                                                <div class="d-flex align-items-center">
+                                                </div>
+                                            </td>
+                                            <td class="pe-0 text-start">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="text-primary">@Model.OrderCode</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                         <tr class="">
+                                            <td class="pe-0">
+                                                <span class="float-end">Customer : </span>
+                                                <div class="d-flex align-items-center">
+                                                </div>
+                                            </td>
+                                            <td class="pe-0 text-start">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="">@Model.CustomerName</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="">
+                                            <td class="pe-0">
+                                                <span class="float-end">Number : </span>
+                                                <div class="d-flex align-items-center">
+                                                </div>
+                                            </td>
+                                            <td class="pe-0 text-start">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="">@Model.CustomerNumber</span>
+                                                </div>
+                                            </td>
+                                        </tr> 
+                                        <tr class="">
+                                            <td class="pe-0">
+                                                <span class="float-end">Date : </span>
+                                                <div class="d-flex align-items-center">
+                                                </div>
+                                            </td>
+                                            <td class="pe-0 text-start">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="">@currentDate @currentTime</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>*@
+                            <!--end::Table Order Summary-->
+
+                            @await Html.PartialAsync("Order/_OrderSummary", Model)
+
+                            <!--begin::Payment Method-->
+                            @if (@Model.Status == OrderStatus.Cancelled)
+                            {
+                                <div class="m-0 text-center">
+                                    <div class="separator separator-dotted border-danger my-3"></div>
+                                    <h4 class="fw-bold text-danger mb-5">This Order has been Cancelled.</h4>
+                                    <div class="separator separator-dotted border-danger my-3"></div>
+                                </div>
+                            }
+                            else if (@Model.SalesStatus == OrderStatus.Paid)
+                            {
+                                <div class="m-0 text-center">
+                                    <div class="separator separator-dotted border-success my-3"></div>
+                                    <h4 class="fw-bold text-success mb-5">This Order has been fully Paid.</h4>
+                                    <div class="separator separator-dotted border-success my-3"></div>
+                                </div>
+
+                            }
+                            else
+                            {
+                                string inputStyle = "border-1 border-gray-500";
+
+                                <form id="payOrderForm" asp-controller="Order" asp-action="Checkout" asp-route-id="@Model.Id"
+                                    method="post">
+                                    <input type="hidden" asp-for="OrderId" value="@Model.OrderId" />
+                                    <input type="hidden" asp-for="TotalAmount" value="" />
+                                    <input type="hidden" asp-for="DiscountAmount" value="" />
+                                    <!--begin::Payment Method-->
+                                    <div class="m-0">
+                                        <!--begin::Title-->
+                                        <h4 class="fw-bold text-gray-800 mb-5">Payment Method</h4>
+                                        @* <div class="separator separator-dotted border-primary my-3"></div> *@
+                                        <!--end::Title-->
+                                        <!--begin::Radio group-->
+                                        <div class="d-flex flex-equal gap-2 gap-xxl-2 px-0 mb-10" data-kt-buttons="true"
+                                            data-kt-buttons-target="[data-kt-button='true']" data-kt-initialized="1">
+                                            <label
+                                                class="btn btn-active-text-gray-900 bg-light border border-1 border-solid border-gray-500 border-active-primary btn-active-light-primary w-100 p-5 "
+                                                data-kt-button="true">
+                                                <input asp-for="@Model.PaymentMethod" class="form-check-input payment-method-radio" type="radio"
+                                                    value="@PaymentMethod.Cash" data-payment-method="@PaymentMethod.Cash">
+                                                <span class="d-flex align-items-center my-2 justify-content-center">
+                                                    <i class="ki-duotone ki-bill fs-2x me-1 text-success">
+                                                        <i class="path1"></i>
+                                                        <i class="path2"></i>
+                                                        <i class="path3"></i>
+                                                        <i class="path4"></i>
+                                                        <i class="path5"></i>
+                                                        <i class="path6"></i>
+                                                    </i>
+                                                    <span class="fs-6 fw-bold">@PaymentMethod.Cash</span>
+                                                </span>
+                                            </label>
+                                            <label
+                                                class="btn btn-active-text-gray-900 bg-light border border-1 border-solid border-gray-500 border-active-primary btn-active-light-primary w-100 p-5 "
+                                                data-kt-button="true">
+
+                                                <input asp-for="@Model.PaymentMethod" class="form-check-input payment-method-radio" type="radio"
+                                                    value="@PaymentMethod.MobileMoney" data-payment-method="@PaymentMethod.MobileMoney">
+                                                <span class="d-flex align-items-center my-2 justify-content-center">
+                                                    <i class="ki-duotone ki-phone fs-2x me-1 text-dark">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                    <span class="fs-6 fw-bold">Mobile Money</span>
+                                                </span>
+
+                                            </label>
+                                            <label
+                                                class="btn btn-active-text-gray-900 bg-light border border-1 border-solid border-gray-500 border-active-primary btn-active-light-primary w-100 p-5 "
+                                                data-kt-button="true">
+
+                                                <input asp-for="@Model.PaymentMethod" class="form-check-input payment-method-radio" type="radio"
+                                                    value="@PaymentMethod.Mixed" data-payment-method="@PaymentMethod.Mixed">
+                                                <span class="d-flex align-items-center my-2 justify-content-center">
+                                                    <i class="ki-duotone ki-abstract-36 fs-2x me-1 text-primary">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                    <span class="fs-6 fw-bold">@PaymentMethod.Mixed</span>
+                                                </span>
+
+                                            </label>
+                                        </div>
+                                        <!--end::Radio group-->
+                                        <div id="cashPayment" class="mb-10 fv-row payment-div" style="display:none;">
+                                            <div class="d-flex flex-wrap gap-2 my-3">
+                                                <div class="fv-row w-100 flex-md-root">
+                                                   <label for="CashAmount" class="fs-5 text-gray-800 fw-bold">Cash Amount:</label>
+                                                    <input type="number" asp-for="@Model.CashAmount" placeholder="0.00"
+                                                        class="form-control mb-2 fs-2 @inputStyle" />
+                                                </div>
+                                                <div class="fv-row w-100 flex-md-root">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="moMoPayment" class="mb-10 fv-row payment-div" style="display:none;">
+                                            <div class="d-flex flex-wrap gap-2 my-3">
+                                                <div class="fv-row w-100 flex-md-root">
+                                                   <label for="MoMoAmount" class="fs-6 text-gray-800 fw-bold">MoMo Amount:</label>
+                                                    <input asp-for="@Model.MoMoAmount" type="number" step="0.01"
+                                                        class="form-control mb-2 @inputStyle" placeholder="0.00" />
+                                                </div>
+                                                <div class="fv-row w-100 flex-md-root">
+                                                    <label for="MoMoNumber" class="fs-6 text-gray-800 fw-bold">MoMo Number:</label>
+                                                    <input asp-for="@Model.MoMoNumber" type="number" class="form-control mb-2 @inputStyle" placeholder="0244000000" />
+                                                </div>
+                                                <div class="fv-row w-100 flex-md-root">
+                                                    <label for="MoMoTransNumber" class="fs-6 text-gray-800 fw-bold">MoMo Transaction ID:</label>
+                                                    <input asp-for="@Model.MoMoTransNumber" type="text"
+                                                        class="form-control mb-2 @inputStyle" placeholder="TX0000XXXXXX" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="cardPayment" class="mb-10 fv-row payment-div" style="display:none;">
+                                            Card Payment
+                                            <input asp-for="@Model.CardTransNumber" type="text" class="form-control mb-2 @inputStyle"
+                                                placeholder="Transaction Number" />
+                                        </div>
+                                        <div id="mixedPayment" class="mb-10 fv-row payment-div" style="display:none;">
+                                            <div class="d-flex flex-wrap gap-2 my-3">
+                                                <div class="fv-row w-100 flex-md-root">
+                                                    <label for="MixedCashAmount" class="fs-4 text-gray-800 fw-bold">Cash Amount:</label>
+                                                    <input type="number" step="0.01" min="1" placeholder="0.00" asp-for="@Model.MixedCashAmount"
+                                                        class="form-control mb-2 @inputStyle" />
+                                                </div>
+                                                <div class="fv-row w-100 flex-md-root">
+                                                    <label for="MixedMoMoAmount" class="fs-4 text-gray-800 fw-bold">MoMo Amount:</label>
+                                                    <input type="number" step="0.01" min="1" placeholder="0.00" asp-for="@Model.MixedMoMoAmount"
+                                                        class="form-control mb-2 @inputStyle" />
+                                                </div>
+                                                <div class="fv-row w-100 flex-md-root">
+                                                    <label for="MixedMoMoNumber" class="fs-4 text-gray-800 fw-bold">MoMo Number:</label>
+                                                    <input type="number" placeholder="0244000000" asp-for="@Model.MixedMoMoNumber"
+                                                        class="form-control mb-2 @inputStyle" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @* <div class="input-group input-group-lg mb-10">
+                                            <span class="input-group-text fs-4 fw-bolder" >Total Amount Paid
+                                                (@settings.Currency) : </span>
+                                            
+                                            <span class="input-group-text d-flex flex-column gap-1">
+                                                <label class="form-label">Change: (@settings.Currency)</label>
+                                                
+                                            </span>
+                                        </div>
+                                       <div class="input-group input-group-lg mb-5">
+                                            <span class="input-group-text" id="inputGroup-change-lg">Change (@settings.Currency) :
+                                            </span>
+                                            <span class="input-group-text"></span>
+                                        </div> *@
+                                        <div class="d-flex flex-wrap gap-5 my-3">
+                                            <div class="fv-row w-100 flex-md-root">
+                                                <label id="inputGroup-amtpaid-lg" class="form-label">Total Amount Paid
+                                                    (@settings.Currency)</label>
+                                                <input id="amountPaid" asp-for="@Model.AmountReceived" type="number" readonly
+                                                    step="0.01" class="form-control bg-light fs-2x"
+                                                    aria-describedby="inputGroup-amtpaid-lg" />
+                                            </div>
+                                            <div class="fv-row w-100 flex-md-root">
+                                                <label class="form-label">Change (@settings.Currency)</label>
+                                                <label id="lblChangeDisplay" class="form-control bg-light fs-2x">0</label>
+                                                <input id="change" asp-for="@Model.Change" type="hidden" step="0.01" readonly
+                                                    class="form-control fs-2x" aria-describedby="inputGroup-change-lg" />
+                                            </div>
+                                        </div>
+
+                                        @{
+                                            var buttonText = @Model.SalesStatus == SalesStatus.Part ? "Complete Payment" : "Make Payment";
+                                        }
+                                        <!--begin::Actions-->
+                                        @* <div class="separator separator-dotted border-primary my-10"></div> *@
+                                        <div class="my-10 fv-row">
+                                            @* <button id="btnPayOrder" type="submit" class="btn btn-primary btn-lg float-end fs-2"> *@
+                                            @* <button id="btnPayOrder" type="button" class="btn btn-primary btn-lg float-end fs-2" onclick="submitPayment();"> *@
+                                            <button id="btnPayOrder" type="button" class="btn btn-primary btn-lg float-end fs-2">
+                                                <span class="indicator-label fs-2">
+                                                    <i class="ki-duotone ki-mouse-square fs-3 me-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                    @buttonText
+                                                </span>
+                                                <span class="indicator-progress">
+                                                    Please wait... <span
+                                                        class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                                </span>
+                                            </button>
+                                        </div>
+
+                                        <!--end::Actions-->
+                                    </div>
+                                    <!--end::Payment Method-->
+                                </form>
+                            }
+                            <!--end::Payment Method-->
+                        </div>
+                    </div>
+                    <!--end::Order Summary -->
+                }
+                else
+                {
+                    <div class="card card-flush mb-3">
+                        <!--begin::Header-->
+                        <div
+                            class="card-header pt-5 pb-5 ribbon ribbon-end ribbon-clip d-flex justify-content-between align-items-center">
+                            <!--begin::Ribbon on the Right-->
+                            <div class="ribbon-label text-@statusColor">
+                                @await Html.PartialAsync("_SalesStatus", Model.SalesStatus)
+                                <span class="ribbon-inner bg-light-@statusColor"></span>
+                            </div>
+                            <!--end::Ribbon-->
+                            <!--begin::Title and Toolbar on the Left-->
+                            <div class="card-title d-flex align-items-center">
+                                <button onclick="printPartialView()" class="btn btn-light-primary fs-4 mx-3">
+                                    <i class="ki-duotone ki-printer fs-2x">
+                                        <i class="path1"></i>
+                                        <i class="path2"></i>
+                                        <i class="path3"></i>
+                                        <i class="path4"></i>
+                                        <i class="path5"></i>
+                                    </i>
+                                    Print Receipt
+                                </button>
+                            </div>
+                            <!--end::Title and Toolbar-->
+                        </div>
+                        <!--end::Header-->
+                    </div>
+                    @await Html.PartialAsync("_SalesReceiptPartial", Model)
+                }
+            }
+        }
+    </div>
+    <!--end::Col-->
+</div>
+
+<!-- modal placeholders-->
+<div id="modal-add" tabindex="-1" class=" modal fade">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+
+            <div id='modal-add-content'></div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function ()
+        {
+            $('.types-select').select2({ width: 'resolve' });
+
+            $("#searchInput").keyup(function ()
+            {
+                loadProducts();
+            });
+
+            //scrollToBottom();
+            @* var defaultMethod = "@PaymentMethod.Cash";
+            orderTypeInputField.value = defaultOrderType; *@
+            // Get the radio buttons and divs
+            var paymentMethodRadios = document.querySelectorAll('input[name="PaymentMethod"]');
+            const paymentForm = document.getElementById('payOrderForm');
+            if (paymentForm)
+            {
+                paymentForm.addEventListener('submit', submitPayment);
+            }
+            const cashPaymentDiv = document.getElementById('cashPayment');
+            const moMoPaymentDiv = document.getElementById('moMoPayment');
+            const mixedPaymentDiv = document.getElementById('mixedPayment');
+            const amountPaidInput = document.getElementById('amountPaid');
+
+            const changeInput = document.getElementById('change');
+            const changeDisplay = document.getElementById('lblChangeDisplay');
+
+            const cashAmountInput = document.getElementById('CashAmount');
+            const moMoAmountInput = document.getElementById('MoMoAmount');
+
+            const mixedCashAmountInput = document.getElementById('MixedCashAmount');
+            const mixedMoMoAmountInput = document.getElementById('MixedMoMoAmount');
+
+            const totalAmountInputField = document.getElementById("TotalAmount");
+
+            @* var discountPercentInput = document.getElementById('discountPercent');
+            var discountAmountInput = document.getElementById('discountAmount');  *@
+
+            initializeOrderSummary();
+
+            @* discountPercentInput.addEventListener("input", () => updateTotals("percent"));
+            discountAmountInput.addEventListener("input", () => updateTotals("amount")); *@
+
+            //let totalDue = 100; // Replace with the actual total due amount
+            //let totalDue = '@Model.TotalAmount'; // Replace with the actual total due amount
+            //let totalDue = parseFloat(totalAmountInputField.value) || 0; // Replace with the actual total due amount
+
+            // Function to show/hide divs based on selected radio button
+            function showHidePaymentDivs()
+            {
+                const selectedValue = document.querySelector('input[name="PaymentMethod"]:checked').value;
+
+                // Hide all divs
+                cashPaymentDiv.style.display = 'none';
+                moMoPaymentDiv.style.display = 'none';
+                mixedPaymentDiv.style.display = 'none';
+
+                // Show the div based on the selected value
+                switch (selectedValue)
+                {
+                    case '@PaymentMethod.Cash':
+                        cashPaymentDiv.style.display = 'block';
+                        break;
+                    case '@PaymentMethod.MobileMoney':
+                        moMoPaymentDiv.style.display = 'block';
+                        break;
+                    case '@PaymentMethod.Mixed':
+                        mixedPaymentDiv.style.display = 'block';
+                        break;
+                }
+            }
+
+            // Function to calculate amount paid and change
+            function calculateAmountPaidAndChange()
+            {
+                let totalDue = parseFloat(totalAmountInputField.value) || 0;
+                var selectedRadio = document.querySelector('.payment-method-radio:checked');
+                var selectedPaymentMethod = selectedRadio.value;
+                const selectedValue = document.querySelector('input[name="PaymentMethod"]:checked').value;
+                if (selectedValue === null || selectedValue === undefined || selectedValue.trim() === "") {
+                    console.log("No payment method selected");
+                    return;
+                }
+                let amountPaid = 0;
+
+                switch (selectedValue)
+                {
+                    case '@PaymentMethod.Cash':
+                        amountPaid = parseFloat(cashAmountInput.value) || 0;
+                        break;
+                    case '@PaymentMethod.MobileMoney':
+                        amountPaid = parseFloat(moMoAmountInput.value) || 0;
+                        break;
+                    case '@PaymentMethod.Mixed':
+                        amountPaid = (parseFloat(mixedCashAmountInput.value) || 0) + (parseFloat(mixedMoMoAmountInput.value) || 0);
+                        break;
+                }
+
+                amountPaidInput.value = amountPaid.toFixed(2);
+                let change = (amountPaid - totalDue).toFixed(2);
+                changeInput.value = (amountPaid - totalDue).toFixed(2);
+                changeDisplay.textContent = change;
+                //changeDisplay.textContent = `Change: ${change}`;
+
+            }
+
+            // Attach change event listener to all radio buttons
+            paymentMethodRadios.forEach(radio =>
+            {
+                radio.addEventListener('change', showHidePaymentDivs);
+                radio.addEventListener('change', calculateAmountPaidAndChange);
+                radio.addEventListener('change', populateMoMoAmount);
+            });
+
+            // Add event listener to amount inputs
+            cashAmountInput.addEventListener('input', calculateAmountPaidAndChange);
+            moMoAmountInput.addEventListener('input', calculateAmountPaidAndChange);
+            mixedCashAmountInput.addEventListener('input', calculateAmountPaidAndChange);
+            mixedMoMoAmountInput.addEventListener('input', calculateAmountPaidAndChange);
+
+            @* discountPercentInput.addEventListener('input', initializeOrderSummary);
+            discountAmountInput.addEventListener('input', initializeOrderSummary); *@
+
+            // Call the function on page load to show the div based on the initially selected radio button
+            const selectedRadio = document.querySelector('input[name="PaymentMethod"]:checked');
+            if (selectedRadio)
+            {
+                showHidePaymentDivs();
+                calculateAmountPaidAndChange();
+            }
+
+            // Function to populate MoMo amount when MobileMoney is selected
+            function populateMoMoAmount()
+            {
+                const selectedValue = document.querySelector('input[name="PaymentMethod"]:checked').value;
+                if (selectedValue === '@PaymentMethod.MobileMoney')
+                {
+                    const grandTotal = parseFloat(document.getElementById('grandTotal').value);
+                    if (!isNaN(grandTotal))
+                    {
+                        moMoAmountInput.value = grandTotal.toFixed(2);
+                    } else
+                    {
+                        moMoAmountInput.value = '';
+                    }
+                    calculateAmountPaidAndChange();
+                }
+            }
+
+            var paySubmitButton = document.querySelector("#btnPayOrder");
+            if (paySubmitButton)
+            {
+                paySubmitButton.addEventListener("click", function (event)
+                {
+                    // Prevent default form submission
+                    event.preventDefault();
+                    // Optionally, you can trigger the button indicator here
+                    triggerButtonIndicator(paySubmitButton);
+                    // Perform validation and submit payment
+                    submitPayment(event);
+                });
+                //triggerButtonIndicator(paySubmitButton);
+            }
+
+            // document.getElementById("btnPrintSalesReceipt").addEventListener("click", function () {
+            //     printJS({
+            //         printable: "sectionToPrint", // ID of the div to print
+            //         type: "html", // Type of content: "html", "image", or "pdf"
+            //         documentTitle: "Sales Receipt", // Title for the print document
+            //         //css: "/lib/pint.js/css/print.min.css",
+            //         //css: ["/css/site.css", "/assets/css/style.bundle.css"]
+            //         css: ["/assets/plugins/global/plugins.bundle.css", "/assets/css/style.bundle.css", "/lib/pint.js/css/print.min.css",]
+            //     });
+            // });
+
+            // Self-contained partial script
+            function initializeOrderSummary()
+            {
+
+                const subTotalField = document.getElementById("subTotal");
+                const grandTotalField = document.getElementById("grandTotal");
+                const totalAmountField = document.getElementById("TotalAmount");
+                const discountPercentField = document.getElementById("discountPercent");
+                const discountAmountField = document.getElementById("discountAmount");
+                const discountAmountInputField = document.getElementById("DiscountAmount");
+
+                const subtotalDisplay = document.getElementById("subtotalDisplay");
+                const discountDisplay = document.getElementById("discountDisplay");
+                const grandTotalDisplay = document.getElementById("grandTotalDisplay");
+
+                if (!subTotalField) return; // stop if partial empty
+
+                const currencySymbol = "@currency";
+                const formatMoney = value => parseFloat(value || 0).toFixed(2);
+
+                function updateTotals(source)
+                {
+                    let subtotal = parseFloat(subTotalField.value) || 0;
+                    let discountPercent = parseFloat(discountPercentField.value) || 0;
+                    let discountAmount = parseFloat(discountAmountField.value) || 0;
+
+                    if (subtotal <= 0) return;
+
+                    if (source === "percent")
+                    {
+                        discountAmount = subtotal * (discountPercent / 100);
+                        discountAmountField.value = formatMoney(discountAmount);
+                    }
+                    if (source === "amount")
+                    {
+                        discountPercent = (discountAmount / subtotal) * 100;
+                        discountPercentField.value = formatMoney(discountPercent);
+                    }
+                    if (discountAmount > subtotal)
+                    {
+                        discountAmount = subtotal;
+                        discountPercent = 100;
+                        discountAmountField.value = formatMoney(discountAmount);
+                        discountPercentField.value = formatMoney(discountPercent);
+                    }
+
+                    const grandTotal = subtotal - discountAmount;
+
+                    // update hidden and visible
+                    grandTotalField.value = formatMoney(grandTotal);
+                    totalAmountField.value = formatMoney(grandTotal);
+                    discountDisplay.textContent = `${currencySymbol} ${formatMoney(discountAmount)}`;
+                    discountAmountField.textContent = `${currencySymbol} ${formatMoney(discountAmount)}`;
+                    discountAmountInputField.value = formatMoney(discountAmount);
+                    grandTotalDisplay.textContent = `${currencySymbol} ${formatMoney(grandTotal)}`;
+
+                    calculateAmountPaidAndChange();
+                }
+
+                // event bindings
+                discountPercentField.addEventListener("input", () => updateTotals("percent"));
+                discountAmountField.addEventListener("input", () => updateTotals("amount"));
+            };
+
+
+            
+
+        });
+
+        function OpenUpdateOrderQuantityModal(id)
+        {
+            var data = { id: id };
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: '@Url.Action("GetUpdateOrderQuantityModal", "Order")',
+                    contentType: 'application/json; charset=utf=8',
+                    data: data,
+                    success: function (result)
+                    {
+                        $('#modal-add-content').html(result);
+                        $('#modal-add').modal('show');
+                        $('.types-select').select2({
+                            width: 'resolve',
+                            dropdownParent: $("#modal-add")
+                        });
+                    },
+                    error: function (er)
+                    {
+                        alert(er);
+                    }
+                });
+        }
+
+        var amountPaidElement = document.getElementById('amountPaid');
+        if (amountPaidElement)
+        {
+            // Element exists
+            amountPaidElement.addEventListener('keyup', function (e)
+            {
+                var amountPaid = amountPaidElement.value;
+                var change = amountPaid - @Model.TotalAmount;
+                var changeElement = document.getElementById('change');
+                if (changeElement)
+                {
+                    changeElement.value = change;
+                }
+                //CalculateChange();
+            });
+        } else
+        {
+            // Element doesn't exist
+        }
+
+        const Options = document.getElementsByClassName('mb-10 fv-row');
+        const FormOptions = document.getElementsByClassName('form-check-input');
+
+        var handleCash = function ()
+        {
+            // Show
+            // if (FormOptions) {
+            //     FormOptions[0].addEventListener('click', function () {
+            //         Options[0].classList.remove('d-none');
+            //         Options[1].classList.add('d-none');
+            //         Options[2].classList.add('d-none');
+            //     });
+            // }
+        }
+
+        var handleCard = function ()
+        {
+            // Show
+            // if (FormOptions) {
+            //     FormOptions[1].addEventListener('click', function () {
+            //         Options[1].classList.remove('d-none');
+            //         Options[0].classList.add('d-none');
+            //         Options[2].classList.add('d-none');
+            //     });
+            // }
+        }
+
+        var handleEWallet = function ()
+        {
+            // Show
+            // if (FormOptions) {
+            //     FormOptions[2].addEventListener('click', function () {
+            //         Options[2].classList.remove('d-none');
+            //         Options[1].classList.add('d-none');
+            //         Options[0].classList.add('d-none');
+            //     });
+            // }
+        }
+
+        function submitPayment(event)
+        {
+            const paymentForm = document.getElementById('payOrderForm');
+            // Submit button handler
+            if (paymentForm)
+            {
+                event.preventDefault(); // Prevent form submission
+
+                // Perform your validation here
+                var isValid = true; // Change this based on your validation logic
+
+                const amountPaidInput = document.getElementById('amountPaid');
+                //const selectedMethod = $('#PaymentMethod').val();
+                //const selectedMethod = document.querySelector('input[name="PaymentMethod"]:checked').value;
+                const selectedMethod = document.querySelector('input[name="PaymentMethod"]:checked')?.value;
+                const amountPaid = parseFloat($("#amountPaid").val());
+
+                const cashAmountInput = document.getElementById('CashAmount');
+                const moMoAmountInput = document.getElementById('MoMoAmount');
+                const moMoNumberInput = document.getElementById('MoMoNumber');
+                const mixedCashAmountInput = document.getElementById('MixedCashAmount');
+                const mixedMoMoAmountInput = document.getElementById('MixedMoMoAmount');
+
+                console.log("Amount Paid :" + amountPaid);
+                console.log("Selected Method:", selectedMethod);
+
+                if (!selectedMethod || selectedMethod === "" || selectedMethod === "None")
+                {
+                    toast_message("error", "Please select a payment method.", "Payment Method Required!");
+                    isValid = false;
+                }
+
+                const validMethods = ['@PaymentMethod.Cash', '@PaymentMethod.MobileMoney', '@PaymentMethod.Card', '@PaymentMethod.Mixed'];
+                if (!validMethods.includes(selectedMethod))
+                {
+                    toast_message("error", "Please select a valid payment method.", "Payment Method Required!");
+                    isValid = false;
+                }
+
+                if (selectedMethod === '@PaymentMethod.Cash' && !cashAmountInput.value)
+                {
+                    toast_message("error", "Please enter a valid cash amount.", "Valid Cash Amount Required!");
+                    isValid = false;
+                    cashAmountInput.focus();
+                }
+
+                //if (selectedMethod === '@PaymentMethod.MobileMoney' && (!moMoAmountInput.value || !moMoNumberInput.value.trim()))
+                if (selectedMethod === '@PaymentMethod.MobileMoney' && (!moMoAmountInput.value))
+                {
+                    toast_message("error", "Please enter a valid MoMo amount", "Valid MoMo Amount Required!");
+                    isValid = false;
+                    moMoAmountInput.focus();
+                }
+
+                if (selectedMethod === '@PaymentMethod.Card' && !cardAmountInput.value)
+                {
+                    toast_message("error", "Please enter a valid card amount.", "Valid Card Amount Required!");
+                    isValid = false;
+                    cardAmountInput.focus();
+                }
+
+                if (selectedMethod === '@PaymentMethod.Mixed' && (!mixedCashAmountInput.value || !mixedMoMoAmountInput.value))
+                {
+                    toast_message("error", "Please enter valid mixed payment amounts.", "Valid Mixed Amounts Required!");
+                    isValid = false;
+                    mixedCashAmountInput.focus();
+                }
+
+                if (!amountPaid || amountPaid <= 0)
+                {
+                    toast_message("error", "Please enter a valid amount.", "Valid Amount Required!");
+                    isValid = false;
+                    amountPaidInput.focus();
+                }
+
+                if (isValid)
+                {
+                    paymentForm.submit();
+                }
+            }
+        }
+
+        //version 3 using printThis.js Library
+        function printPartialView()
+        {
+            // Specify the ID of the div containing the content to print
+            const elementId = 'section-to-print';
+            // Use printThis.js to print the content
+            $(`#${elementId}`).printThis({
+                debug: false, // Set to true to enable debugging
+                importCSS: true, // Import stylesheets
+                importStyle: true, // Import inline styles
+                printContainer: true, // Print the entire container
+                loadCSS: ['/assets/css/style.bundle.css'] // Specify additional CSS files to load
+            });
+        }
+
+    </script>
+}

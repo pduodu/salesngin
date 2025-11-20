@@ -1,0 +1,125 @@
+﻿@model ItemViewModel
+@{
+
+    <div class="fv-row mb-5 mt-10" id="stockManagementContainer">
+        <div class="row mt-5 g-5">
+            <div class="col">
+                <label class="form-label">Units per Pack (Pcs)</label>
+                <input asp-for="@Model.UnitsPerPack" type="number" class="form-control mb-2" placeholder="0" />
+            </div>
+            @{
+                if (Model.InventoryItem == null)
+                {
+                    <div class="col">
+                        <label class="form-label">Quantity Available (Pcs)</label>
+                        <input asp-for="@Model.Quantity" type="number" class="form-control mb-2" placeholder="0" />
+                    </div>
+                }
+                else
+                {
+                    <div class="col">
+                        <label class="form-label">Quantity Available (Pcs)</label>
+                        <label class="form-control form-control-solid mb-2">@Model.Quantity</label>
+                    </div>
+                }
+                // <div class="col">
+                //     <label class="form-label">Units per Carton (Pieces)</label>
+                //     <input asp-for="@Model.UnitsPerCarton" type="number" class="form-control mb-2" placeholder="0" />
+                // </div>
+                <div class="col">
+                    <label class="form-label">Restock Alert Quantity (Pcs)</label>
+                    <input asp-for="@Model.RestockLevel" type="number" class="form-control mb-2" placeholder="0" />
+                </div>
+            }
+        </div>
+        @{
+            if (Model.InventoryItem != null)
+            {
+                <div class="row mt-5 g-5">
+                    <div class="col">
+                        <label class="form-label">Current Stock Summary : @Model.InventoryItem?.StockQuantitySummary</label>
+                        <label class="form-label">Retail Profit : @Model.InventoryItem?.RetailProfit</label>
+                        <label class="form-label">Total Retail Profit : @Model.InventoryItem?.TotalRetailProfit</label>
+                        <label class="form-label">Wholesale Profit : @Model.InventoryItem?.WholesaleProfit</label>
+                        <label class="form-label">Total Wholesale Profit : @Model.InventoryItem?.TotalWholesaleProfit</label>
+                        <label class="form-label">Stock value at Cost : @Model.InventoryItem?.StockValueAtCost</label>
+                        <label class="form-label">Stock value at Retail : @Model.InventoryItem?.StockValueAtRetail</label>
+                        <label class="form-label">Stock value at Wholesale : @Model.InventoryItem?.StockValueAtWholesale</label>
+                    </div>
+                </div>
+            }
+        }
+        <div class="row mt-5 g-5">
+            @{
+
+                // <div class="col">
+                //     <label class="form-label">Retail Price</label>
+                //     @{
+                //         if (Model.InventoryItem == null)
+                //         {
+                //             <input asp-for="@Model.RetailPrice" type="number" class="form-control mb-2" placeholder="0" />
+                //         }
+                //         else
+                //         {
+                //             <label class="form-control form-control-solid mb-2">@Model.RetailPrice</label>
+                //         }
+                //     }
+                // </div>
+                // <div class="col">
+                //     <label class="form-label">Wholesale Price</label>
+                //     @{
+                //         if (Model.InventoryItem == null)
+                //         {
+                //             <input asp-for="@Model.WholesalePrice" type="number" class="form-control mb-2" placeholder="0" />
+                //         }
+                //         else
+                //         {
+                //             <label class="form-control form-control-solid mb-2">@Model.WholesalePrice</label>
+                //         }
+                //     }
+                // </div>
+                // <div class="col">
+                //     <label class="form-label">Retail Price</label>
+                //     @{
+                //         if (Model.InventoryItem == null)
+                //         {
+                //             <input asp-for="@Model.RetailPrice" type="number" class="form-control mb-2" placeholder="0" />
+                //         }
+                //         else
+                //         {
+                //             <label class="form-control form-control-solid mb-2">@Model.RetailPrice</label>
+                //         }
+                //     }
+                // </div>
+
+                <div class="col">
+                    <label class="form-label">Cost Price</label>
+                    <input asp-for="@Model.CostPrice" type="number" class="form-control mb-2" placeholder="0.00" min="0.00"
+                        max="9999999999999999.99" step="0.01" />
+                </div>
+                <div class="col">
+                    <label class="form-label">Retail Price</label>
+                    <input asp-for="@Model.RetailPrice" type="number" class="form-control mb-2" placeholder="0.00" min="0.00"
+                        max="9999999999999999.99" step="0.01" />
+                </div>
+                <div class="col">
+                    <label class="form-label">Wholesale Price</label>
+                    <input asp-for="@Model.WholesalePrice" type="number" class="form-control mb-2" placeholder="0.00" min="0.00"
+                        max="9999999999999999.99" step="0.01" />
+                </div>
+            }
+            @*<div class="row g-5">
+                                    <div class="col">
+                                        <label class="form-label">Current Restock Level</label>
+                                        <label class="form-control form-control-solid mb-2" placeholder="Stock Alert">@Model.RestockLevel</label>
+                                    </div>
+                                </div>*@
+        </div>
+        <div class="mb-5 mt-5 fv-row">
+            <label class="form-label fs-6 fw-semibold">Additional Notes</label>
+            <textarea rows="3" asp-for="@Model.Notes" type="" class="form-control mb-2" placeholder="..." value=""></textarea>
+            <div class="text-muted fs-7">Add notes concerning this Item.</div>
+        </div>
+    </div>
+
+}

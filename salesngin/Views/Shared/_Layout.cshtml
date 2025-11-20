@@ -1,0 +1,274 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] </title>
+    <!--begin::favicon-->
+    <link rel="apple-touch-icon" sizes="180x180" href="~/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/favicon/favicon-16x16.png">
+    <!--end::favicon-->
+    <!--begin::Fonts-->
+    @* <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700"> *@
+    <link href="~/fonts/Inter-VariableFont_slnt,wght.ttf" as="font" type="font/ttf">
+    <!--end::Fonts-->
+    <!--plugins-->
+    <link href="~/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+    <!--end::Page Vendor Stylesheets-->
+    <!--begin::Global Stylesheets Bundle(used by all pages)-->
+    <link href="~/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="~/lib/boxicons/css/boxicons.css" rel="stylesheet" type="text/css" />
+    @* <link href="~/lib/pint.js/css/print.min.css" rel="stylesheet" /> *@
+    <link href="~/lib/print-js/print.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link href="~/lib/apexcharts/apexcharts.min.css" rel="stylesheet" />
+    <link href="~/lib/summernote/summernote-lite.css" rel="stylesheet" />
+    <!--end::Global Stylesheets Bundle-->
+</head>
+@* oncontextmenu="return false;" *@
+<body id="kt_app_body" data-kt-app-layout="dark-sidebar" data-kt-app-header-fixed="true"
+      data-kt-app-sidebar-enabled="true" data-kt-app-sidebar-fixed="true" data-kt-app-sidebar-hoverable="true"
+      data-kt-app-sidebar-push-header="true" data-kt-app-sidebar-push-toolbar="true"
+      data-kt-app-sidebar-push-footer="true" data-kt-app-toolbar-enabled="true" class="app-default">
+
+    <!--begin::Theme mode setup on page load-->
+    <script>
+        var defaultThemeMode = "light";
+        var themeMode;
+
+        if (document.documentElement) {
+            if (document.documentElement.hasAttribute("data-bs-theme-mode")) {
+                themeMode = document.documentElement.getAttribute("data-bs-theme-mode");
+            } else {
+                if (localStorage.getItem("data-bs-theme") !== null) {
+                    themeMode = localStorage.getItem("data-bs-theme");
+                } else {
+                    themeMode = defaultThemeMode;
+                }
+            }
+
+            if (themeMode === "system") {
+                themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+
+            document.documentElement.setAttribute("data-bs-theme", themeMode);
+        }
+
+    </script>
+    <!--end::Theme mode setup on page load-->
+    <!--begin::Main-->
+    <!--begin::Root-->
+    <div class="d-flex flex-column flex-root app-root" id="kt_app_root">
+        <!--begin::Page-->
+        <div class="app-page  flex-column flex-column-fluid " id="kt_app_page">
+
+            <!--begin::Header-->
+            @await Html.PartialAsync("_Header")
+            <!--end::Header-->
+            <!--begin::Aside-->
+            @* @await Html.PartialAsync("_Aside") *@
+            <!--end::Aside-->
+            <!--begin::Wrapper-->
+            <div class="app-wrapper  flex-column flex-row-fluid " id="kt_app_wrapper">
+
+                <!--begin::Sidebar-->
+                @await Html.PartialAsync("_Sidebar")
+                <!--end::Sidebar-->
+                <!--begin::Main-->
+                <div class="app-main flex-column flex-row-fluid " id="kt_app_main">
+                    <!--begin::Content wrapper-->
+                    <div class="d-flex flex-column flex-column-fluid">
+                        <!--begin::Toolbar-->
+                        @*<div id="kt_app_toolbar" class="app-toolbar  py-3 py-lg-6 ">
+                        <!--begin::Toolbar container-->
+                        @await Html.PartialAsync("_Toolbar")
+                        <!--end::Toolbar container-->
+                        </div>*@
+                        <!--end::Toolbar-->
+                        <!--begin::Content-->
+                        <div id="kt_app_content" class="app-content flex-column-fluid ">
+                            <!--begin::Content container-->
+                            <div id="kt_app_content_container" class="app-container  container-fluid mt-10">
+
+                                <!--begin::Content-->
+                                @RenderBody()
+                                <!--end::Content-->
+
+                            </div>
+                        </div>
+                        <!--end::Content-->
+                    </div>
+                    <!--end::Content wrapper-->
+                    <!--begin::Footer-->
+                    @await Html.PartialAsync("_Footer")
+                    <!--end::Footer-->
+                </div>
+                <!--end:::Main-->
+            </div>
+            <!--end::Wrapper-->
+        </div>
+        <!--end::Page-->
+    </div>
+    <!--end::Root-->
+    <div id="div_notification_popup" class="modal fade" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <!--begin::Modal dialog-->
+        <div class="modal-dialog modal-dialog-centered">
+            <!--begin::Modal content-->
+            <div id="div_notification_content" class="modal-content">
+            </div>
+            <!--end::Modal content-->
+        </div>
+        <!--end::Modal dialog-->
+    </div>
+    <!-- Example Bootstrap modal for the session expiry popup -->
+    <div class="modal fade" id="sessionExpiryModal" tabindex="-1" role="dialog" aria-labelledby="sessionExpiryModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sessionExpiryModalLabel">Session Expiry Warning</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Your session is about to expire. Please save your work.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="extendSessionButton">Extend Session</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--begin::Scrolltop-->
+    <div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
+        <i class="ki-duotone ki-arrow-up fs-2x">
+            <span class="path1"></span>
+            <span class="path2"></span>
+        </i>
+    </div>
+    <!--end::Scrolltop-->
+    <!--begin::Javascript-->
+    <script>var hostUrl = "~/assets/";</script>
+    <!--begin::Global Javascript Bundle-->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/assets/plugins/global/plugins.bundle.js"></script>
+    <script src="~/assets/js/scripts.bundle.js"></script>
+    <!--end::Global Javascript Bundle-->
+    <!--begin::Page Vendors Javascript-->
+    <script src="~/assets/plugins/custom/datatables/datatables.bundle.js"></script>
+    <script src="~/lib/list.js/list.js"></script>
+    <!--end::Page Vendors Javascript-->
+    <!--begin::Page Custom Javascript-->
+    <script src="~/js/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/assets/js/tablelist.js"></script>
+    @* <script src="~/assets/js/list.js"></script> *@
+    @* <script src="~/lib/pint.js/js/print.min.js"></script> *@
+    <script src="~/lib/print-js/print.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/notification.js"></script>
+    <script src="~/lib/apexcharts/apexcharts.min.js" asp-append-version="true"></script>
+    <script src="~/lib/summernote/summernote-lite.js" asp-append-version="true"></script>
+    <script src="~/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
+    <script src="~/lib/printthis/printthis.min.js" asp-append-version="true"></script>
+    @* <script src="~/lib/jspdf/jspdf.umd.js"></script> *@
+    @* <script src="~/lib/jspdf/jspdf.umd.min.js"></script> *@
+    <!--end::Page Custom Javascript-->
+    <!-- script to handle notification button clicked in header -->
+    <script type="text/javascript">
+
+    </script>
+    <!-- Notification Partial -->
+    @await Html.PartialAsync("_NotificationPartial")
+    @await Html.PartialAsync("_CustomScriptsPartial")
+    <!--end::Javascript-->
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <style>
+        .requiredField:after {
+            content: " *";
+            color: red;
+            font-size: larger;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .borderInvalid {
+            border: dotted 1px red;
+        }
+
+        /* Define default table border size and color */
+        /*   .note-editable table {
+                    border: 2px solid #000; 
+        }
+        */
+
+        /* Define default table border size and color for tables, rows, and columns */
+        .note-editable table {
+            width: 100%; /* Set table width to 100% */
+            border-collapse: collapse; /* Collapse borders for consistent styling */
+        }
+
+        .note-editable table,
+        .note-editable table th,
+        .note-editable table td {
+            border: 1px solid #000; /* Set border size and color for tables, th, and td */
+            padding: 3px; /* Set padding for cells */
+        }
+
+        .note-editable td {
+            text-align: center; /* Set text alignment for table data */
+        }
+    </style>
+
+    <!-- Add session timeout warning script here -->
+    <script>
+        // Set the session timeout duration (same as your session setup in C#)
+        const sessionTimeout = 30 * 60 * 1000; // 30 minutes
+        const alertBeforeTimeout = 2 * 60 * 1000; // 2 minutes before timeout
+
+        let timeoutWarning;
+        let timeoutLogout;
+
+        function showSessionAlert() {
+            //alert("Your session will expire in 2 minutes. Please save your work or click anywhere to extend your session.");
+            toast_message("error","Your session will expire in 2 minutes. Please save your work or click anywhere to extend your session.","Session Info");
+        }
+
+        function extendSession() {
+            // This function can optionally make an AJAX call to keep the session alive
+            console.log("Session extended.");
+            //toast_message("success","Session extended","Session Info");
+        }
+
+        function startSessionTimers() {
+            timeoutWarning = setTimeout(showSessionAlert, sessionTimeout - alertBeforeTimeout);
+            timeoutLogout = setTimeout(() => {
+                //alert("Your session has expired. You will be logged out.");
+                toast_message("warning","Your session has expired. You will be logged out.","Session Info");
+                window.location.href = '@Url.Action("Login", "Account")'; // Redirect to Logout action
+            }, sessionTimeout);
+        }
+
+        // Reset session timers on any user activity (click, keypress, etc.)
+        document.addEventListener("click", function () {
+            clearTimeout(timeoutWarning);
+            clearTimeout(timeoutLogout);
+            extendSession();
+            startSessionTimers();
+        });
+
+        // Start timers when the page loads
+        window.onload = function () {
+            startSessionTimers();
+        };
+
+    </script>
+
+</body>
+</html>

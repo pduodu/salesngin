@@ -1,0 +1,102 @@
+﻿@{
+    var showTitle = ViewBag.ShowTitle;
+    //var showTitle = false;
+}
+<!--begin::Toolbar-->
+<div id="kt_app_toolbar" class="app-toolbar">
+
+    <!--begin::Toolbar container-->
+    <div id="kt_app_toolbar_container" class="app-container  container-xxl d-flex align-items-start ">
+        <!--begin::Toolbar container-->
+        <div class="d-flex flex-column flex-row-fluid">
+            <div class="d-flex align-items-center pt-1">
+            </div>
+
+            @{
+                if (showTitle)
+                {
+                    <!--begin::Page title-->
+                    <div class="page-title d-flex align-items-center me-3 mb-4 pt-4 pt-lg-4 mb-lg-5">
+
+                        @*<div class="btn btn-icon btn-custom h-65px w-65px me-6">
+                <img alt="Logo" src="../../assets/media/svg/misc/layer.svg" class="h-40px" />
+                </div>*@
+
+                        <!--begin::Title-->
+                        <h1 class="page-heading d-flex text-white fw-bolder fs-2 flex-column justify-content-center my-0">
+                            @ViewData["Title"]
+                            <!--begin::Description-->
+                            @*<span class="page-desc text-white fs-6 pt-2">
+                    @ViewData["Page"]
+                    </span> *@
+                            <!--end::Description-->
+                        </h1>
+                        <!--end::Title-->
+                    </div>
+                    <!--end::Page title-->
+                }
+            }
+
+            <div class="d-flex justify-content-between flex-wrap gap-4 gap-lg-10 mt-4">
+
+                <!--begin::Toolbar menu-->
+                <div class="app-toolbar-menu menu menu-rounded menu-gray-800 menu-state-bg flex-wrap fs-5 fw-semibold ">
+                    <!--begin::Menu item-->
+                    <div class="menu-item pb-xl-8 pb-4 mt-5 mt-lg-0">
+                        <!--begin::Breadcrumb-->
+                        <ul class="breadcrumb breadcrumb-separatorless fw-semibold pt-5">
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-white fw-bold lh-1">
+                                <a asp-controller="Home" asp-action="Index" class="text-white">
+                                    <i class="ki-duotone ki-home text-white fs-2">
+                                    </i>
+                                </a>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item">
+                                <i class="ki-duotone ki-right fs-3 text-white mx-n1"></i>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-white fs-3 fw-bold lh-1">
+                                @ViewData["Title"]
+                            </li>
+                            <!--end::Item-->
+                        </ul>
+                        <!--end::Breadcrumb-->
+                    </div>
+                    <!--end::Menu item-->
+                </div>
+                <!--begin::Toolbar menu-->
+                <!--begin::Wrapper-->
+                <div class="d-flex flex-align-items flex-wrap gap-3 gap-xl-0 mb-7 mt-n1">
+
+                    <!--begin::Actions-->
+                    <div class="d-flex align-items-center flex-shrink-0">
+                        @*
+                        <a asp-controller="Home" asp-action="Hazard" class="btn btn-sm btn-flex btn-primary p-3 mx-2 fs-5">
+                        <i class='bx bx-error fs-2x'></i>
+                        <span>Hazard</span>
+                        </a>
+                        <a asp-controller="Home" asp-action="Voluntary" class="btn btn-sm btn-flex btn-primary p-3 mx-2 fs-5">
+                        <i class='bx bx-group fs-2x'></i>
+                        <span>Voluntary & Confidential</span>
+                        </a>
+                        <a asp-controller="Form" asp-action="Forms" class="btn btn-sm btn-flex btn-primary p-3 mx-2 fs-5">
+                        <i class='bx bx-shield-quarter fs-2x'></i>
+                        <span>Mandatory</span>
+                        </a>
+                        *@
+                    </div>
+                    <!--end::Actions-->
+                </div>
+                <!--end::Wrapper-->
+
+            </div>
+        </div>
+        <!--end::Toolbar container--->
+    </div>
+    <!--end::Toolbar container-->
+</div>
+<!--end::Toolbar-->

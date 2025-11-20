@@ -1,0 +1,779 @@
+﻿@model UserViewModel
+@inject IDataControllerService _dataService
+@{
+    //Layout = "_Layout";
+    ViewData["Title"] = "Create";
+    ViewData["MainMenu"] = "User Management";
+    ViewData["SubMenu"] = "Users";
+    ViewData["Page"] = "Create User";
+}
+
+
+<div class="card col-md-11 mb-5 mb-lg-10 mx-auto">
+    <div class="card-header">
+        <div class="card-toolbar">
+            <a asp-controller="Account" asp-action="Users" class="btn btn-light-primary px-3 float-end" data-kt-roles-table-filter="delete_row"><i class="bx bx-arrow-back bx-sm"></i></a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="stepper stepper-links d-flex flex-column pt-5" id="kt_stepper_user_create" data-kt-stepper="true">
+            <!--begin::Nav-->
+            <div class="stepper-nav mb-5">
+                <!--begin::Step 1-->
+                <div class="stepper-item current" data-kt-stepper-element="nav">
+                    <h3 class="stepper-title">Corporate Info</h3>
+                </div>
+                <!--end::Step 1-->
+                <!--begin::Step 2-->
+                <div class="stepper-item" data-kt-stepper-element="nav">
+                    <h3 class="stepper-title">User Info</h3>
+                </div>
+                <!--end::Step 2-->
+                <!--begin::Step 3-->
+                <div class="stepper-item" data-kt-stepper-element="nav">
+                    <h3 class="stepper-title">Login & Role Info</h3>
+                </div>
+                <!--end::Step 3-->
+                <!--begin::Step 4-->
+                <div class="stepper-item" data-kt-stepper-element="nav">
+                    <h3 class="stepper-title">Permissions</h3>
+                </div>
+                <!--end::Step 4-->
+                <!--begin::Step 5-->
+                <div class="stepper-item" data-kt-stepper-element="nav">
+                    <h3 class="stepper-title">Photo</h3>
+                </div>
+                <!--end::Step 5-->
+            </div>
+            <!--end::Nav-->
+            <div class='separator separator-dashed my-2'></div>
+            <!--begin::Form-->
+            <form asp-controller="Account" asp-action="Create" enctype="multipart/form-data" method="post" class="mx-auto  w-100 pt-5 px-5 pb-5 fv-plugins-bootstrap5 fv-plugins-framework" id="create_account_form">
+                <!--begin::Step 1-->
+                <div class="current" data-kt-stepper-element="content">
+                    <!--begin::Wrapper-->
+                    <div class="w-100">
+                        <!--begin::Heading-->
+                        <div class="pb-5 pb-lg-10">
+                            <!--begin::Title-->
+                            <h2 class="fw-bolder d-flex align-items-center text-dark">
+                                Corporate Info
+                                <i class="fas fa-exclamation-circle ms-2 fs-7" data-bs-toggle="tooltip" title="" data-bs-original-title="Provide valid user data" aria-label="Only valid corporate data should be entered in here."></i>
+                            </h2>
+                            <!--end::Title-->
+                            <!--begin::Notice-->
+                            <div class="text-muted fw-bold fs-6">
+                                Only valid corporate data should be entered in here.
+                            </div>
+                            <!--end::Notice-->
+                        </div>
+                        <div class="mb-5 fv-row fv-plugins-icon-container">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card card-dashed">
+                                        <div id="divEmpType" class="card-body">
+                                            <label class="fs-6 fw-bold form-label mb-5">
+                                                <span class="">Select Employee Type<i class="fa fa-asterisk px-2 text-danger"></i></span>
+                                            </label>
+                                            @{
+                                                int num = 0;
+                                                foreach (var type in Model.EmployeeTypes)
+                                                {
+                                                    num++;
+                                                    string radioNumber = $"employeeTypeId_{@num}";
+                                                    string radioText = type.Name.Trim();
+                                                    <div class="d-flex">
+                                                        <div class="form-check form-check-custom form-check-solid">
+                                                            <input class="form-check-input me-3 employeeRadio" asp-for="EmployeeTypeId" value="@type.Id" type="radio" id="@radioNumber" data-arg1="@radioText" onclick="getStaffId(@type.Id);" />
+                                                            <label class="form-check-label" for="@radioNumber">
+                                                                <div class="fs-5 fw-bolder text-gray-800">@type.Name</div>
+                                                                <small class="text-gray-600">@type.Description</small>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class='separator separator-dashed my-5'></div>
+                                                }
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card card-dashed">
+                                        <div class="card-body">
+
+                                            <div class="row mb-3">
+                                                <div class="col">
+                                                    <!--begin::Label-->
+                                                    <label class="fs-6 fw-bold mb-2">Start Date</label>
+                                                    <!--end::Label-->
+                                                    <div class="position-relative d-flex align-items-center">
+                                                        <!--begin::Svg Icon | path: icons/duotune/general/gen014.svg-->
+                                                        <span class="svg-icon svg-icon-2 position-absolute mx-4">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                                <path opacity="0.3" d="M21 22H3C2.4 22 2 21.6 2 21V5C2 4.4 2.4 4 3 4H21C21.6 4 22 4.4 22 5V21C22 21.6 21.6 22 21 22Z" fill="currentColor"></path>
+                                                                <path d="M6 6C5.4 6 5 5.6 5 5V3C5 2.4 5.4 2 6 2C6.6 2 7 2.4 7 3V5C7 5.6 6.6 6 6 6ZM11 5V3C11 2.4 10.6 2 10 2C9.4 2 9 2.4 9 3V5C9 5.6 9.4 6 10 6C10.6 6 11 5.6 11 5ZM15 5V3C15 2.4 14.6 2 14 2C13.4 2 13 2.4 13 3V5C13 5.6 13.4 6 14 6C14.6 6 15 5.6 15 5ZM19 5V3C19 2.4 18.6 2 18 2C17.4 2 17 2.4 17 3V5C17 5.6 17.4 6 18 6C18.6 6 19 5.6 19 5Z" fill="currentColor"></path>
+                                                                <path d="M8.8 13.1C9.2 13.1 9.5 13 9.7 12.8C9.9 12.6 10.1 12.3 10.1 11.9C10.1 11.6 10 11.3 9.8 11.1C9.6 10.9 9.3 10.8 9 10.8C8.8 10.8 8.59999 10.8 8.39999 10.9C8.19999 11 8.1 11.1 8 11.2C7.9 11.3 7.8 11.4 7.7 11.6C7.6 11.8 7.5 11.9 7.5 12.1C7.5 12.2 7.4 12.2 7.3 12.3C7.2 12.4 7.09999 12.4 6.89999 12.4C6.69999 12.4 6.6 12.3 6.5 12.2C6.4 12.1 6.3 11.9 6.3 11.7C6.3 11.5 6.4 11.3 6.5 11.1C6.6 10.9 6.8 10.7 7 10.5C7.2 10.3 7.49999 10.1 7.89999 10C8.29999 9.90003 8.60001 9.80003 9.10001 9.80003C9.50001 9.80003 9.80001 9.90003 10.1 10C10.4 10.1 10.7 10.3 10.9 10.4C11.1 10.5 11.3 10.8 11.4 11.1C11.5 11.4 11.6 11.6 11.6 11.9C11.6 12.3 11.5 12.6 11.3 12.9C11.1 13.2 10.9 13.5 10.6 13.7C10.9 13.9 11.2 14.1 11.4 14.3C11.6 14.5 11.8 14.7 11.9 15C12 15.3 12.1 15.5 12.1 15.8C12.1 16.2 12 16.5 11.9 16.8C11.8 17.1 11.5 17.4 11.3 17.7C11.1 18 10.7 18.2 10.3 18.3C9.9 18.4 9.5 18.5 9 18.5C8.5 18.5 8.1 18.4 7.7 18.2C7.3 18 7 17.8 6.8 17.6C6.6 17.4 6.4 17.1 6.3 16.8C6.2 16.5 6.10001 16.3 6.10001 16.1C6.10001 15.9 6.2 15.7 6.3 15.6C6.4 15.5 6.6 15.4 6.8 15.4C6.9 15.4 7.00001 15.4 7.10001 15.5C7.20001 15.6 7.3 15.6 7.3 15.7C7.5 16.2 7.7 16.6 8 16.9C8.3 17.2 8.6 17.3 9 17.3C9.2 17.3 9.5 17.2 9.7 17.1C9.9 17 10.1 16.8 10.3 16.6C10.5 16.4 10.5 16.1 10.5 15.8C10.5 15.3 10.4 15 10.1 14.7C9.80001 14.4 9.50001 14.3 9.10001 14.3C9.00001 14.3 8.9 14.3 8.7 14.3C8.5 14.3 8.39999 14.3 8.39999 14.3C8.19999 14.3 7.99999 14.2 7.89999 14.1C7.79999 14 7.7 13.8 7.7 13.7C7.7 13.5 7.79999 13.4 7.89999 13.2C7.99999 13 8.2 13 8.5 13H8.8V13.1ZM15.3 17.5V12.2C14.3 13 13.6 13.3 13.3 13.3C13.1 13.3 13 13.2 12.9 13.1C12.8 13 12.7 12.8 12.7 12.6C12.7 12.4 12.8 12.3 12.9 12.2C13 12.1 13.2 12 13.6 11.8C14.1 11.6 14.5 11.3 14.7 11.1C14.9 10.9 15.2 10.6 15.5 10.3C15.8 10 15.9 9.80003 15.9 9.70003C15.9 9.60003 16.1 9.60004 16.3 9.60004C16.5 9.60004 16.7 9.70003 16.8 9.80003C16.9 9.90003 17 10.2 17 10.5V17.2C17 18 16.7 18.4 16.2 18.4C16 18.4 15.8 18.3 15.6 18.2C15.4 18.1 15.3 17.8 15.3 17.5Z" fill="currentColor"></path>
+                                                            </svg>
+                                                        </span>
+                                                        <input asp-for="DateStarted" class="form-control flatPickr_Date ps-12 flatpickr-input" type="date" placeholder="dd-mm-yyyy" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col">
+                                                    <!--begin::Label-->
+                                                    <label class="fs-6 fw-bold mb-2">End Date</label>
+                                                    <!--end::Label-->
+                                                    <div class="position-relative d-flex align-items-center">
+                                                        <!--begin::Icon-->
+                                                        <!--begin::Svg Icon | path: icons/duotune/general/gen014.svg-->
+                                                        <span class="svg-icon svg-icon-2 position-absolute mx-4">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                                <path opacity="0.3" d="M21 22H3C2.4 22 2 21.6 2 21V5C2 4.4 2.4 4 3 4H21C21.6 4 22 4.4 22 5V21C22 21.6 21.6 22 21 22Z" fill="currentColor"></path>
+                                                                <path d="M6 6C5.4 6 5 5.6 5 5V3C5 2.4 5.4 2 6 2C6.6 2 7 2.4 7 3V5C7 5.6 6.6 6 6 6ZM11 5V3C11 2.4 10.6 2 10 2C9.4 2 9 2.4 9 3V5C9 5.6 9.4 6 10 6C10.6 6 11 5.6 11 5ZM15 5V3C15 2.4 14.6 2 14 2C13.4 2 13 2.4 13 3V5C13 5.6 13.4 6 14 6C14.6 6 15 5.6 15 5ZM19 5V3C19 2.4 18.6 2 18 2C17.4 2 17 2.4 17 3V5C17 5.6 17.4 6 18 6C18.6 6 19 5.6 19 5Z" fill="currentColor"></path>
+                                                                <path d="M8.8 13.1C9.2 13.1 9.5 13 9.7 12.8C9.9 12.6 10.1 12.3 10.1 11.9C10.1 11.6 10 11.3 9.8 11.1C9.6 10.9 9.3 10.8 9 10.8C8.8 10.8 8.59999 10.8 8.39999 10.9C8.19999 11 8.1 11.1 8 11.2C7.9 11.3 7.8 11.4 7.7 11.6C7.6 11.8 7.5 11.9 7.5 12.1C7.5 12.2 7.4 12.2 7.3 12.3C7.2 12.4 7.09999 12.4 6.89999 12.4C6.69999 12.4 6.6 12.3 6.5 12.2C6.4 12.1 6.3 11.9 6.3 11.7C6.3 11.5 6.4 11.3 6.5 11.1C6.6 10.9 6.8 10.7 7 10.5C7.2 10.3 7.49999 10.1 7.89999 10C8.29999 9.90003 8.60001 9.80003 9.10001 9.80003C9.50001 9.80003 9.80001 9.90003 10.1 10C10.4 10.1 10.7 10.3 10.9 10.4C11.1 10.5 11.3 10.8 11.4 11.1C11.5 11.4 11.6 11.6 11.6 11.9C11.6 12.3 11.5 12.6 11.3 12.9C11.1 13.2 10.9 13.5 10.6 13.7C10.9 13.9 11.2 14.1 11.4 14.3C11.6 14.5 11.8 14.7 11.9 15C12 15.3 12.1 15.5 12.1 15.8C12.1 16.2 12 16.5 11.9 16.8C11.8 17.1 11.5 17.4 11.3 17.7C11.1 18 10.7 18.2 10.3 18.3C9.9 18.4 9.5 18.5 9 18.5C8.5 18.5 8.1 18.4 7.7 18.2C7.3 18 7 17.8 6.8 17.6C6.6 17.4 6.4 17.1 6.3 16.8C6.2 16.5 6.10001 16.3 6.10001 16.1C6.10001 15.9 6.2 15.7 6.3 15.6C6.4 15.5 6.6 15.4 6.8 15.4C6.9 15.4 7.00001 15.4 7.10001 15.5C7.20001 15.6 7.3 15.6 7.3 15.7C7.5 16.2 7.7 16.6 8 16.9C8.3 17.2 8.6 17.3 9 17.3C9.2 17.3 9.5 17.2 9.7 17.1C9.9 17 10.1 16.8 10.3 16.6C10.5 16.4 10.5 16.1 10.5 15.8C10.5 15.3 10.4 15 10.1 14.7C9.80001 14.4 9.50001 14.3 9.10001 14.3C9.00001 14.3 8.9 14.3 8.7 14.3C8.5 14.3 8.39999 14.3 8.39999 14.3C8.19999 14.3 7.99999 14.2 7.89999 14.1C7.79999 14 7.7 13.8 7.7 13.7C7.7 13.5 7.79999 13.4 7.89999 13.2C7.99999 13 8.2 13 8.5 13H8.8V13.1ZM15.3 17.5V12.2C14.3 13 13.6 13.3 13.3 13.3C13.1 13.3 13 13.2 12.9 13.1C12.8 13 12.7 12.8 12.7 12.6C12.7 12.4 12.8 12.3 12.9 12.2C13 12.1 13.2 12 13.6 11.8C14.1 11.6 14.5 11.3 14.7 11.1C14.9 10.9 15.2 10.6 15.5 10.3C15.8 10 15.9 9.80003 15.9 9.70003C15.9 9.60003 16.1 9.60004 16.3 9.60004C16.5 9.60004 16.7 9.70003 16.8 9.80003C16.9 9.90003 17 10.2 17 10.5V17.2C17 18 16.7 18.4 16.2 18.4C16 18.4 15.8 18.3 15.6 18.2C15.4 18.1 15.3 17.8 15.3 17.5Z" fill="currentColor"></path>
+                                                            </svg>
+                                                        </span>
+                                                        <!--end::Svg Icon-->
+                                                        <!--end::Icon-->
+                                                        <!--begin::Input-->
+                                                        <input asp-for="DateEnded" class="form-control flatPickr_Date ps-12 flatpickr-input" type="date" placeholder="dd-mm-yyyy" />
+                                                        <!--end::Input-->
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col fv-row mb-3">
+                                                    <label class="fs-6 fw-bold mb-2">Staff Number<i class="fa fa-asterisk px-2 text-danger"></i></label>
+                                                    <input asp-for="StaffNumber" class="form-control" placeholder="" type="text" />
+                                                </div>
+                                            </div>
+                                            <div id="divUnit" class="row mb-3">
+                                                <div class="col fv-row">
+                                                    <label class="fs-6 fw-bold mb-2">Unit</label>
+                                                    <select asp-for="UnitId" class="form-select" asp-items="@(new SelectList(Model.Units,"Id","UnitName"))" data-control="select2" data-hide-search="false" data-placeholder="Select Unit" data-allow-clear="true">
+                                                        <option value="">Select Unit...</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row  mb-3">
+                                                <div class="col fv-row">
+                                                    <label class=" fs-6 fw-bold mb-2">Job Title<i class="fa fa-asterisk px-2 text-danger"></i></label>
+                                                    <input asp-for="JobTitle" class="form-control" placeholder="" type="text" />
+                                                </div>
+                                            </div>
+                                            <div class="row  mb-3">
+                                                <div class="col fv-row" id="divCompany" style="display:none;">
+                                                    <label class="fs-6 fw-bold mb-2">Company<i class="fa fa-asterisk px-2 text-danger"></i></label>
+                                                    <input asp-for="Company" class="form-control" placeholder="" type="text" />
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--end::Step 1-->
+                <!--begin::Step 2-->
+                <div data-kt-stepper-element="content">
+                    <!--begin::Wrapper-->
+                    <div class="w-100">
+                        <!--begin::Heading-->
+                        <div class="pb-10 pb-lg-15">
+                            <!--begin::Title-->
+                            <h2 class="fw-bolder text-dark">User Info</h2>
+                            <!--end::Title-->
+                            <!--begin::Notice-->
+                            <div class="text-muted fw-bold fs-6">
+                                Provide valid user info
+                                <a href="#" class="link-primary fw-bolder">Help Page</a>.
+                            </div>
+                            <!--end::Notice-->
+                        </div>
+                        <!--end::Heading-->
+                        <!--begin::Input group-->
+                        <div class="mb-5 fv-row fv-plugins-icon-container">
+
+                            <div class="card card-dashed">
+                                <div class="card-body">
+
+                                    <div class="row g-9 mb-8">
+                                        <!--begin::Col-->
+                                        <div class="col-md-4 fv-row">
+                                            <label class="fs-6 fw-bold mb-2">Title</label>
+                                            <select asp-for="Title" asp-items="@(new SelectList(Model.Titles,"Name","Name"))" class="form-select" data-control="select2" data-hide-search="false" data-placeholder="Select a Title" data-allow-clear="true">
+                                                <option value="">Select Title...</option>
+                                            </select>
+                                        </div>
+                                        <!--end::Col-->
+                                        <!--begin::Col-->
+                                        <div class="col-md-4 fv-row">
+                                        </div>
+                                        <!--end::Col-->
+                                    </div>
+                                    <div class="row g-9 mb-8">
+                                        <!--begin::Col-->
+                                        <div class="col-md-4 fv-row">
+                                            <label class="fs-6 fw-bold mb-2">First name<i class="fa fa-asterisk px-2 text-danger"></i></label>
+                                            <input asp-for="FirstName" class="form-control" placeholder="" type="text" />
+                                        </div>
+                                        <!--end::Col-->
+                                        <!--begin::Col-->
+                                        <div class="col-md-4 fv-row">
+                                            <label class="fs-6 fw-bold mb-2">Last name<i class="fa fa-asterisk px-2 text-danger"></i></label>
+                                            <input asp-for="LastName" class="form-control" placeholder="" type="text" />
+                                        </div>
+                                        <!--end::Col-->
+                                        <!--begin::Col-->
+                                        <div class="col-md-4 fv-row">
+                                            <label class="fs-6 fw-bold mb-2">Other name</label>
+                                            <input asp-for="OtherName" class="form-control" placeholder="" type="text" />
+                                        </div>
+                                        <!--end::Col-->
+                                    </div>
+                                    <div class="row g-9 mb-8">
+                                        <!--begin::Col-->
+                                        <div class="col-md-4 fv-row">
+                                            <label class="fs-6 fw-bold mb-2">Gender<i class="fa fa-asterisk px-2 text-danger"></i></label>
+                                            <select asp-for="Gender" class="form-select" data-control="select2" data-hide-search="false" data-placeholder="Select a Gender" data-allow-clear="true">
+                                                <option value="">Select Gender...</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4 fv-row">
+                                            <label class="fs-6 fw-bold mb-2">Date of Birth</label>
+                                            <div class="position-relative d-flex align-items-center">
+                                                <span class="svg-icon svg-icon-2 position-absolute mx-4">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                        <path opacity="0.3" d="M21 22H3C2.4 22 2 21.6 2 21V5C2 4.4 2.4 4 3 4H21C21.6 4 22 4.4 22 5V21C22 21.6 21.6 22 21 22Z" fill="currentColor"></path>
+                                                        <path d="M6 6C5.4 6 5 5.6 5 5V3C5 2.4 5.4 2 6 2C6.6 2 7 2.4 7 3V5C7 5.6 6.6 6 6 6ZM11 5V3C11 2.4 10.6 2 10 2C9.4 2 9 2.4 9 3V5C9 5.6 9.4 6 10 6C10.6 6 11 5.6 11 5ZM15 5V3C15 2.4 14.6 2 14 2C13.4 2 13 2.4 13 3V5C13 5.6 13.4 6 14 6C14.6 6 15 5.6 15 5ZM19 5V3C19 2.4 18.6 2 18 2C17.4 2 17 2.4 17 3V5C17 5.6 17.4 6 18 6C18.6 6 19 5.6 19 5Z" fill="currentColor"></path>
+                                                        <path d="M8.8 13.1C9.2 13.1 9.5 13 9.7 12.8C9.9 12.6 10.1 12.3 10.1 11.9C10.1 11.6 10 11.3 9.8 11.1C9.6 10.9 9.3 10.8 9 10.8C8.8 10.8 8.59999 10.8 8.39999 10.9C8.19999 11 8.1 11.1 8 11.2C7.9 11.3 7.8 11.4 7.7 11.6C7.6 11.8 7.5 11.9 7.5 12.1C7.5 12.2 7.4 12.2 7.3 12.3C7.2 12.4 7.09999 12.4 6.89999 12.4C6.69999 12.4 6.6 12.3 6.5 12.2C6.4 12.1 6.3 11.9 6.3 11.7C6.3 11.5 6.4 11.3 6.5 11.1C6.6 10.9 6.8 10.7 7 10.5C7.2 10.3 7.49999 10.1 7.89999 10C8.29999 9.90003 8.60001 9.80003 9.10001 9.80003C9.50001 9.80003 9.80001 9.90003 10.1 10C10.4 10.1 10.7 10.3 10.9 10.4C11.1 10.5 11.3 10.8 11.4 11.1C11.5 11.4 11.6 11.6 11.6 11.9C11.6 12.3 11.5 12.6 11.3 12.9C11.1 13.2 10.9 13.5 10.6 13.7C10.9 13.9 11.2 14.1 11.4 14.3C11.6 14.5 11.8 14.7 11.9 15C12 15.3 12.1 15.5 12.1 15.8C12.1 16.2 12 16.5 11.9 16.8C11.8 17.1 11.5 17.4 11.3 17.7C11.1 18 10.7 18.2 10.3 18.3C9.9 18.4 9.5 18.5 9 18.5C8.5 18.5 8.1 18.4 7.7 18.2C7.3 18 7 17.8 6.8 17.6C6.6 17.4 6.4 17.1 6.3 16.8C6.2 16.5 6.10001 16.3 6.10001 16.1C6.10001 15.9 6.2 15.7 6.3 15.6C6.4 15.5 6.6 15.4 6.8 15.4C6.9 15.4 7.00001 15.4 7.10001 15.5C7.20001 15.6 7.3 15.6 7.3 15.7C7.5 16.2 7.7 16.6 8 16.9C8.3 17.2 8.6 17.3 9 17.3C9.2 17.3 9.5 17.2 9.7 17.1C9.9 17 10.1 16.8 10.3 16.6C10.5 16.4 10.5 16.1 10.5 15.8C10.5 15.3 10.4 15 10.1 14.7C9.80001 14.4 9.50001 14.3 9.10001 14.3C9.00001 14.3 8.9 14.3 8.7 14.3C8.5 14.3 8.39999 14.3 8.39999 14.3C8.19999 14.3 7.99999 14.2 7.89999 14.1C7.79999 14 7.7 13.8 7.7 13.7C7.7 13.5 7.79999 13.4 7.89999 13.2C7.99999 13 8.2 13 8.5 13H8.8V13.1ZM15.3 17.5V12.2C14.3 13 13.6 13.3 13.3 13.3C13.1 13.3 13 13.2 12.9 13.1C12.8 13 12.7 12.8 12.7 12.6C12.7 12.4 12.8 12.3 12.9 12.2C13 12.1 13.2 12 13.6 11.8C14.1 11.6 14.5 11.3 14.7 11.1C14.9 10.9 15.2 10.6 15.5 10.3C15.8 10 15.9 9.80003 15.9 9.70003C15.9 9.60003 16.1 9.60004 16.3 9.60004C16.5 9.60004 16.7 9.70003 16.8 9.80003C16.9 9.90003 17 10.2 17 10.5V17.2C17 18 16.7 18.4 16.2 18.4C16 18.4 15.8 18.3 15.6 18.2C15.4 18.1 15.3 17.8 15.3 17.5Z" fill="currentColor"></path>
+                                                    </svg>
+                                                </span>
+                                                <input asp-for="DOB" class="form-control flatPickr_Date ps-12 flatpickr-input" type="date" placeholder="" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 fv-row">
+                                            <label class="fs-6 fw-bold mb-2">Country<i class="fa fa-asterisk px-2 text-danger"></i></label>
+                                            <select asp-for="CountryId" asp-items="@(new SelectList(Model.Countries,"Id","CountryName"))" class="form-select" data-control="select2" data-hide-search="false" data-placeholder="Select a Country" data-allow-clear="true">
+                                                <option value="">Select Country...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row g-9 mb-8">
+                                        <div class="d-flex flex-column col-md-8 mb-2">
+                                            <label class="fs-6 fw-bold mb-2">Postal Address</label>
+                                            <textarea asp-for="PostalAddress" class="form-control" rows="3" placeholder=""></textarea>
+                                        </div>
+                                        <div class="d-flex flex-column col-md-4 mb-2">
+                                            <label class="fs-6 fw-bold form-label mb-2">
+                                                <span class="">Phone number<i class="fa fa-asterisk px-2 text-danger"></i></span>
+                                                <i class="fas fa-exclamation-circle ms-1 fs-7" data-bs-toggle="tooltip" title="A valid phone number is required. +233 200 000 000"></i>
+                                            </label>
+                                            <input asp-for="PhoneNumber" type="text" class="form-control " placeholder="" value="" />
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--end::Step 2-->
+                <!--begin::Step 3-->
+                <div data-kt-stepper-element="content">
+                    <div class="w-100">
+                        <div class="pb-10 pb-lg-12">
+                            <h2 class="fw-bolder text-dark">Login & Role Info</h2>
+                            <div class="text-muted fw-bold fs-6">
+                                @*If you need more info, please check out*@
+                                @*<a href="#" class="link-primary fw-bolder">Help Page</a>.*@
+                            </div>
+                        </div>
+                        <div class="row g-6 col-md-11 p-0 mx-auto">
+                            <div class="col-md-6">
+                                <div class="card card-dashed">
+                                    <div class="card-body">
+
+                                        <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed mb-9 p-6">
+                                            <span class="svg-icon svg-icon-2tx svg-icon-primary me-4">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                    <rect opacity="0.3" x="2" y="2" width="20" height="20" rx="10" fill="currentColor" />
+                                                    <rect x="11" y="14" width="7" height="2" rx="1" transform="rotate(-90 11 14)" fill="currentColor" />
+                                                    <rect x="11" y="17" width="2" height="2" rx="1" transform="rotate(-90 11 17)" fill="currentColor" />
+                                                </svg>
+                                            </span>
+                                            <div class="d-flex flex-stack flex-grow-1">
+                                                <div class="fw-bold">
+                                                    <div class="fs-6 text-gray-700">Please note that a valid email address is required for account verification.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="fv-row mb-7">
+                                            <label class="fs-6 fw-bold form-label mb-2">
+                                                <span class="">Email Address<i class="fa fa-asterisk px-2 text-danger"></i></span>
+                                            </label>
+                                            <input asp-for="Email" class="form-control form-control-solid" placeholder="" value="youremail@mail.com" />
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                        <div class="mb-10 fv-row" data-kt-password-meter="true">
+                                            <div class="mb-1">
+                                                <label class="form-label fw-bold fs-6 mb-2"><span class="">Default Password<i class="fa fa-asterisk px-2 text-danger"></i></span></label>
+                                                <div class="position-relative mb-3">
+                                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                                    <input asp-for="Password" class="form-control" type="password" placeholder="" autocomplete="off" />
+                                                    <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2" data-kt-password-meter-control="visibility">
+                                                        <i class="bi bi-eye-slash fs-2"></i>
+                                                        <i class="bi bi-eye fs-2 d-none"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex align-items-center mb-3" data-kt-password-meter-control="highlight">
+                                                    <div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"></div>
+                                                    <div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"></div>
+                                                    <div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"></div>
+                                                    <div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px me-2"></div>
+                                                    <div class="flex-grow-1 bg-secondary bg-active-success rounded h-5px"></div>
+                                                </div>
+                                            </div>
+                                            <div class="text-muted">Use 8 or more characters with a mix of letters, numbers &amp; symbols.</div>
+                                        </div>
+                                        <div class="fv-row mb-10">
+                                            <label class="form-label fw-bold fs-6 mb-2"><span class="">Confirm Default Password<i class="fa fa-asterisk px-2 text-danger"></i></span></label>
+                                            <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="" autocomplete="off" />
+                                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card card-dashed">
+                                    <div class="card-body">
+                                        <label class="fs-6 fw-bold form-label mb-3">
+                                            <span class="">Select a user role<i class="fa fa-asterisk px-2 text-danger"></i></span>
+                                        </label>
+                                        <div id="divRoles" class="fv-row mb-4 hover-scroll h-450px px-5">
+                                            @{
+                                                async Task<bool> ShouldDisplayRole(ApplicationRole role)
+                                                {
+                                                    return !(role.Name == ApplicationRoles.SuperAdministrator && !await _dataService.IsUserInRole(Model.UserLoggedIn.Id, ApplicationRoles.SuperAdministrator));
+                                                }
+
+
+                                                int rolenum = 0;
+                                                foreach (var role in Model.Roles)
+                                                {
+                                                    rolenum++;
+                                                    if (await ShouldDisplayRole(role))
+                                                    {
+                                                        <div class="d-flex">
+                                                            <div class="form-check form-check-custom form-check-solid">
+                                                                <input asp-for="RoleId" class="form-check-input me-3 roleRadio" type="radio" value="@role.Id" id="RoleId_@rolenum" onclick="GetPermissions(@role.Id)" />
+                                                                <label class="form-check-label" for="RoleId_@rolenum">
+                                                                    <div class="fw-bolder text-gray-800">@role.RoleDisplayText</div>
+                                                                    <div class="text-gray-600">@role.RoleDescription</div>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class='separator separator-dashed my-5'></div>
+                                                    }
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Wrapper-->
+                </div>
+                <!--end::Step 3-->
+                <!--begin::Step 4-->
+                <div data-kt-stepper-element="content">
+                    <!--begin::Wrapper-->
+                    <div class="w-100">
+                        <!--begin::Heading-->
+                        <div class="pb-10 pb-lg-15">
+                            <!--begin::Title-->
+                            <h2 class="fw-bolder text-dark">Permissions</h2>
+                            <!--end::Title-->
+                            <!--begin::Notice-->
+                            <div class="text-muted fw-bold fs-6">
+                                Select required actions for each module avaible for the selected role
+                                @*<a href="#" class="text-primary fw-bolder">Help Page</a>.*@
+                            </div>
+                            <!--end::Notice-->
+                        </div>
+                        <!--end::Heading-->
+                        <div class="card card-dashed">
+                            <div id="divModulePermissions" class="card-body">
+                                @await Html.PartialAsync("_AddModulePermission", Model)
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Wrapper-->
+                </div>
+                <!--end::Step 4-->
+                <!--begin::Step 5-->
+                <div data-kt-stepper-element="content">
+                    <!--begin::Wrapper-->
+                    <div class="w-100">
+                        <!--begin::Heading-->
+                        <div class="pb-8 pb-lg-10">
+                            <!--begin::Title-->
+                            <h2 class="fw-bolder text-dark">Photo</h2>
+                            <!--end::Title-->
+                            <!--begin::Notice-->
+                            <div class="text-muted fw-bold fs-6">
+                                Upload passport sized photo of user.
+                                @*<a href="../../demo1/dist/authentication/sign-in/basic.html" class="link-primary fw-bolder">Sign In</a>.*@
+                            </div>
+                            <!--end::Notice-->
+                        </div>
+                        <!--end::Heading-->
+                        <!--begin::Body-->
+                        <div class="mb-0">
+                            <!--begin::Input group-->
+                            <div class="row mb-6">
+                                <!--begin::Label-->
+                                <label class="col-lg-4 col-form-label fw-bold fs-6"></label>
+                                <!--end::Label-->
+                                <!--begin::Col-->
+                                <div class="col-lg-8">
+                                    @{
+                                        var defaultImage = FileStorePath.noUserPhotoPath;
+                                    }
+                                    <!--begin::Image input-->
+                                    <div class="image-input image-input-outline" data-kt-image-input="true" style="background-image: url('/assets/media/svg/avatars/blank.svg')">
+                                        <!--begin::Preview existing avatar-->
+                                        <div class="image-input-wrapper" src="defaultImage" style="background-image: url('@Url.Content(defaultImage)'); width:150px !important; height:150px !important;"></div>
+                                        <!--end::Preview existing avatar-->
+                                        <!--begin::Label-->
+                                        <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change Photo">
+                                            <i class="bi bi-pencil-fill fs-7"></i>
+                                            <!--begin::Inputs-->
+                                            <input type="file" asp-for="Photo" accept=".png, .jpg, .jpeg" />
+                                            <input type="hidden" name="avatar_remove" />
+                                            <!--end::Inputs-->
+                                        </label>
+                                        <!--end::Label-->
+                                        <!--begin::Cancel-->
+                                        <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel Photo">
+                                            <i class="bi bi-x fs-2"></i>
+                                        </span>
+                                        <!--end::Cancel-->
+                                        <!--begin::Remove-->
+                                        <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove Photo">
+                                            <i class="bi bi-x fs-2"></i>
+                                        </span>
+                                        <!--end::Remove-->
+                                    </div>
+                                    <!--end::Image input-->
+                                    <!--begin::Hint-->
+                                    <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
+                                    <!--end::Hint-->
+                                </div>
+                                <!--end::Col-->
+                            </div>
+                            <!--end::Input group-->
+                        </div>
+                        <!--end::Body-->
+                    </div>
+                    <!--end::Wrapper-->
+                </div>
+                <!--end::Step 5-->
+                <!--begin::Actions-->
+                <div class="d-flex flex-stack pt-15">
+                    <!--begin::Wrapper-->
+                    <div class="mr-2">
+                        <button type="button" class="btn btn-lg btn-light-primary me-3" data-kt-stepper-action="previous">
+                            <!--begin::Svg Icon | path: icons/duotune/arrows/arr063.svg-->
+                            <span class="svg-icon svg-icon-4 me-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <rect opacity="0.5" x="6" y="11" width="13" height="2" rx="1" fill="currentColor"></rect>
+                                    <path d="M8.56569 11.4343L12.75 7.25C13.1642 6.83579 13.1642 6.16421 12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75L5.70711 11.2929C5.31658 11.6834 5.31658 12.3166 5.70711 12.7071L11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25C13.1642 17.8358 13.1642 17.1642 12.75 16.75L8.56569 12.5657C8.25327 12.2533 8.25327 11.7467 8.56569 11.4343Z" fill="currentColor"></path>
+                                </svg>
+                            </span>
+                            <!--end::Svg Icon-->Back
+                        </button>
+                    </div>
+                    <!--end::Wrapper-->
+                    <!--begin::Wrapper-->
+                    <div>
+                        <button type="submit" id="kt_stepper_submit" class="btn btn-lg btn-primary me-3" data-kt-stepper-action="submit">
+                            <span class="indicator-label">
+                                Submit
+                                <!--begin::Svg Icon | path: icons/duotune/arrows/arr064.svg-->
+                                <span class="svg-icon svg-icon-3 ms-2 me-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor"></rect>
+                                        <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor"></path>
+                                    </svg>
+                                </span>
+                                <!--end::Svg Icon-->
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait...
+                                <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-lg btn-primary" data-kt-stepper-action="next">
+                            Continue
+                            <!--begin::Svg Icon | path: icons/duotune/arrows/arr064.svg-->
+                            <span class="svg-icon svg-icon-4 ms-1 me-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor"></rect>
+                                    <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor"></path>
+                                </svg>
+                            </span>
+                            <!--end::Svg Icon-->
+                        </button>
+                    </div>
+                    <!--end::Wrapper-->
+                </div>
+                <!--end::Actions-->
+                <div></div><div></div><div></div><div></div>
+            </form>
+            <!--end::Form-->
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        //await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            //$('#kt_datepicker_1').datepicker();
+            $('.flatPickr_Date').flatpickr({
+                //dateFormat:"dd-mm-yyyy"
+                altInput: true,
+                altFormat: "j F, Y",
+                dateFormat: "Y-m-d",
+            });
+        });
+
+        //roleCheckboxes = document.getElementsByClassName('chkPer');
+        //roleCheckboxes.on("chnage")
+        //$(document).on("click", "[type='checkbox']", function(e) {
+
+
+
+        $(document).on("click", "[class='chkPer']", function (e) {
+
+        });
+
+        // Stepper element
+        //var element = document.querySelector("#kt_stepper_user_create");
+        var stepperEl = document.querySelector("#kt_stepper_user_create");
+        // Initialize Stepper
+        //var stepper = new KTStepper(element);
+        var options = { startIndex: 1 };
+        var stepper = new KTStepper(stepperEl, options);
+        // Handle next step
+        stepper.on("kt.stepper.next", function (stepper) {
+
+            var currentIndex = stepper.getCurrentStepIndex();
+            console.log(currentIndex);
+            //Step 1 Validation
+            //Employee Type , Staff Number, Job title, Company
+            if (currentIndex == 1) {
+                if (!requiredRadio('EmployeeTypeId')) {
+                    showRequiredToastr("Select an Employee Type", "Employee Type Required");
+                    addDivValidatorClass('divEmpType');
+                }
+                else {
+                    removeDivValidatorClass('divEmpType');
+                    if (!requiredInput('StaffNumber')) {
+                        showRequiredToastr("Staff Number cannot be empty", "Staff Number Required");
+                        addValidatorClass('StaffNumber');
+                    }
+                    else {
+                        removeValidatorClass('StaffNumber');
+                        if (!requiredInput('JobTitle')) {
+                            showRequiredToastr("Job Title cannot be empty", "Job Title Required");
+                            addValidatorClass('JobTitle');
+                        }
+                        else {
+                            removeValidatorClass('JobTitle');
+                            let tempEmp = 'Temporal';
+                            const selectedRadio = document.querySelector('input[name="EmployeeTypeId"]:checked');
+                            var selectedValue = selectedRadio.getAttribute('data-arg1');
+                            if (selectedValue === tempEmp) {
+                                //Check Company
+                                if (!requiredInput('Company')) {
+                                    showRequiredToastr("Company cannot be empty", "Company Required");
+                                    addValidatorClass('Company');
+                                }
+                                else {
+                                    removeValidatorClass('Company');
+                                    stepper.goNext(); // go next step
+                                }
+                            }
+                            else {
+                                stepper.goNext(); // go next step
+                            }
+                        }
+                    }
+                }
+            }
+            //Step 2 Validation
+            else if (currentIndex == 2) {
+                //FirstName, LastName, PhoneNumber,  select options( Gender, Country )
+                if (!requiredInput('FirstName')) {
+                    showRequiredToastr("First Name cannot be empty", "First Name Required");
+                    addValidatorClass('FirstName');
+                }
+                else {
+                    removeValidatorClass('FirstName');
+                    if (!requiredInput('LastName')) {
+                        showRequiredToastr("Last Name cannot be empty", "Last Name Required");
+                        addValidatorClass('LastName');
+                    }
+                    else {
+                        removeValidatorClass('LastName');
+                        if (!requiredInput('PhoneNumber')) {
+                            showRequiredToastr("Phone Number cannot be empty", "Phone Number Required");
+                            addValidatorClass('PhoneNumber');
+                        }
+                        else {
+                            removeValidatorClass('PhoneNumber');
+                            if (!requiredDropdown('Gender')) {
+                                showRequiredToastr("Select a Gender", "Gender Required");
+                                addValidatorClass('Gender');
+                            }
+                            else {
+                                removeValidatorClass('Gender');
+                                if (!requiredDropdown('CountryId')) {
+                                    showRequiredToastr("Select a country ", "Country Required");
+                                    addValidatorClass('CountryId');
+                                }
+                                else {
+                                    removeValidatorClass('CountryId');
+                                    stepper.goNext();
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+            //Step 3 Validation
+            else if (currentIndex == 3) {
+                //Email, Password, radio select( Roles )
+                if (!requiredInput('Email')) {
+                    showRequiredToastr("Email cannot be empty", "Email Required");
+                    addValidatorClass('Email');
+                }
+                else {
+                    removeValidatorClass('Email');
+                    if (!requiredInput('Password')) {
+                        showRequiredToastr("Password cannot be empty", "Password Required");
+                        addValidatorClass('Password');
+                    }
+                    else {
+                        removeValidatorClass('Password');
+                        if (!requiredInput('ConfirmPassword')) {
+                            showRequiredToastr("Confirm Password cannot be empty", "Confirm Password Required");
+                            addValidatorClass('ConfirmPassword');
+                        }
+                        else {
+                            removeValidatorClass('ConfirmPassword');
+                            if (!requiredRadio('RoleId')) {
+                                showRequiredToastr("Select a role", "Role Required");
+                                addDivValidatorClass('divRoles');
+                            }
+                            else {
+                                removeDivValidatorClass('divRoles');
+                                if (passwordCompare('Password', 'ConfirmPassword') == false) {
+                                    showRequiredToastr("Password and Confirm Password do not match.", "Passwords do not match");
+                                    addValidatorClass('Password');
+                                    addValidatorClass('ConfirmPassword');
+                                }
+                                else {
+                                    removeValidatorClass('Password');
+                                    removeValidatorClass('ConfirmPassword');
+                                    stepper.goNext();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            //Step 4 Validation
+            else if (currentIndex == 4) {
+                //Module Permissions (Optional)
+                stepper.goNext();
+            }
+            else { }
+        });
+        // Handle previous step
+        stepper.on("kt.stepper.previous", function (stepper) {
+            stepper.goPrevious(); // go previous step
+        });
+
+        function getStaffId(id) {
+
+            let radioElement = document.getElementById("employeeTypeId_" + id);
+            var name = radioElement.getAttribute('data-arg1')
+            let companyElement = document.getElementById("divCompany");
+            let unitElement = document.getElementById("divUnit");
+
+            let tempEmp = 'Temporal';
+            companyElement.style.display = name === tempEmp ? 'block' : 'none';
+            unitElement.style.display = name === tempEmp ? 'none' : 'block';
+
+            var data = { id: id };
+
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetTemporalStaffNumber", "Account")',
+                contentType: 'application/json; charset=utf=8',
+                data: data,
+                success: function (result) {
+                    $('#StaffNumber').val(result);
+                },
+                error: function (er) {
+                    alert(er);
+                }
+            });
+
+        }
+
+        function GetPermissions(id) {
+            if (id == "") {
+                $("#divModulePermissions").empty();
+            }
+            else {
+                $.ajax({
+                    type: 'GET',
+                    cache: false,
+                    url: '@Url.Action("GetRolePermissions", "Account")',
+                    data: { id: id },
+                    success: function (response) {
+                        $("#divModulePermissions").empty();
+                        $("#divModulePermissions").html(response);
+                    }
+                });
+            }
+        }
+
+
+
+    </script>
+
+}

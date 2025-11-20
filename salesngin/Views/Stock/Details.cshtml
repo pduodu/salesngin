@@ -1,0 +1,414 @@
+﻿@model StockViewModel
+@inject UserManager<ApplicationUser> _userManager
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Details";
+    ViewData["MainMenu"] = "Stock Management";
+    ViewData["Page"] = "Details";
+
+    var currentDate = DateTime.UtcNow.Date.ToShortDateString();
+    var currentTime = DateTime.UtcNow.ToString("t");
+    var settings = await _dataService.GetSettings();
+    string statusColor = Model.Stock?.Status switch
+    {
+        PurchaseStatus.Pending => "primary",
+        PurchaseStatus.Received => "success",
+        PurchaseStatus.Cancelled => "danger",
+        _ => "light"
+    };
+}
+
+<div class="row g-5 g-xl-5 mb-5 mb-xl-10">
+    <!--begin::Col-->
+    <div class="col-xxl-4">
+
+        <div class="card mb-6 mb-xl-9">
+            <div class="card-header ribbon ribbon-top">
+                <div class="ribbon-label bg-light-@statusColor">
+                    @await Html.PartialAsync("Inventory/_StockStatus", Model.Stock?.Status)
+                </div>
+                <div class="card-title">
+                    <span class="card-label fw-bold text-gray-900">Stock Replenishment</span>
+                </div>
+                <div class="card-toolbar">
+                </div>
+            </div>
+            <div class="card-body d-flex flex-column">
+
+                <div class="mb-5">
+                    <span class="badge badge-light-info fs-5 fw-bold p-3">Record Number : @Model.Stock?.Reference</span>
+                    <div class="d-flex flex-wrap fw-semibold mb-4 fs-5 text-gray-400">
+                        @Model.Stock?.Notes
+                    </div>
+                </div>
+
+                <div class="mb-5">
+
+                    <div class="d-flex flex-column flex-grow-1 pe-8">
+                        <div class="d-flex flex-wrap">
+                            <div class="border border-gray-400 border-dashed text-info rounded py-3 px-4 me-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="fs-5 fw-bold counted" data-kt-countup="true" data-kt-countup-value="4500" data-kt-countup-prefix="$" data-kt-initialized="1">
+                                        @Html.DisplayFor(modelItem => Model.Stock.StockDate)
+                                    </div>
+                                </div>
+                                <div class="fw-semibold fs-6 text-gray-900">Date Received</div>
+                            </div>
+                            <div class="border border-gray-400 border-dashed text-info rounded py-3 px-4 me-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="fs-5 fw-bold counted" data-kt-countup="true" data-kt-countup-value="@Model.Stock?.Quantity" data-kt-initialized="1">
+                                        @Model.Stock?.Quantity
+                                    </div>
+                                </div>
+                                <div class="fw-semibold fs-6 text-gray-900">Total Items </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                @{
+                    if (Model.Stock?.CreatedByUser != null)
+                    {
+                        <div class="mb-5">
+                            <span class="fw-bold fs-6">Entered By:</span>
+                            @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Stock?.CreatedByUser)
+                        </div>
+                    }
+
+                    if (Model.Stock?.ApprovedByUser != null)
+                    {
+                        <div class="mb-5">
+                            <span class="fw-bold fs-6">Approved By:</span>
+                            @await Html.PartialAsync("User/_UserInfoMiniDisplay", Model.Stock?.ApprovedByUser)
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+
+    </div>
+    <!--end::Col-->
+    <!--begin::Col-->
+    <div class="col-xxl-8">
+        <div class="card mb-6 mb-xl-9">
+            <div class="card-header pt-5">
+                <div class="card-title">
+                    <h2 class="d-flex align-items-center">
+                        Re-stock Items
+                        <span class="text-gray-600 fs-6 ms-1">(@Model.StockItems?.Count)</span>
+                    </h2>
+                </div>
+                <div class="card-toolbar">
+                    <a asp-controller="Stock" asp-action="Stock" class="btn btn-icon btn-primary me-3">
+                        <i class="ki-duotone ki-double-left fs-1">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </a>
+                </div>
+            </div>
+            <div class="card-header">
+                <div class="card-title">
+                </div>
+                <div class="card-toolbar">
+
+                    @{
+                        if (Model.Stock?.Status == PurchaseStatus.Pending)
+                        {
+                            <a asp-controller="Stock" asp-action="Edit" asp-route-id="@Model.Stock?.Id" class="btn btn-primary mx-2">
+                                <i class="ki-duotone ki-eraser fs-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                Edit
+                            </a>
+                            <form id="formApprovePurchase_@Model.Id" method="post" asp-controller="Stock" asp-action="Approve" asp-route-id="@Model.Stock?.Id">
+                                <button type="submit" class="btn btn-success mx-2">
+                                    <i class="ki-duotone ki-bookmark fs-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Approve
+                                </button>
+                            </form>
+                            <form id="formCancelPurchase_@Model.Id" method="post" asp-controller="Stock" asp-action="Cancel" asp-route-id="@Model.Stock?.Id">
+                                <button type="submit" class="btn btn-danger mx-2">
+                                    <i class="ki-duotone ki-abstract-11 fs-1">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    Cancel
+                                </button>
+                            </form>
+                        }
+                        else if (Model.Stock?.Status == PurchaseStatus.Received)
+                        {
+                            // <form id="formCancelPurchase_@Model.Id" method="post" asp-controller="Purchase" asp-action="Cancel" asp-route-id="@Model.Purchase?.Id">
+                            //     <button type="submit" class="btn btn-danger mx-2">
+                            //         <i class="ki-duotone ki-abstract-11 fs-1">
+                            //             <span class="path1"></span>
+                            //             <span class="path2"></span>
+                            //         </i>
+                            //         Cancel
+                            //     </button>
+                            // </form>
+                        }
+                        else
+                        {
+
+                        }
+                    }
+
+
+                </div>
+            </div>
+            @await Html.PartialAsync("_TableToolbar")
+            <div id="divTbPlaceholder" class="card-body py-4">
+                <div class="table-responsive">
+                    <table class="table align-middle table-row-dashed fs-6 gy-5 gs-5" id="restockItems_records">
+                        <thead>
+                            <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                                <th>Code</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Date</th>
+                                <th class="text-end"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-600 fw-bold">
+
+                            @{
+                                if (Model.StockItems.Count > 0)
+                                {
+                                    int i = 0;
+                                    foreach (var product in Model.StockItems)
+                                    {
+                                        i++;
+                                        <tr>
+                                            <td><span class="badge badge-light-primary fs-5 fw-bolder px-3 py-3">@product.Item?.ItemCode</span></td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-5 position-relative">
+                                                        @{
+                                                            if (Model.ModulePermission.Configure)
+                                                            {
+
+
+
+                                                                <a asp-controller="Facility" asp-action="UpdateItem" asp-route-id="@product.Item?.Id">
+
+                                                                    <div class="symbol symbol-40px symbol-circle">
+                                                                        <img alt="@product.Item?.ItemName" src="@Url.Content(product.Item?.ItemPhotoPath)">
+                                                                    </div>
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="symbol symbol-40px symbol-circle">
+                                                                    <img alt="@product.Item?.ItemName" src="@Url.Content(product.Item?.ItemPhotoPath)">
+                                                                </div>
+                                                            }
+                                                        }
+                                                        <!--end::Avatar-->
+                                                    </div>
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        @{
+                                                            if (Model.ModulePermission.Configure)
+                                                            {
+                                                                <a asp-controller="Facility" asp-action="UpdateItem" asp-route-id="@product.Stock?.Id" class="text-gray-800 text-hover-primary mb-1">@product.Item?.ItemName</a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a href="#" class="text-gray-800 text-hover-secondary mb-1">@product.Item?.ItemCode</a>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge badge-light-primary fs-5 fw-bolder px-3 py-3">@product.Quantity</span></td>
+                                            <td>@Html.DisplayFor(modelItem => product.DateCreated)</td>
+                                            <td class="text-end">
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::Col-->
+</div>
+
+
+
+
+
+
+<!-- modal placeholders-->
+<div id="modal-add" tabindex="-1" class=" modal fade">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+
+            <div id='modal-add-content'></div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.types-select').select2({ width: 'resolve' });
+
+            $("#searchInput").keyup(function () {
+                loadProducts();
+            });
+
+            scrollToBottom();
+
+            document.getElementById("btnPrintSalesReceipt").addEventListener("click", function () {
+                printJS({
+                    printable: "sectionToPrint", // ID of the div to print
+                    type: "html", // Type of content: "html", "image", or "pdf"
+                    documentTitle: "Sales Receipt", // Title for the print document
+                    //css: "/lib/pint.js/css/print.min.css",
+                    //css: ["/css/site.css", "/assets/css/style.bundle.css"]
+                    css: ["/assets/plugins/global/plugins.bundle.css", "/assets/css/style.bundle.css", "/lib/pint.js/css/print.min.css",]
+                });
+            });
+
+            KTUtil.onDOMContentLoaded(function () {
+                KTAppTableListing.init("tblStockRecords", "tbl_daterange_flatpickr",
+                    "searchInput", "tbl_status", [2,], "Date", "Status",
+                    "tbl_daterange_flatpickr_clear",
+                    "datatable_export_buttons", "datatable_table_export_menu");
+            });
+
+        });
+
+        // $(function () {
+        //     //submit event handler to the form
+        //     $("#addCommentForm").submit(function (e) {
+        //         e.preventDefault(); // Prevent the default form submission.
+
+        //         // Serialize form data
+        //         var formData = $(this).serialize();
+
+        //         // Use AJAX to send the serialized data to the server
+        //         $.ajax({
+        //             type: "POST",
+        //             url: $(this).attr("action"), // Use the form's action attribute
+        //             data: formData, // Send serialized form data
+        //             success: function (data) {
+        //                 // Handle the success response
+        //                 $("#div_chat_container").html(data);
+        //                 $("#Comment").html("");
+        //                 scrollToBottom();
+        //             },
+        //             error: function () {
+        //                 // Handle errors, if any
+        //             }
+        //         });
+        //     });
+        // });
+
+        // Scroll to the bottom of the div
+        function scrollToBottom() {
+            var chatBox = document.getElementById("div_chat_container");
+            chatBox.scrollTop = parseInt(chatBox.scrollHeight);
+        }
+
+        // Scroll to the top of div
+        function scrollToTop() {
+            var chatBox = document.getElementById("div_chat_container");
+            chatBox.scrollTop = 0;
+        }
+
+        function OpenUpdateOrderQuantityModal(id) {
+            var data = { id: id };
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: '@Url.Action("GetUpdateOrderQuantityModal", "Order")',
+                    contentType: 'application/json; charset=utf=8',
+                    data: data,
+                    success: function (result) {
+                        $('#modal-add-content').html(result);
+                        $('#modal-add').modal('show');
+                        $('.types-select').select2({
+                            width: 'resolve',
+                            dropdownParent: $("#modal-add")
+                        });
+                    },
+                    error: function (er) {
+                        alert(er);
+                    }
+                });
+        }
+
+
+
+        const Options = document.getElementsByClassName('mb-10 fv-row');
+        const FormOptions = document.getElementsByClassName('form-check-input');
+
+
+
+        var handleCash = function () {
+            // Show
+            if (FormOptions) {
+                FormOptions[0].addEventListener('click', function () {
+                    Options[0].classList.remove('d-none');
+                    Options[1].classList.add('d-none');
+                    Options[2].classList.add('d-none');
+                });
+            }
+        }
+
+        var handleCard = function () {
+            // Show
+            if (FormOptions) {
+                FormOptions[1].addEventListener('click', function () {
+                    Options[1].classList.remove('d-none');
+                    Options[0].classList.add('d-none');
+                    Options[2].classList.add('d-none');
+                });
+            }
+        }
+
+        var handleEWallet = function () {
+            // Show
+            if (FormOptions) {
+                FormOptions[2].addEventListener('click', function () {
+                    Options[2].classList.remove('d-none');
+                    Options[1].classList.add('d-none');
+                    Options[0].classList.add('d-none');
+                });
+            }
+        }
+
+        // On document ready
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", function () {
+                handleCash();
+                handleCard();
+                handleEWallet();
+            });
+        }
+        else {
+            handleCash();
+            handleCard();
+            handleEWallet();
+
+
+        }
+
+    </script>
+}

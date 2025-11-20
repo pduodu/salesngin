@@ -1,0 +1,63 @@
+﻿@model ItemViewModel
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Create Item";
+    ViewData["MainMenu"] = "Item Management";
+    ViewData["SubMenu"] = "Items";
+    ViewData["Page"] = "Create Item";
+}
+<div class="container-xxl " id="contentContainer">
+    <div class="row my-5">
+        <div class="col-md-6">
+            <h3>Create Item </h3>
+            <p>Please fill in the details below to create a new item.</p>
+        </div>
+        <div class="col-md-6">
+            <div class="d-flex justify-content-end">
+                <a asp-controller="Items" asp-action="Items" id="backToListButton" class="btn btn-lg btn-primary me-5">
+                    <i class="ki-duotone ki-arrow-left fs-2x">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+    <form asp-controller="Items" asp-action="CreateItem" method="post" enctype="multipart/form-data" class="">
+        @Html.AntiForgeryToken()
+        @await Html.PartialAsync("Item/_ItemFormEditor", Model)
+        <div class="my-5">
+            <a asp-controller="Items" asp-action="Items" id="itemCancelButton"
+                class="btn btn-danger float-end mx-3 fs-3">
+                <i class="ki-duotone ki-cross-circle fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                Cancel
+            </a>
+            <button id="itemSubmitButton" type="submit" class="btn btn-primary float-end fs-3">
+                <i class="ki-duotone ki-save-2 fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                <span class="indicator-label">
+                    Save
+                </span>
+                <span class="indicator-progress">
+                    Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                </span>
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function ()
+        {
+
+            $('.types-select').select2({ width: 'resolve' });
+
+        });
+    </script>
+}

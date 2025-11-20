@@ -1,0 +1,138 @@
+﻿@{
+
+}
+<!--begin::Card header-->
+<div class="card-header border-0 pt-6">
+    <!--begin::Card title-->
+    <div class="card-title">
+        <!--begin::Search-->
+        <div class="d-flex align-items-center position-relative my-1">
+            <i class="ki-duotone ki-magnifier fs-1 position-absolute ms-6">
+                <span class="path1"></span>
+                <span class="path2"></span>
+            </i>
+            <input id="searchInput" type="text" data-kt-datatable-table-filter="search" class="form-control form-control-solid w-250px ps-15" placeholder="Search @ViewBag.PageName" />
+            <input type="hidden" id="hd_filterConfig" data-datecolumn="@ViewBag.ToolBarDateFilter" data-statuscolumn="@ViewBag.ToolBarStatusFilter" />
+        </div>
+        <!--end::Search-->
+    </div>
+    <!--begin::Card title-->
+    <!--begin::Card toolbar-->
+    <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+        @{
+            if (ViewBag.ToolBarDateFilter == true)
+            {
+
+                <div class="input-group w-300px">
+                    <input class="form-control form-control-solid rounded rounded-end-0" placeholder="Pick date range" id="tbl_daterange_flatpickr" />
+                    <button class="btn btn-icon btn-light" id="tbl_daterange_flatpickr_clear">
+                        <i class="ki-duotone ki-cross fs-2"><span class="path1"></span><span class="path2"></span></i>
+                    </button>
+                </div>
+
+            }
+
+            if (ViewBag.ToolBarStatusFilter == true)
+            {
+                <div class="w-100 mw-250px">
+                    <!--begin::Select2-->
+                    <select id="tbl_status" class="form-select form-select-solid types-select" data-control="select2" data-hide-search="true" data-placeholder="Status" data-datatable-status-filter="status">
+                        <option value="all">All</option>
+                        @{
+                            foreach (var item in (ViewBag.ToolBarStatusFilterOptions as List<(int, string)>).OrderBy(x => x.Item2))
+                            {
+                                <option value="@item.Item2">@item.Item2</option>
+                            }
+                        }
+                    </select>
+                    <!--end::Select2-->
+                </div>
+            }
+
+            if (ViewBag.ToolBarExportOptions == true)
+            {
+                <!--begin::Toolbar-->
+                <div class="d-flex justify-content-end" data-kt-datatable-table-toolbar="base">
+                    <!--begin::Export dropdown-->
+                    <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                        <i class="ki-duotone ki-exit-down fs-2x"><span class="path1"></span><span class="path2"></span></i>
+                        Export Records
+                    </button>
+                    <!--begin::Menu-->
+                    <div id="datatable_table_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-6 w-200px py-4" data-kt-menu="true">
+                        <div class="menu-item px-3">
+                            <a href="#" class="menu-link px-3" data-kt-export="print">
+                                <i class="ki-duotone ki-printer fs-2 mx-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                    <span class="path5"></span>
+                                </i>
+                                Print
+                            </a>
+                        </div>
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                            <a href="#" class="menu-link px-3" data-kt-export="copy">
+                                <i class="ki-duotone ki-some-files fs-2 mx-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Copy to clipboard
+                            </a>
+                        </div>
+                        <!--end::Menu item-->
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                            <a href="#" class="menu-link px-3" data-kt-export="excel">
+                                <i class="ki-duotone ki-notepad fs-2 mx-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                    <span class="path5"></span>
+                                </i>
+                                Export as Excel
+                            </a>
+                        </div>
+                        <!--end::Menu item-->
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                            <a href="#" class="menu-link px-3" data-kt-export="csv">
+                                <i class="ki-duotone ki-subtitle fs-2 mx-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                    <span class="path5"></span>
+                                </i>
+                                Export as CSV
+                            </a>
+                        </div>
+                        <!--end::Menu item-->
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                            <a href="#" class="menu-link px-3" data-kt-export="pdf">
+                                <i class="ki-duotone ki-file-sheet fs-2 mx-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                Export as PDF
+                            </a>
+                        </div>
+                        <!--end::Menu item-->
+                    </div>
+                    <!--end::Menu-->
+                    <!--end::Export dropdown-->
+                    <!--begin::Hide default export buttons-->
+                    <div id="datatable_export_buttons" class="d-none"></div>
+                    <!--end::Hide default export buttons-->
+                    <!--end::Toolbar-->
+                </div>
+                <!--end::Card toolbar-->
+            }
+        }
+    </div>
+</div>
+<!--end::Card header-->

@@ -1,0 +1,126 @@
+﻿@model RoleViewModel
+@inject IDataControllerService _dataService
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "System Roles";
+    ViewData["MainMenu"] = "User Management";
+    ViewData["SubMenu"] = "";
+    ViewData["Page"] = "System Roles";
+}
+
+<!--begin::Row-->
+<div class="row col-md-11 mx-auto row-cols-1 row-cols-md-2 row-cols-xl-3 g-5 g-xl-5">
+
+    @{
+
+        async Task<bool> ShouldDisplayRole(ApplicationRole role)
+        {
+            return !(role.Name == ApplicationRoles.SuperAdministrator && !await _dataService.IsUserInRole(Model.UserLoggedIn.Id, ApplicationRoles.SuperAdministrator));
+        }
+
+
+        if (Model.Roles.Count() > 0)
+        {
+            foreach (var role in Model.Roles)
+            {
+                var users = await _dataService.GetUsersInRole(role.Name);
+                var modules = await _dataService.GetRoleModules(role.Id);
+
+                var userCount = users.Count;
+                var moduleCount = modules.Count;
+
+                if (await ShouldDisplayRole(role))
+                {
+                    <!--begin::Col-->
+                    <div class="col-md-4">
+                        <!--begin::Card-->
+                        <div class="card card-flush h-md-100">
+                            <!--begin::Card header-->
+                            <div class="card-header">
+                                <!--begin::Card title-->
+                                <div class="card-title">
+                                    <h2>@role.RoleDisplayText</h2>
+                                </div>
+                                <!--end::Card title-->
+                            </div>
+                            <!--end::Card header-->
+                            <!--begin::Card body-->
+                            <div class="card-body pt-1">
+                                <!--begin::Permissions-->
+                                <div class="d-flex flex-column text-gray-600">
+                                    <div class="d-flex align-items-center py-2">
+                                        @*<span class="bullet bg-primary me-3"></span>@role.RoleDescription*@
+                                        @role.RoleDescription
+                                    </div>
+                                </div>
+                                <!--end::Permissions-->
+                                @*<div class="fw-bolder text-gray-600 mb-5">Total users with this role: @userCount</div>*@
+                            </div>
+                            <!--end::Card body-->
+                            <!--begin::Card footer-->
+                            <div class="card-footer flex-wrap pt-0">
+                                <a asp-controller="Account" asp-action="RoleUsers" asp-route-id="@role.Id" class="btn btn-light btn-light-primary my-2 me-2">
+                                    <i class="ki-duotone ki-profile-user fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                    </i>
+                                    Users ( @userCount )
+                                </a>
+                                <a asp-controller="Account" asp-action="RoleModules" asp-route-id="@role.Id" class="btn btn-light btn-light-primary my-2 me-2">
+                                    <i class="ki-duotone ki-setting-3 fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                        <span class="path4"></span>
+                                        <span class="path5"></span>
+                                    </i>
+                                Modules ( @moduleCount )
+                                </a>
+                            </div>
+                            <!--end::Card footer-->
+                        </div>
+                        <!--end::Card-->
+                    </div>
+                    <!--end::Col-->
+                }
+            }
+        }
+        else
+        {
+            <!--begin::Add new card-->
+            <div class="ol-md-4">
+                <!--begin::Card-->
+                <div class="card h-md-100">
+                    <!--begin::Card body-->
+                    <div class="card-body d-flex flex-center">
+                        <!--begin::Button-->
+                        <span class="btn btn-clear d-flex flex-column flex-center">
+                            <!--begin::Illustration-->
+                            <img src="~/assets/media/illustrations/sketchy-1/4.png" alt="" class="mw-100 mh-150px mb-7">
+                            <!--end::Illustration-->
+                            <!--begin::Label-->
+                            <span class="fw-bolder fs-3 text-gray-600 text-hover-primary">Add New Role</span>
+                            <!--end::Label-->
+                        </span>
+                        <!--begin::Button-->
+                    </div>
+                    <!--begin::Card body-->
+                </div>
+                <!--begin::Card-->
+            </div>
+            <!--begin::Add new card-->
+        }
+    }
+
+</div>
+<!--end::Row-->
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.types-select').select2({ width: 'resolve' });
+            $('#tableRecords').DataTable();
+        });
+    </script>
+}

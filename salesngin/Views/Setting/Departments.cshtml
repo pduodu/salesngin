@@ -1,0 +1,236 @@
+﻿@model OrganisationViewModel
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Departments";
+    ViewData["MainMenu"] = "Settings";
+    //ViewData["SubMenu"] = "Users";
+    ViewData["Page"] = "Departments";
+}
+
+<!--begin::Row-->
+<div class="d-flex flex-column flex-lg-row">
+    <!--begin::Sidebar-->
+    <div class="flex-column flex-lg-row-auto w-100 w-lg-200px w-xl-300px mb-10">
+        <form asp-action="SaveDepartment" asp-controller="Setting" method="Post" enctype="multipart/form-data">
+            <!--begin::Card-->
+            <div class="card">
+                <!--begin::Card header-->
+                <div class="card-header">
+                    <!--begin::Card title-->
+                    <div class="card-title">
+                        <h2 class="mb-0">Department</h2>
+                    </div>
+                    <!--end::Card title-->
+                </div>
+                <!--end::Card header-->
+               @*  <div class="separator separator-dashed border-secondary my-3"></div> *@
+                <!--begin::Card body-->
+                <div class="card-body pt-0">
+                    @* <div asp-validation-summary="All" class="text-danger"></div> *@
+                    <input type="hidden" asp-for="@Model.DepartmentId" value="@Model.DepartmentId" />
+                    <div class="row mb-3">
+                        <div class="col fv-row mb-3">
+                            <label class="fs-6 fw-bold mb-2">Name of Department<i class="fa fa-asterisk px-2 text-danger"></i></label>
+                            <input asp-for="@Model.DepartmentName" class="form-control" placeholder="" required type="text" />
+                            <span asp-validation-for="@Model.DepartmentName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col fv-row">
+                            <label class="fs-6 fw-bold mb-2">Head Of Department</label>
+                            <select asp-for="@Model.HeadOfDepartmentId" asp-items="@(new SelectList(Model.Users,"Id","FullName"))" class="form-select form-select-solid" data-control="select2" data-hide-search="false" data-placeholder="Select Employee" data-allow-clear="true">
+                                <option value="">Select Employee...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Card body-->
+                <!--begin::Card footer-->
+                <div class="card-footer">
+                    <a class="btn btn-secondary" asp-controller="Setting" asp-action="Departments" data-toggle="tooltip" title="Reset Form"> Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+                <!--end::Card footer-->
+            </div>
+        </form>
+        <!--end::Card-->
+    </div>
+    <!--end::Sidebar-->
+    <!--begin::Content-->
+    <div class="flex-lg-row-fluid ms-lg-10">
+        <!--begin::Card-->
+        <div class="card mb-6 mb-xl-9">
+            <!--begin::Card header-->
+            <div class="card-header py-5">
+                <!--begin::Card title-->
+                <div class="card-title">
+                    <h2 class="d-flex align-items-center"> Departments<span class="text-gray-600 fs-6 ms-1">(@Model.Departments?.Count)</span></h2>
+                </div>
+                <!--end::Card title-->
+                <!--begin::Card toolbar-->
+                <div class="card-toolbar">
+                    @* <a class="btn btn-primary" asp-controller="Product" asp-action="Products">
+                    <i class="ki-duotone ki-arrow-left fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    </i>
+                    </a>  *@
+                </div>
+                <!--end::Card toolbar-->
+            </div>
+            <!--end::Card header-->
+            <!--begin::Card header-->
+            @await Html.PartialAsync("_TableToolbar")
+            <!--end::Card header-->
+            <!--begin::Card body-->
+            <div class="card-body pt-0">
+                <!--begin::Table-->
+                <div>
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-5 gy-3 mb-0" id="tbl_datatable_records">
+                            <thead>
+                                <tr class="text-start text-muted fw-bold fs-5 text-uppercase gs-0">
+                                    <th>#</th>
+                                    <th>Department</th>
+                                    <th>Head of Department</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fw-semibold text-gray-600">
+                                @{
+                                    if (Model.Departments?.Count > 0)
+                                    {
+                                        int rowNo = 0;
+                                        foreach (var department in Model.Departments)
+                                        {
+                                            rowNo++;
+
+                                            <tr>
+                                                <td>
+                                                    <i class="ki-duotone ki-abstract-47 text-primary fs-2 mr-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                </td>
+                                                <td>
+                                                    <span class="">
+                                                        @department.DepartmentName
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="">
+                                                        @department.HeadOfDepartment?.FullName
+                                                    </span>
+                                                </td>
+                                                <td class="text-end">
+                                                    @{
+                                                        <a class="btn btn-icon btn-active-light-primary w-30px h-30px mx-3" asp-controller="Setting" asp-action="EditDepartment" asp-route-id="@department.Id" data-toggle="tooltip" title="Edit">
+                                                            <i class="ki-duotone ki-pencil fs-2">
+                                                                <i class="path1"></i>
+                                                                <i class="path2"></i>
+                                                            </i>
+                                                        </a>
+                                                        if (Model.RecordsCount <= 0)
+                                                        {
+                                                            <button class="btn btn-icon btn-active-light-danger w-30px h-30px" type="submit" value="Delete" onclick="return swalConfirm('@department.Id', this)" data-toggle="tooltip" title="Delete">
+                                                                <i class="ki-duotone ki-trash fs-2">
+                                                                    <span class="path1"></span>
+                                                                    <span class="path2"></span>
+                                                                    <span class="path3"></span>
+                                                                    <span class="path4"></span>
+                                                                    <span class="path5"></span>
+                                                                </i>
+                                                            </button>
+                                                            <form id="actionForm_@department.Id" asp-controller="Setting" asp-action="DeleteDepartment" asp-route-id="@department.Id" method="post">
+                                                            </form>
+                                                        }
+                                                    }
+
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!--end::Table-->
+            </div>
+            <!--end::Card body-->
+        </div>
+        <!--end::Card-->
+    </div>
+    <!--end::Content-->
+</div>
+<!--end::Row-->
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            //$('#tableRecords').DataTable();
+
+            $('.types-select').select2({
+                width: 'resolve',
+                placeholder: 'Select an Option',
+                allowClear: true
+            });
+
+            $("#checkAll").click(function () {
+                $(".checkBox").prop('checked',
+                    $(this).prop('checked'));
+            });
+
+            $("actionForm_1").submit(function () {
+                if ($('input:checkbox').filter(':checked').length < 1) {
+                    //alert("Please Check at least one Check Box");
+                    Swal.fire('Oops!', 'Please select at least one item.', 'info');
+                    return false;
+                }
+            });
+
+            KTUtil.onDOMContentLoaded(function () {
+                KTAppTableListing.init("tbl_datatable_records", "tbl_daterange_flatpickr",
+                    "searchInput", "tbl_status", [], "Date", "Status",
+                    "tbl_daterange_flatpickr_clear",
+                    "datatable_export_buttons", "datatable_table_export_menu");
+            });
+
+
+        });
+
+        $(function () {
+            $('#btnImport').on('click', function () {
+                var fileExtension = ['xls', 'xlsx'];
+                var filename = $('#customFileExcel').val();
+                if (filename.length == 0) {
+                    //alert("Please select a file.");
+                    Swal.fire('Oops!', 'Please select a file.', 'info');
+                    return false;
+                }
+                else {
+                    var extension = filename.replace(/^.*\./, '');
+                    if ($.inArray(extension, fileExtension) == -1) {
+                        //alert("Please select only excel files.");
+                        Swal.fire('Oops!', 'Please select only excel files.', 'info');
+                        return false;
+                    }
+                }
+            })
+        });
+
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            //Change file upload text with name of selected file
+            $("#customFileExcel").change(function () {
+                $("#customFileNameExcel").text(this.files[0].name);
+            });
+        });
+    </script>
+}

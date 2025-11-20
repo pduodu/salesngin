@@ -1,0 +1,23 @@
+﻿@model ItemViewModel
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Edit";
+    ViewData["MainMenu"] = "Item Management";
+    ViewData["SubMenu"] = "Items";
+    ViewData["Page"] = "Edit";
+}
+<div class="container-xxl " id="kt_content_container">
+    <form asp-controller="Facility" asp-action="UpdateItem" method="post" enctype="multipart/form-data" class="form d-flex flex-column flex-lg-row fv-plugins-bootstrap5 fv-plugins-framework">
+        @await Html.PartialAsync("Inventory/_ItemFormEditor", Model)
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            $('.types-select').select2({ width: 'resolve' });
+
+        });
+    </script>
+}

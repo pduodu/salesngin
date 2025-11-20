@@ -1,0 +1,141 @@
+﻿@inject IConfiguration _configuration
+@{
+    string sideLogo = _configuration["LoginSideLogo"];
+    string loginBackground = _configuration["LoginBg"];
+    string companyName = _configuration["CompanyName"];
+    string applicationName = _configuration["ApplicationName"];
+    string applicationShortName = _configuration["ApplicationShortName"];
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] </title>
+    <!--begin::favicon-->
+    <link rel="apple-touch-icon" sizes="180x180" href="~/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/favicon/favicon-16x16.png">
+    <!--end::favicon-->
+    <!--begin::Fonts-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
+    <!--end::Fonts-->
+    <!--plugins-->
+    <link href="~/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+    <!--end::Page Vendor Stylesheets-->
+    <!--begin::Global Stylesheets Bundle(used by all pages)-->
+    <link href="~/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+    @* <link href="~/css/logincustom.css" rel="stylesheet" /> *@
+    <!--end::Global Stylesheets Bundle-->
+</head>
+
+@*<body class="bg-body">*@
+@*<body id="particles-js" class="bg-body">*@
+<body class="bg-body">
+
+    <!--begin::Main-->
+    <!--begin::Root-->
+    <div class="d-flex flex-column flex-root">
+
+        <!--begin::Authentication - Sign-in -->
+        <div class="d-flex flex-column flex-lg-row flex-column-fluid">
+            <!--begin::Body-->
+            <div class="d-flex flex-column flex-lg-row-fluid w-lg-50 p-10 order-2 order-lg-1">
+                <!--begin::Form-->
+                <div class="d-flex flex-center flex-column flex-lg-row-fluid">
+
+                    @RenderBody()
+
+                </div>
+                <!--end::Form-->
+                <!--begin::Footer-->
+
+                <!--end::Footer-->
+            </div>
+            <!--begin::Aside-->
+            <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2" style="background-image: url(@loginBackground)">
+                <!--begin::Content-->
+                <div class="d-flex flex-column flex-center py-7 py-lg-15 px-5 px-md-15 w-100">
+                    <!--begin::Logo-->
+                    @* <a asp-action="Login" asp-controller="Account" class="mb-0 mb-lg-12">
+                        <img alt="Logo" src="../../../assets/media/logos/posdeltalogoWhite.png" class="h-30px h-lg-40px" />
+                    </a> *@
+                    <!--end::Logo-->
+                    <!--begin::Image-->
+                    <img class="d-none d-lg-block mx-auto w-200px w-md-50 w-xl-200px mb-10 mb-lg-20" src="@Url.Content(sideLogo)" alt="" />
+                    <!--end::Image-->
+                    <!--begin::Title-->
+                    <h1 class="d-none d-lg-block text-white fw-bolder text-center mb-5">
+                        @companyName
+                    </h1>
+                    <!--end::Title-->
+                    <!--begin::Text-->
+                    <div class="d-none d-lg-block text-white fs-2 fs-base text-center">
+                       @applicationName (@applicationShortName)
+                    </div>
+                    <!--end::Text-->
+                </div>
+                <!--end::Content-->
+            </div>
+            <!--end::Aside-->
+        </div>
+        <!--end::Authentication - Sign-in-->
+
+
+    </div>
+    <!--end::Root-->
+    <!--begin::Javascript-->
+    <script>var hostUrl = "~/assets/";</script>
+    <!--begin::Global Javascript Bundle(used by all pages)-->
+    <script src="~/assets/plugins/global/plugins.bundle.js"></script>
+    <script src="~/assets/js/scripts.bundle.js"></script>
+    <script src="~/lib/particles.js/particles.js"></script>
+    <!--end::Global Javascript Bundle-->
+    <!-- Notification Partial -->
+    @await Html.PartialAsync("_NotificationPartial.cshtml")
+    <!--end::Javascript-->
+    @await RenderSectionAsync("Scripts", required: false)
+    <!--begin::Theme mode setup on page load-->
+    <script>
+        var defaultThemeMode = "light";
+        var themeMode;
+
+        if (document.documentElement) {
+            if (document.documentElement.hasAttribute("data-bs-theme-mode")) {
+                themeMode = document.documentElement.getAttribute("data-bs-theme-mode");
+            } else {
+                if (localStorage.getItem("data-bs-theme") !== null) {
+                    themeMode = localStorage.getItem("data-bs-theme");
+                } else {
+                    themeMode = defaultThemeMode;
+                }
+            }
+
+            if (themeMode === "system") {
+                themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+
+            document.documentElement.setAttribute("data-bs-theme", themeMode);
+        }</script>
+    <!--end::Theme mode setup on page load-->
+    <style>
+        input.input-validation-error {
+            border: 1px solid red;
+        }
+
+        .requiredField:after {
+            content: " *";
+            color: red;
+            font-size: larger;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .borderInvalid {
+            border: dotted 1px red;
+        }
+
+    </style>
+</body>
+</html>

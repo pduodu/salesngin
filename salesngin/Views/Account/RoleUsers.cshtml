@@ -1,0 +1,272 @@
+﻿@model RoleModuleViewModel
+@inject IDataControllerService _dataService
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Role Users";
+    ViewData["MainMenu"] = "User Management";
+    ViewData["SubMenu"] = "";
+    ViewData["Page"] = "Role Users";
+
+    var users = await _dataService.GetUsersInRole(Model.Role.Name);
+}
+
+
+<div class="d-flex flex-column flex-lg-row">
+    <div class="flex-column flex-lg-row-auto w-100 w-lg-200px w-xl-300px mb-10">
+        <div class="card card-flush">
+            <div class="card-header">
+                <div class="card-title">
+                    <h2 class="mb-0">@Model.Role?.RoleDisplayText</h2>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <div class="d-flex flex-column text-gray-600">
+                    <div class="d-flex align-items-center py-2">
+                        <span class="bullet bg-primary me-3"></span>@Model.Role?.RoleDescription
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer pt-0">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_User_Modal">
+                    <i class="ki-duotone ki-user-square fs-2 mr-2">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
+                    Add User
+                </button>
+            </div>
+        </div>
+    </div>
+    <!--end::Sidebar-->
+    <!--begin::Content-->
+    <div class="flex-lg-row-fluid ms-lg-10">
+        <div class="card mb-6 mb-xl-9">
+            <div class="card-header pt-5">
+                <div class="card-title">
+                    <h2 class="d-flex align-items-center">
+                        Users Assigned
+                        <span class="text-gray-600 fs-6 ms-1">(@users.Count)</span>
+                    </h2>
+                </div>
+                <div class="card-toolbar">
+                    <a asp-controller="Account" asp-action="Roles" class="btn btn-light-primary px-3">
+                        <i class="ki-duotone ki-arrow-left fs-2x">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </a>
+
+                </div>
+            </div>
+            <!--begin::Card header-->
+            @await Html.PartialAsync("_TableToolbar")
+            <!--end::Card header-->
+            <div class="card-body pt-0">
+                <div class="table-responsive">
+                    <table class="table align-middle table-row-dashed fs-6 gy-5 mb-0" id="tbl_datatable_records">
+                        <thead>
+                            <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                                <th class="">User</th>
+                                <th class="">Status</th>
+                                <th class="text-end min-w-100px">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="fw-bold text-gray-600">
+                            @{
+                                if (Model.Users.Count > 0)
+                                {
+                                    int i = 0;
+                                    foreach (var user in Model.Users)
+                                    {
+                                        i++;
+                                        <tr>
+                                            <td>@user.FullName</td>
+                                            <td>
+                                                @{
+                                                    if (user.IsActive == true)
+                                                    {
+                                                        <div class="badge badge-light-success fw-bolder">Active</div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="badge badge-light-danger fw-bolder">InActive</div>
+                                                    }
+                                                }
+                                            </td>
+                                            <td class="text-end">
+                                                <button type="button" class="btn btn-light btn-light-primary" data-bs-toggle="modal" onclick="OpenPermissionModal(@user.Id)">Edit Permission</button>
+                                                @*<button class="btn btn-light-danger px-3" type="submit" value="Delete" form="actionForm_@user.Id" onclick="return swalConfirm('@user.Id', this)">
+                                    <i class="ki-duotone ki-trash fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                    <span class="path4"></span>
+                                    <span class="path5"></span>
+                                    </i>
+                                    </button>
+                                    <form id="actionForm_@user.Id" asp-controller="Account" asp-action="DeleteRoleModule" asp-route-id="@user?.Id" asp-route-rid="@Model.Role?.Id" method="post">
+                                    </form>*@
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                // else
+                                // {
+                                //     <tr>
+                                //         <td>
+                                //             <div class="col-md-4">
+                                //                 <div class="card h-md-100">
+                                //                     <div class="card-body d-flex flex-center">
+                                //                         <span class="btn btn-clear d-flex flex-column flex-center">
+                                //                             <img src="~/assets/media/illustrations/sketchy-1/4.png" alt="" class="mw-100 mh-150px mb-7">
+                                //                             <span class="fw-bolder fs-3 text-gray-600 text-hover-primary">Add New Role</span>
+                                //                         </span>
+                                //                     </div>
+                                //                 </div>
+                                //             </div>
+                                //         </td>
+                                //     </tr>
+                                // }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--begin::Modal-->
+<div class="modal fade" tabindex="-1" id="add_User_Modal">
+    <div class="modal-dialog">
+        <form method="post" asp-controller="Account" asp-action="AddUserToRole" asp-route-id="@Model.Role?.Id">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add User</h5>
+
+                    <!--begin::Close-->
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ki-duotone ki-cross fs-2x">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </div>
+                    <!--end::Close-->
+                </div>
+
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col fv-row">
+                            <label class="fs-5 fw-bolder form-label mb-2">
+                                <span class="">SMS Role</span>
+                            </label>
+                            <input type="hidden" asp-for="RoleId" value="@Model.Role?.Id" />
+                            <input class="form-control form-control-solid " placeholder="" readonly="readonly" value="@Model.Role?.RoleDisplayText" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col fv-row">
+                            <label class="fs-5 fw-bolder form-label mb-2">User</label>
+                            <select asp-for="UserId" asp-items="@(new SelectList(Model.UserList,"Id","FullName"))" class="form-select" data-control="select2" data-dropdown-parent="#add_User_Modal" data-placeholder="Select a User" data-allow-clear="true">
+                                <option value="0">Select User...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--begin::Modal - Update role-->
+<div class="modal fade" id="modal_permissions" tabindex="-1" aria-hidden="true">
+    <!--begin::Modal dialog-->
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered mw-850px">
+        <!--begin::Modal content-->
+        <div class="modal-content">
+            <!--begin::Modal header-->
+            <div class="modal-header">
+                <!--begin::Modal title-->
+                <h2 class="fw-bold">Update Permission</h2>
+                <!--end::Modal title-->
+                <!--begin::Close-->
+                <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+                <!--end::Close-->
+            </div>
+            <!--end::Modal header-->
+            <!--begin::Modal body-->
+            <div id='modal-permission-content' class="modal-body scroll-y mx-0 my-0">
+                <!--begin::Form-->
+                <!--end::Form-->
+            </div>
+            <!--end::Modal body-->
+        </div>
+        <!--end::Modal content-->
+    </div>
+    <!--end::Modal dialog-->
+</div>
+<!--end::Modal - Update role--><!--end::Modal-->
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            $('.types-select').select2({ width: 'resolve' });
+
+            registerCheckStatus();
+
+            KTUtil.onDOMContentLoaded(function () {
+                KTAppTableListing.init("tbl_datatable_records", "tbl_daterange_flatpickr",
+                    "searchInput", "tbl_status", [], "Date", "Status",
+                    "tbl_daterange_flatpickr_clear",
+                    "datatable_export_buttons", "datatable_table_export_menu");
+            });
+
+        });
+
+        //hold check box vlaue form base
+        function registerCheckStatus() {
+            var elements = document.getElementsByClassName("chkPer");
+            for (var i = 0, len = elements.length; i < len; i++) {
+                // elements[i].style ...
+                if (elements[i].checked) {
+                    $(elements[i]).attr("value", "true");
+                } else {
+                    $(elements[i]).attr("value", "false");
+                }
+            }
+        }
+
+        function OpenPermissionModal(id) {
+            var data = { id: id };
+            $.ajax(
+                {
+                    type: 'GET',
+                    url: '@Url.Action("GetUserPermissionsModal", "Account")',
+                    contentType: 'application/json; charset=utf=8',
+                    data: data,
+                    success: function (result) {
+                        $('#modal-permission-content').html(result);
+                        $('#modal_permissions').modal('show');
+                        $('.types-select').select2({
+                            width: 'resolve',
+                            dropdownParent: $("#modal_permissions")
+                        });
+                        registerCheckStatus();
+                    },
+                    error: function (er) {
+                        alert(er);
+                    }
+                });
+        }
+
+    </script>
+}

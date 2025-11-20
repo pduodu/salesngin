@@ -1,0 +1,169 @@
+﻿<script>
+    $(document).ready(function ()
+    {
+        $('[data-toggle="popover"]').popover();
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    function initializeSelect2()
+    {
+        $('.types-select').select2({
+            width: 'resolve',
+            placeholder: 'Select an Option',
+            allowClear: true
+        });
+    }
+
+    function initializeSelect2InModal(modalId)
+    {
+        $('.types-select').select2({
+            width: '100% ',
+            allowClear: true,
+            dropdownParent: $(modalId)
+        });
+    }
+
+    const radioButtons = document.querySelectorAll(".form-check-input");
+    const labels = document.querySelectorAll("[data-kt-button='true']");
+
+    function handleRadioButtonChange(index)
+    {
+        if (!labels || !radioButtons[index].checked)
+        {
+            return;
+        }
+
+        labels.forEach((label, i) =>
+        {
+            if (label)
+            {
+                label.classList.toggle("active", i === index);
+            }
+        });
+    }
+
+    radioButtons.forEach((radioButton, index) =>
+    {
+        radioButton.addEventListener("change", () => handleRadioButtonChange(index));
+    });
+
+
+    //script to handle notification button clicked in header
+    function notificationClick(status)
+    {
+        $.ajax({
+            type: 'GET',
+            url: "@Url.Action("GetOrdersPartialViewWOS", "Order")",
+            //url: '/Order/GetOrdersPartialViewWOS',
+            contentType: 'application/json; charset=utf=8',
+            data: { status: status },
+            success: function (response)
+            {
+                $("#div_notification_content").empty();
+                $("#div_notification_content").html(response);
+                $("#div_notification_popup").modal("show");
+            },
+            error: function (xhr, status, error)
+            {
+                var err = eval("(" + xhr.responseText + ")");
+                alert(err.Message);
+            }
+        });
+    }
+
+    function triggerButtonIndicator(buttonElement)
+    {
+        if (buttonElement)
+        {
+            // Handle button click event
+            buttonElement.addEventListener("click", function ()
+            {
+                // Activate indicator
+                buttonElement.setAttribute("data-kt-indicator", "on");
+
+                // Disable indicator after 3 seconds
+                setTimeout(function ()
+                {
+                    buttonElement.removeAttribute("data-kt-indicator");
+                }, 8000);
+            });
+        }
+    }
+
+    function toggleStockManagement()
+    {
+
+        // // Get a reference to the radio buttons and the div element
+        // const radioButtons = document.querySelectorAll('input[name="IsStockManaged"]');
+        // const divToToggle = document.getElementById('toggleStockManagementDiv');
+
+        // // Add change event listeners to the radio buttons
+        // radioButtons.forEach(function (radioButton) {
+        //     radioButton.addEventListener('change', function () {
+        //         if (radioButton.value === '1') {
+        //             // If "Yes" is selected, show the div
+        //             divToToggle.style.display = 'block';
+        //         } else {
+        //             // If "No" is selected, hide the div
+        //             divToToggle.style.display = 'none';
+        //         }
+        //     });
+        // });
+
+        // Get references to the checkbox and the div element
+        // const checkbox = document.getElementById('IsStockManaged');
+        // const divToToggle = document.getElementById('toggleStockManagementDiv');
+
+        // // Check if the checkbox is checked
+        // if (checkbox.checked) {
+        //     // If checked, show the div
+        //     divToToggle.style.display = 'block';
+        // } else {
+        //     // If unchecked, hide the div
+        //     divToToggle.style.display = 'none';
+        // }
+    }
+
+
+</script>
+
+@* Session Timeout checker *@
+
+@* <script type="text/javascript">
+
+    //Function to show a popup notification
+    function showSessionExpiryPopup() {
+        // show a popup
+        $('#sessionExpiryModal').modal('show');
+    }
+
+    // Periodically check the session status
+    function checkSessionStatus() {
+        $.ajax({
+            url: '@Url.Action("CheckSessionStatus", "Account")',
+            success: function (data) {
+                if (data.isSessionExpired) {
+                    showSessionExpiryPopup();
+                }
+            }
+        });
+    }
+    // Call the checkSessionStatus function every few seconds
+    setInterval(checkSessionStatus, 5000); // Adjust the interval as needed
+
+    // Function to extend the session
+    function extendSession() {
+        $.ajax({
+            url: '@Url.Action("ExtendSession", "YourController")',
+            method: 'POST',
+            success: function (data) {
+                // Optionally, you can provide feedback to the user
+                alert('Session extended successfully!');
+            }
+        });
+    }
+
+    // Attach click event handler to the "Extend Session" button
+    $('#extendSessionButton').on('click', extendSession);
+
+</script> *@

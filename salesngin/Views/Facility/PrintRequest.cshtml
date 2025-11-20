@@ -1,0 +1,260 @@
+﻿@model RequestViewModel
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
+@inject IDataControllerService _dataService
+@inject IConfiguration _configuration
+@{
+    var company = await _dataService.GetCompany();
+    ApplicationUser loggedInUser = new();
+    if (_signInManager.IsSignedIn(User))
+    {
+        loggedInUser = await _userManager.GetUserAsync(User);
+    }
+
+    ViewData["Title"] = "Print Request";
+    ViewData["MainMenu"] = "Print Request";
+    ViewData["SubMenu"] = "Request";
+    ViewData["Page"] = "Print Request";
+
+    var settings = await _dataService.GetSettings();
+
+    //Use this to configure the datatables toolbar
+    // ViewBag.ToolBarDateFilter = true; //Table has a date column
+    // ViewBag.ToolBarStatusFilter = true;//Table has a status filter column
+    // ViewBag.ToolBarStatusFilterOptions = GlobalConstants.PurchaseStatuses;  //Status filter option items
+    //ViewBag.ToolBarExportOptions = true;
+}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memo Request</title>
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 10px;
+        }
+
+        .container {
+        width: 100%; /* Control the width of the memo content */
+        margin: 0 auto; /* Center the content horizontally */
+        padding: 20px;
+        }
+
+        .memo-header {
+        text-align: center;
+        margin-bottom: 30px;
+        }
+
+        .memo-header img {
+        justify-content: center;
+        align-items: center;
+        height: 100px;
+        padding-left: 50px;
+        padding-bottom: 20px;
+        }
+
+        .memo-section {
+        margin-bottom: 20px;
+        }
+
+        .memo-title {
+        text-align: center;
+        font-size: 1.5em;
+        font-weight: bold;
+        }
+
+        .memo-content {
+        margin: 10px;
+        }
+
+        .memo-content p {
+        margin: 5px 0;
+        }
+
+        .footer {
+        text-align: center;
+        margin-top: 30px;
+        font-style: italic;
+        }
+
+        .bold-text {
+        font-weight: bold;
+        }
+
+        .line-break {
+        border-bottom: 2px solid black; /* Line thickness and color */
+        margin: 1px 0; /* Adjust spacing between the lines */
+        }
+
+        .double-line {
+        margin: 2px 0; /* Space between the two lines */
+        }
+
+        @@media print {
+        
+           body {
+        visibility: hidden; /* Hide everything by default */
+        margin: 0;
+        margin-top: 0; /* Remove default margins */
+        padding: 0; /* Remove default padding */
+           }
+           
+           #PrintDiv, #PrintDiv * {
+           visibility: visible; /* Show the div and its contents */
+           }
+           
+           #PrintDiv {
+           position: relative;
+           width: 100%; /* Ensure full width on the print page */
+           margin: 0 auto; /* Center on the print page */
+           top: 0;
+           padding: 0; /* Remove additional padding for print */
+           }
+           
+           .container {
+           width: 100%; /* Ensure full width for print */
+           margin: 0 auto; /* Center content */
+           padding: 0; /* Remove padding */
+           }
+           
+           .memo-header {
+           margin-bottom: 50px; /* Reduce space under the header */
+           text-align: center;
+           }
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <button onclick="printDiv()" class="btn btn-primary" style="float:right;">Print</button>
+    </div>
+    <div class="" id="PrintDiv">
+
+        <div class="memo-header" style="text-align:center; padding-bottom:20px;">
+            <img style="text-align:center;" src="@Url.Content(company.CompanyLogoPath)" alt="GCAA Logo">
+            <h2 style="text-align:center;">@company.CompanyName</h2>
+        </div>
+
+        <div>
+            <div class="memo-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="text-bolder" style="text-decoration: underline;padding-bottom:15px;font-size:15px;">MEMO</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="bold-text" style="padding-bottom:15px;font-size:12px;"><span>TO</span></td>
+                            <td class="bold-text" style="padding-left:20px;padding-bottom:15px;font-size:12px;">:</td>
+                            <td style="padding-left:30px;padding-bottom:15px;font-size:12px;"> FACILITY MANAGEMENT OFFICER</td>
+                        </tr>
+                        <tr>
+
+                            <td class="bold-text" style="padding-bottom:15px;font-size:12px;"><span>FROM</span></td>
+                            <td class="bold-text" style="padding-left:20px;padding-bottom:15px;font-size:12px;">:</td>
+                            @{
+                                if (Model.Request?.RequestedBy?.JobTitle != null)
+                                {
+                                    <td style="text-transform: uppercase; padding-left:30px;padding-bottom:15px;font-size:12px;"> @Model.Request?.RequestedBy?.JobTitle, @Model.Request?.RequestedBy?.Unit?.UnitName</td>
+                                }
+                            }
+                        </tr>
+                        <tr>
+
+                            <td class="bold-text" style="padding-bottom:15px;font-size:12px;"><span>DATE</span></td>
+                            <td class="bold-text" style="padding-left:20px;padding-bottom:15px;font-size:12px;">:</td>
+                            <td style="text-transform: uppercase; padding-left:30px;padding-bottom:15px;font-size:12px;"> @Model.Request?.RequestDate?.ToString("MMMM dd, yyyy")</td>
+
+                        </tr>
+                        <tr>
+
+                            <td class="bold-text" style="padding-bottom:10px;font-size:12px;"><span>SUBJECT</span></td>
+                            <td class="bold-text" style="padding-left:20px;padding-bottom:10px;font-size:12px;">:</td>
+                            <td class="bold-text" style="padding-left:30px;padding-bottom:10px;"> REQUEST FOR ITEMS</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="memo-content">
+            <div class="double-line">
+                <div class="line-break "></div> <!-- First line -->
+                <div class="line-break "></div> <!-- Second line -->
+            </div>
+        </div>
+
+        <div class="memo-content py-5">
+            <p style="font-size:12px;"><strong style="text-transform: uppercase;">REQUEST PURPOSE: </strong>@Model.Request?.Purpose</p>
+        </div>
+
+        <div class="memo-content">
+            <p class="text-start fw-bolder fs-7 text-uppercase" style="text-align:center;font-size:12px;">Item(s) Requested:</p>
+            <table class="table align-middle table-row-dashed fs-6 gy-2 gs-2" style="border:1px solid black;">
+                <thead style="border:1px solid black;">
+                    <tr class="text-start text-gray-900 fw-bolder fs-7 text-uppercase gs-0">
+                        <th style="text-align:center;">Item</th>
+                        <th style="text-align:center;">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-900 fw-bold" style="border:1px solid black;">
+                    @{
+                        if (Model.RequestItems.Count > 0)
+                        {
+                            foreach (var products in Model.RequestItems)
+                            {
+                                <tr>
+                                    <td style="text-align:center;font-size:12px;">@products.Item?.ItemName</td>
+                                    <td style="text-align:center;font-size:12px;">@products.Quantity</td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="2" style="text-align:center;font-size:12px;"> Items not available.</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <div class="memo-section" style="width: 48%;">
+                <div class="memo-content">
+                    <p style="text-transform: uppercase;font-size:12px;"><span class="bold-text">Requested By:</span> @Model.RequestedBy?.FullName</p>
+                    <p style="text-transform: uppercase;padding-bottom:20px;font-size:12px;">@Model.RequestedBy?.JobTitle, @Model.RequestedBy?.Unit?.UnitName</p>
+                    <p style="text-transform: uppercase;font-size:12px;"><span class="bold-text">Approved By:</span> @Model.Request?.ApprovedBy?.FullName</p>
+                    <p style="text-transform: uppercase;font-size:12px;">@Model.ApprovedByUser?.JobTitle, @Model.ApprovedByUser?.Unit?.UnitName</p>
+                </div>
+            </div>
+            <div class="memo-section" style="width: 48%;">
+                <div class="memo-content">
+                    <p style="text-transform: uppercase;font-size:12px;"><span class="bold-text">Received By:</span> @Model.ReceivedBy?.FullName</p>
+                    <p style="text-transform: uppercase;padding-bottom:20px;font-size:12px;">@Model.ReceivedBy?.JobTitle, @Model.ReceivedBy?.Unit?.UnitName</p>
+                    <p style="text-transform: uppercase;font-size:12px;"><span class="bold-text">Delivered By:</span> @Model.Request?.SuppliedBy?.FullName</p>
+                    <p style="text-transform: uppercase;font-size:12px;">@Model.SuppliedBy?.JobTitle, @Model.SuppliedBy?.Unit?.UnitName</p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="footer">
+            <p>@company.CompanyName - Facility Inventory Management System(FIMS)</p>
+        </div>
+    </div>
+
+    <script>
+        function printDiv() {
+            window.print(); // Trigger the print dialog
+        }
+    </script>
+</body>

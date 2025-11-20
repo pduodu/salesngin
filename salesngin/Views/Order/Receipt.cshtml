@@ -1,0 +1,184 @@
+﻿@model SalesViewModel
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Receipt";
+    ViewData["MainMenu"] = "Sales Management";
+    ViewData["Page"] = "Reeipt";
+
+    var currentDate = DateTime.UtcNow.Date.ToShortDateString();
+    var currentTime = DateTime.UtcNow.ToString("t");
+
+
+}
+<link rel="stylesheet" href="~/css/site.css" />
+
+<div class="container-xxl px-0">
+
+    <div class="row gy-5 g-xl-10">
+        <!--begin::Col-->
+        <div class=col-xxl-5 mb-5 mb-xl-10">
+            <!--begin::Chart widget 8-->
+            <div class="card card-flush h-xl-100">
+                <!--begin::Header-->
+                <div class="card-header pt-5">
+                  
+                    <!--begin::Toolbar-->
+                    <div class="card-toolbar">
+                        <button onclick="window.print()" class="btn btn-light-primary mx-2 fs-4">
+                            <i class="ki-duotone ki-printer fs-3"><i class="path1"></i><i class="path2"></i><i class="path3"></i><i class="path4"></i><i class="path5"></i></i>
+                            Print
+                        </button>
+                    </div>
+                    <!--end::Toolbar-->
+                </div>
+                <!--end::Header-->
+                <div class="separator separator-dotted border-dark my-3"></div>
+                <!--begin::Body-->
+                <div id="section-to-print" class="card-body pt-1">
+                    <!--begin::Title-->
+                    <h2 style=" text-align: center;" class="card-title text-align-center flex-column">
+                        <span class="card-label fs-2 fw-bold text-dark">BOHENKO CATERING SERVICES</span><br/>
+                        <span class="card-label fs-2 fw-bold text-dark">OFFICIAL RECEIPT</span>
+                    </h2>
+                    <div class="separator separator-dotted border-dark my-3"></div>
+                    <!--end::Title-->
+                    <!--begin::Table Invoice Summary-->
+                    <div class="table mb-2">
+                        <table id="tblInvoiceSummary" class="table  gs-0 gy-2 my-0 mb-6 fw-bold text-dark fs-6">
+                            <thead class="m-0 p-0">
+                                <tr class="m-0 p-0">
+                                    <th  ></th>
+                                    <th  ></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="">
+                                    <td class="pe-0">
+                                        <div class="d-flex align-items-center">
+                                            <span class="">Invoice # : </span>
+                                        </div>
+                                    </td>
+                                    <td class="pe-0 text-start">
+                                        <div class="d-flex align-items-center">
+                                            <span class="">@Model.Order.OrderCode</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td class="pe-0">
+                                        <div class="d-flex align-items-center">
+                                            <span class="">Customer Name : </span>
+                                        </div>
+                                    </td>
+                                    <td class="pe-0 text-start">
+                                        <div class="d-flex align-items-center">
+                                            <span class="">@Model.Order.CustomerName</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td class="pe-0">
+                                        <div class="d-flex align-items-center">
+                                            <span class="">Customer Tel : </span>
+                                        </div>
+                                    </td>
+                                    <td class="pe-0 text-start">
+                                        <div class="d-flex align-items-center">
+                                            <span class="">@Model.Order.CustomerNumber</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td class="pe-0">
+                                        <div class="d-flex align-items-center">
+                                            <span class="">Delivery Method : </span>
+                                        </div>
+                                    </td>
+                                    <td class="pe-0 text-start">
+                                        <div class="d-flex align-items-center">
+                                            <span class="">@Model.Order.DeliveryMethod</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td class="pe-0">
+                                        <div class="d-flex align-items-center">
+                                            <span class="">Date : </span>
+                                        </div>
+                                    </td>
+                                    <td class="pe-0 text-start">
+                                        <div class="d-flex align-items-center">
+                                            <span class="">@currentDate @currentTime</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="separator separator-dotted border-dark my-3"></div>
+                    <!--end::Table Invoice Summary-->
+                    <!--begin::Table container-->
+                    @* @await Html.PartialAsync("_CartItemsDisplay", Model.Order.OrderItems) *@
+                    @await Html.PartialAsync("_ReceiptItemsPartial", Model)
+                    @await Html.PartialAsync("_Receipt", Model)
+                    
+                    <!--end::Table container-->
+                    <div class="separator separator-dotted border-dark my-2"></div>
+                    <div class="d-flex flex-stack bg-light rounded-3 p-6 mb-5">
+
+                        <div class="table">
+                            <table id="tblCartSummary" class="table align-middle gs-0 gy-2 my-0 fw-bold text-dark fs-6">
+                                <thead>
+                                    <tr>
+                                        <th class="min-width-175px" ></th>
+                                        <th  ></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="">
+                                        <td class="pe-0">
+                                            <div class="d-flex align-items-center">
+                                                <span class="">Status : </span>
+                                            </div>
+                                        </td>
+                                        <td class="pe-0">
+                                            <div class="d-flex align-items-center">
+                                                <span class="">@Model.Order.Status </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="">
+                                        <td class="pe-0">
+                                            <div class="d-flex align-items-center">
+                                                <span class="">Served By : </span>
+                                            </div>
+                                        </td>
+                                        <td class="pe-0">
+                                            <div class="d-flex align-items-center">
+                                                <span class="">@Model.Order.CreatedByUser?.FullName </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+                <!--end::Body-->
+            </div>
+            <!--end::Chart widget 8-->
+        </div>
+        <!--end::Col-->
+        <!--begin::Col-->
+        <div class="col-xxl-7">
+            <!--begin::Table widget 1-->
+            <!--end::Table widget 1-->
+        </div>
+        <!--end::Col-->
+    </div>
+
+</div>
+
+
+

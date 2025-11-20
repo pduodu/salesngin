@@ -1,0 +1,134 @@
+﻿@model LoginViewModel
+@inject IDataControllerService _dataService
+@inject IConfiguration _configuration
+@{
+    Layout = "_LoginLayout";
+    ViewData["Title"] = "Login";
+    var returnUrl = Context.Request.Query["ReturnUrl"];
+    var company = await _dataService.GetCompany();
+
+    string sideLogo = _configuration["LoginSideLogo"];
+    string externalLogins = _configuration["ExternalLogins"];
+    string companyName = _configuration["CompanyName"];
+    string applicationName = _configuration["ApplicationName"];
+    string applicationShortName = _configuration["ApplicationShortName"];
+}
+
+<!--begin::Wrapper-->
+<div class="w-lg-500px p-10">
+
+    <!--begin::Heading-->
+    <div class="text-center mb-5">
+
+        <a asp-action="Index" asp-controller="Home" class="mb-0">
+            <img alt="Logo" src="@Url.Content(company.CompanyLogoPath)" class="mb-2 col-4" />
+        </a>
+        <div class="fw-bolder fs-2 mb-7">
+            @company?.CompanyName.ToUpper()
+        </div>
+    </div>
+    <!--begin::Heading-->
+    @{
+        if (!string.IsNullOrEmpty(externalLogins) && (externalLogins == "enable" || externalLogins == "1"))
+        {
+            <!--begin::Login options-->
+            <div class="row g-3 mb-1">
+                <div class="row g-3 mb-2">
+                    <div class="col-md-6">
+                        <!--begin::Google link--->
+                        <a href="sign-in.html#" style="" class="btn btn-flex btn-outline btn-outline-dashed btn-bg-light btn-text-gray-700 btn-active-color-primary flex-center text-nowrap w-100">
+                            <img alt="Logo" src="../../../assets/media/svg/brand-logos/outlook-1.svg" class="theme-light-show h-15px me-3" />
+                            Sign in with Outlook
+                        </a>
+                        <!--end::Google link--->
+                    </div>
+                    <div class="col-md-6">
+                        <!--begin::Google link--->
+                        <a href="sign-in.html#" style="" class="btn btn-flex btn-outline btn-outline-dashed btn-bg-light btn-text-gray-700 btn-active-color-primary flex-center text-nowrap w-100">
+                            <img alt="Logo" src="../../../assets/media/svg/brand-logos/google-icon.svg" class="h-15px me-3" />
+                            Sign in with Google
+                        </a>
+                        <!--end::Google link--->
+                    </div>
+                    <!--end::Col-->
+                </div>
+            </div>
+            <!--end::Login options-->
+        }
+    }
+    <!--begin::Separator-->
+    <div class="separator separator-content my-14">
+        <span class="w-125px text-gray-600 fw-semibold fs-3">Sign In</span>
+    </div>
+    <!--end::Separator-->
+    <!--begin::Form-->
+    <form class="form w-100" id="signInform" asp-action="Login" asp-controller="Account" method="post" asp-route-returnUrl="@returnUrl">
+        @*<div asp-validation-summary="All" class="text-danger"></div>*@
+
+        <div class="fv-row fs-4 mb-8">
+
+            <span asp-validation-for="Email" class="text-danger"></span>
+            <div class="input-group input-group-lg mb-5">
+                <span class="input-group-text">
+                    <i class="ki-duotone ki-profile-circle fs-2x">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
+                </span>
+                <input asp-for="Email" type="text" placeholder="Email" class="form-control fs-4" autocomplete="off" />
+            </div>
+
+            <span asp-validation-for="Password" class="text-danger"></span>
+            <div class="input-group input-group-lg mb-5">
+                <span class="input-group-text">
+                    <i class="ki-duotone ki-password-check fs-2x">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                        <span class="path4"></span>
+                        <span class="path5"></span>
+                    </i>
+                </span>
+                <input asp-for="Password" type="password" placeholder="Password" class="form-control fs-4" autocomplete="off" />
+            </div>
+
+        </div>
+
+        <!--begin::Wrapper-->
+        <div class="d-flex flex-stack flex-wrap gap-3 fs-base fw-semibold fs-3 mb-8">
+            <div></div>
+
+            <!--begin::Link-->
+            <a asp-action="ForgotPassword" asp-controller="Account" class="link-primary">
+                Reset Password
+            </a>
+            <!--end::Link-->
+        </div>
+        <!--end::Wrapper-->
+        <!--begin::Submit button-->
+        <div class="d-grid mb-10 ">
+            <button type="submit" id="signInsubmit" class="btn btn-primary">
+
+                <!--begin::Indicator label-->
+                <span class="indicator-label fs-2">
+                    Sign In
+                </span>
+                <!--end::Indicator label-->
+                <!--begin::Indicator progress-->
+                <span class="indicator-progress">
+                    Please wait...    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                </span>
+                <!--end::Indicator progress-->
+            </button>
+        </div>
+        <!--end::Submit button-->
+    </form>
+    <!--end::Form-->
+</div>
+<!--end::Wrapper-->
+@section Scripts {
+    <script type="text/javascript">
+
+    </script>
+}

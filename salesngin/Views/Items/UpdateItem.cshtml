@@ -1,0 +1,203 @@
+﻿@model ItemViewModel
+@inject IDataControllerService _dataService
+@{
+    ViewData["Title"] = "Update Item";
+    ViewData["MainMenu"] = "Item Management";
+    ViewData["SubMenu"] = "Items";
+    ViewData["Page"] = "Update Item";
+
+    @* string actionName = Model.ItemType == ItemType.Fixed ? "FixedItems" : "OperationalItems"; *@
+}
+<div class="container-xxl " id="kt_content_container">
+    <div class="row my-5">
+        <div class="col-md-6">
+            <h3>Update Item</h3>
+            <p>Please fill in the details below to update the item.</p>
+        </div>
+        <div class="col-md-6">
+            <div class="d-flex justify-content-end">
+                <a asp-controller="Items" asp-action="Items" id="backToListButton"
+                    class="btn btn-lg btn-primary me-5">
+                    <i class="ki-duotone ki-arrow-left fs-2x">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+    <form asp-controller="Items" asp-action="UpdateItem" asp-route-id="@Model.Id" method="post"enctype="multipart/form-data" class="form">
+        @Html.AntiForgeryToken()
+        @* <input type="hidden" asp-for="ItemType" /> *@
+        @* @await Html.PartialAsync("Item/_ItemEditor", Model) *@
+        @await Html.PartialAsync("Item/_ItemFormEditor", Model)
+        <div class="row my-5">
+            <div class="d-flex justify-content-end">
+                <a asp-controller="Items" asp-action="Items" id="itemCancelButton"
+                    class="btn btn-lg btn-danger me-5">
+                    <i class="ki-duotone ki-cross-circle fs-2x">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    Cancel
+                </a>
+                <button type="submit" id="itemSubmitButton" class="btn btn-lg btn-primary">
+                    <i class="ki-duotone ki-clipboard fs-2x">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                    </i>
+                    <span class="indicator-label">
+                        Save
+                    </span>
+                    <span class="indicator-progress">
+                        Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function ()
+        {
+
+            $('.types-select').select2({ width: 'resolve' });
+
+            $('.form-select').select2({
+                width: '100%',
+                placeholder: 'Select ...',
+                allowClear: true
+            });
+
+            toggleItemType();
+
+            // Initialize the select2 for the ItemId dropdown
+            // Ensure the select element exists before initializing Select2
+            const selectElement = document.getElementById('ItemId');
+            if (selectElement)
+            {
+                console.log("Select item element found. Initializing Select2...");
+                const url = "@Url.Action("GetItemsJson", "Items")";
+                initializeCustomSelect2(selectElement, url, 'Search...');
+            }
+
+        });
+
+        function toggleItemType()
+        {
+            const toggleCheck = document.getElementById("IsNewItem");
+            const newItemDiv = document.getElementById("newItemPlaceHolder");
+            const existingItemDiv = document.getElementById("existingItemPlaceHolder");
+            @* const programNameInput = document.getElementById("ProgramName");
+            const courseInput = document.getElementById("CourseId"); *@
+
+                            // Null checks to ensure elements exist
+                            if (!toggleCheck || !newItemDiv || !existingItemDiv)
+            {
+                console.error('One or more elements not found.');
+                return;
+            }
+
+            if (toggleCheck.checked)
+            {
+                // If toggle is checked (New Item selected), show the new item div and hide the existing item div
+                newItemDiv.style.display = "block";
+                existingItemDiv.style.display = "none";
+                @* programNameInput.value = "";
+                courseInput.value = ""; *@
+                            } else
+            {
+                // If toggle is unchecked (Existing Item selected), show the existing item div and hide the new item div
+                existingItemDiv.style.display = "block";
+                newItemDiv.style.display = "none";
+                @* programNameInput.value = "";
+                courseInput.value = ""; *@
+                            }
+        }
+
+        function initializeCustomSelect2(element, url, placeholder = 'Search...')
+        {
+            if (element)
+            {
+                console.log("Select element found. Initializing Select2...");
+
+                $(element).select2({
+                    placeholder: placeholder,
+                    allowClear: true,
+                    width: '100%',
+                    minimumInputLength: 2,
+                    templateResult: formatItem,
+                    templateSelection: formatItemSelection,
+                    ajax: {
+                        url: url,
+                        type: 'GET',
+                        dataType: "json",
+                        delay: 250,
+                        data: function (params)
+                        {
+                            return {
+                                q: params.term || '',
+                                page: params.page || 1
+                            };
+                        },
+                        processResults: function (data, params)
+                        {
+                            params.page = params.page || 1;
+                            var results = data.items || [];
+                            return {
+                                results: results,
+                                pagination: {
+                                    more: data.total_count > (params.page * 30)
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    escapeMarkup: function (markup)
+                    {
+                        return markup;
+                    },
+                });
+
+                function formatItem(item)
+                {
+                    if (!item.id) return item.text;
+                    var avatarUrl = item.avatarUrl;
+                    var $container = $(
+                        '<div class="d-flex align-items-center p-0">' +
+                        '<div class="symbol symbol-30px me-3">' +
+                        '<img src="' + avatarUrl + '" class="rounded-circle" alt="image" >' +
+                        '</div>' +
+                        '<div class="d-flex flex-column">' +
+                        '<span class="fw-bold">' + item.text + '</span>' +
+                        '</div>' +
+                        '</div>'
+                    );
+                    return $container;
+                }
+
+                function formatItemSelection(item)
+                {
+                    if (!item.id) return item.text;
+                    var avatarUrl = item.avatarUrl || $(item.element).data('avatarUrl');
+                    //var avatarUrl = item.avatarUrl;
+                    var $selection = $(
+                        '<div class="d-flex align-items-center p-0">' +
+                        '<div class="symbol symbol-30px me-3">' +
+                        '<img src="' + avatarUrl + '" class="rounded-circle" alt="image" >' +
+                        '</div>' +
+                        '<div class="d-flex flex-column">' +
+                        '<span class="fw-bold">' + item.text + '</span>' +
+                        '</div>' +
+                        '</div>'
+                    );
+                    return $selection;
+                }
+            }
+        }
+
+    </script>
+}

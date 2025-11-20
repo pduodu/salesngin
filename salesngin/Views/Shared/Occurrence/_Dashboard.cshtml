@@ -1,0 +1,166 @@
+﻿@model DashboardViewModel
+
+
+<div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+    <div class="col">
+        <a asp-controller="Occurrence" asp-action="Hazards" class=" ">
+            <div class="card mb-6 mb-xl-9">
+                <!--begin::Header-->
+                <div class="card-header border-0">
+                    <div class="card-title">
+                        <h3>Hazard Reports</h3>
+                    </div>
+                </div>
+                <!--end::Header-->
+                <!--begin::Body-->
+                <div class="card-body py-0">
+                    @* <div class="fs-6 fw-semibold text-gray-500 mb-4"></div> *@
+                    <!--begin::Left Section-->
+                    <div class="d-flex flex-wrap flex-stack mb-5">
+                        <!--begin::Row-->
+                        <div class="d-flex flex-wrap">
+                            <!--begin::Col-->
+                            <div class="border border-dashed border-gray-300 w-125px rounded my-3 p-4 me-6">
+                                <span class="fs-2 fw-bold text-gray-800 lh-1">
+                                    <span class="pulse pulse-danger">
+                                        <span class="pulse-ring"></span>
+                                        <i class="ki-duotone ki-black-right-line text-danger fs-3">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <span data-kt-countup="true" data-kt-countup-value="@Model.OpenedHazards" data-kt-countup-prefix="" class="" data-kt-initialized="1">@Model.OpenedHazards</span>
+                                </span>
+                                <span class="fs-6 fw-semibold text-muted d-block lh-1 pt-2">Open</span>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="border border-dashed border-gray-300 w-125px rounded my-3 p-4 me-6">
+                                <span class="fs-2 fw-bold text-gray-800 lh-1">
+                                    <span class="pulse pulse-warning">
+                                        <span class="pulse-ring"></span>
+                                        <i class="ki-duotone ki-black-right-line text-warning fs-3">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <span data-kt-countup="true" data-kt-countup-value="@Model.CompletedHazards" data-kt-countup-prefix="" class="" data-kt-initialized="1">@Model.CompletedHazards</span>
+                                </span>
+                                <span class="fs-6 fw-semibold text-muted d-block lh-1 pt-2">Completed</span>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="border border-dashed border-gray-300 w-125px rounded my-3 p-4 me-6">
+                                <span class="fs-2 fw-bold text-gray-800 lh-1">
+                                    <i class="ki-duotone ki-black-right-line text-success fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <span class="" data-kt-countup="true" data-kt-countup-value="@Model.ClosedHazards" data-kt-countup-prefix="" data-kt-initialized="1">@Model.ClosedHazards</span>
+                                </span>
+                                <span class="fs-6 fw-semibold text-muted d-block lh-1 pt-2">Closed</span>
+                            </div>
+                            <!--end::Col % -->
+                        </div>
+                        <!--end::Row-->
+                        <a asp-controller="Occurrence" asp-action="Hazards" class="btn btn-sm btn-light-primary flex-shrink-0">View</a>
+                    </div>
+                    <!--end::Left Section-->
+                </div>
+                <!--end::Body-->
+            </div>
+        </a>
+    </div>
+    <div class="col">
+        <a asp-controller="Occurrence" asp-action="Voluntary" class=" ">
+            <div class="card mb-6 mb-xl-9">
+                <!--begin::Header-->
+                <div class="card-header border-0">
+                    <div class="card-title">
+                        <h3>Voluntary & Confidential Reports</h3>
+                    </div>
+                </div>
+                <!--end::Header-->
+                <!--begin::Body-->
+                <div class="card-body py-0">
+                    @* <div class="fs-6 fw-semibold text-gray-500 mb-4"></div> *@
+                    <!--begin::Left Section-->
+                    <div class="d-flex flex-wrap flex-stack mb-5">
+                        <!--begin::Row-->
+                        <div class="d-flex flex-wrap">
+                            <!--begin::Col-->
+                            <div class="border border-dashed border-gray-300 w-125px rounded my-3 p-4 me-6">
+                                <span class="fs-2 fw-bold text-gray-800 lh-1">
+                                    <span class="pulse pulse-danger">
+                                        <span class="pulse-ring"></span>
+                                        <i class="ki-duotone ki-black-right-line text-danger fs-3">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <span data-kt-countup="true" data-kt-countup-value="@Model.OpenedVoluntary" data-kt-countup-prefix="" class="" data-kt-initialized="1">@Model.OpenedVoluntary</span>
+                                </span>
+                                <span class="fs-6 fw-semibold text-muted d-block lh-1 pt-2">Open</span>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="border border-dashed border-gray-300 w-125px rounded my-3 p-4 me-6">
+                                <span class="fs-2 fw-bold text-gray-800 lh-1">
+                                    <span class="pulse pulse-warning">
+                                        <span class="pulse-ring"></span>
+                                        <i class="ki-duotone ki-black-right-line text-warning fs-3">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </span>
+                                    <span data-kt-countup="true" data-kt-countup-value="@Model.CompletedVoluntary" data-kt-countup-prefix="" class="" data-kt-initialized="1">@Model.CompletedVoluntary</span>
+                                </span>
+                                <span class="fs-6 fw-semibold text-muted d-block lh-1 pt-2">Completed</span>
+                            </div>
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <div class="border border-dashed border-gray-300 w-125px rounded my-3 p-4 me-6">
+                                <span class="fs-2 fw-bold text-gray-800 lh-1">
+                                    <i class="ki-duotone ki-black-right-line text-success fs-3">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <span class="" data-kt-countup="true" data-kt-countup-value="@Model.ClosedVoluntary" data-kt-countup-prefix="" data-kt-initialized="1">@Model.ClosedVoluntary</span>
+                                </span>
+                                <span class="fs-6 fw-semibold text-muted d-block lh-1 pt-2">Closed</span>
+                            </div>
+                            <!--end::Col % -->
+                        </div>
+                        <!--end::Row-->
+                        <a asp-controller="Occurrence" asp-action="Voluntary" class="btn btn-sm btn-light-primary flex-shrink-0">View</a>
+                    </div>
+                    <!--end::Left Section-->
+                </div>
+                <!--end::Body-->
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row py-5 gx-4 gy-3 gx-xl-6">
+    <div class="col-md-6">
+        <div class="card shadow-sm ">
+            <div class="card-header fs-3 fw-bold text-gray-800 text-center pt-5">
+                <span class="me-2">
+                    Occurrence Type
+                </span>
+            </div>
+            <div id="chartA" class="card-body"></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header fs-3 fw-bold text-gray -800 text-center pt-5">
+                <span class="me-2">
+                    Occurrence Category
+                </span>
+            </div>
+            <div id="chartB" class="card-body"></div>
+        </div>
+    </div>
+</div>

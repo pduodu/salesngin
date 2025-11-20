@@ -1,0 +1,64 @@
+﻿@model dynamic
+
+@{
+
+    <div class="d-flex flex-wrap align-items-end flex-stack my-3 pt-3">
+        <div class="d-flex flex-column flex-grow-1 py-2">
+            <div class="d-flex flex-wrap fs-4">
+
+                @{
+                    if (!string.IsNullOrEmpty(Model.TotalStatsOne))
+                    {
+                        <div class="border border-gray-600 border-solid rounded-3 min-w-130px p-8 me-6 mb-3">
+                            <div class="d-flex align-items-center mt-3">
+                                <div class="fs-1 fw-bold" data-kt-countup="true" data-kt-countup-value="@Model.TotalStatsOne" data-kt-countup-prefix="@Model.Currency" data-kt-initialized="1">
+                                    @Model.Currency @Model.TotalStatsOne
+                                </div>
+                            </div>
+                            <div class="fw-semibold fs-5 text-gray-900">@Model.TotalStatsOneLabel</div>
+                        </div>
+                    }
+
+                    if (!string.IsNullOrEmpty(Model.TotalStatsTwo))
+                    {
+                        <div class="border border-gray-600 border-solid rounded-3 min-w-130px p-8 me-6 mb-3">
+                            <div class="d-flex align-items-center mt-4">
+                                <div class="fs-1 fw-bold" data-kt-countup="true" data-kt-countup-value="@Model.TotalStatsTwo" data-kt-countup-prefix="@Model.Currency" data-kt-initialized="1">
+                                    @Model.Currency  @Model.TotalStatsTwo
+                                </div>
+                            </div>
+                            <div class="fw-semibold fs-5 text-gray-900">@Model.TotalStatsTwoLabel</div>
+                        </div>
+                    }
+
+                    if (!string.IsNullOrEmpty(Model.TotalStatsThree))
+                    {
+                        <div class="border border-gray-600 border-solid rounded-3 min-w-130px p-8 me-6 mb-3">
+                            <div class="d-flex align-items-center mt-4">
+                                <div class="fs-1 fw-bold" data-kt-countup="true" data-kt-countup-value="@Model.TotalStatsThree" data-kt-countup-prefix="@Model.Currency" data-kt-initialized="1">
+                                    @Model.Currency @Model.TotalStatsThree
+                                </div>
+                            </div>
+                            <div class="fw-semibold fs-5 text-gray-900">@Model.TotalStatsThreeLabel</div>
+                        </div>
+                    }
+
+                    if (!string.IsNullOrEmpty(Model.TotalStatsFour))
+                    {
+                        <div class="border border-gray-600 border-solid rounded-3 min-w-130px p-8 mb-3">
+                            <div class="d-flex align-items-center mt-4">
+                                <div class="fs-1 fw-bold" data-kt-countup="true" data-kt-countup-value="@Model.TotalStatsFour" data-kt-countup-prefix="@Model.Currency" data-kt-initialized="1">
+                                    @Model.Currency @Model.TotalStatsFour
+                                </div>
+                            </div>
+                            <div class="fw-semibold fs-5 text-gray-900">@Model.TotalStatsFourLabel</div>
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
+
+
+}

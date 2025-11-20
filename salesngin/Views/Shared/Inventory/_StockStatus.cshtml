@@ -1,0 +1,20 @@
+﻿@model string 
+
+@{
+    if (@Model == PurchaseStatus.Pending)
+    {
+        <span class="badge badge-light-primary fw-bold fs-5 px-4 py-3">@PurchaseStatus.Pending</span>
+    }
+    else if (@Model == PurchaseStatus.Received)
+    {
+        <span class="badge badge-light-success fw-bold fs-5 px-4 py-3">@PurchaseStatus.Received</span>
+    }
+    else if (@Model == PurchaseStatus.Cancelled)
+    {
+        <span class="badge badge-light-danger fw-bold fs-5 px-4 py-3">@PurchaseStatus.Cancelled</span>
+    }
+    else
+    {
+        <span class="badge badge-light-danger fw-bold fs-5 px-4 py-3">...</span>
+    }
+}

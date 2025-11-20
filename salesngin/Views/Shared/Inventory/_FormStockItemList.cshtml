@@ -1,0 +1,62 @@
+﻿@model List<Item>
+
+@{
+
+    Pager pager = new Pager();
+    int pageNumber = 0;
+    if (ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNumber = pager.CurrentPage;
+    }
+
+    string searchTerm = string.Empty;
+    if (ViewBag.Search != null)
+    {
+        searchTerm = ViewBag.Search;
+    }
+
+    <div class="d-flex flex-wrap d-grid gap-2">
+
+        @if (Model.Count > 0)
+        {
+            int i = 0;
+            @foreach (Item item in Model)
+            {
+                i++;
+                <a href="javascript:void(0);" id="btnSelectProduct_@i" class="d-flex align-items-center cursor-pointer w-100 p-3 bg-white rounded-2 border border-1 border-dashed border-primary" onclick="OpenItemAddModal(@item.Id)">
+                    <span class="symbol symbol-50px">
+                        <img src="@Url.Content(item.ItemPhotoPath)" class="mb-4 w-50px h-50px" alt="">
+                    </span>
+                    <div class="ms-5">
+                        <span class="ms-3 text-gray-800 text-hover-primary fs-4 fw-bold">@item.ItemName</span>
+                        <div class="badge badge-light-primary fs-6">@item.ItemCode</div>
+                    </div>
+                </a>
+            }
+        }
+    </div>
+
+    <div class="d-flex">
+        @{
+            if (pager.TotalItems > pager.PageSize)
+            {
+                if (pager.TotalPages > 0)
+                {
+                    <ul class="pagination justify-content-end my-5">
+
+                        @for (int pageNo = pager.StartPage; pageNo <= pager.EndPage; pageNo++)
+                        {
+                            <li class="page-item @(pageNo == pager.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-controller="Order" asp-action="Create" asp-route-search="@searchTerm" asp-route-page="@pageNo"> @pageNo </a>
+                            </li>
+
+                        }
+
+                    </ul>
+                }
+
+            }
+        }
+    </div>
+}

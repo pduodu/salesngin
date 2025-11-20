@@ -1,0 +1,79 @@
+﻿@model UserViewModel
+@inject UserManager<ApplicationUser> _userManager
+
+<div class="card pt-4 mb-6 mb-xl-9">
+    <div class="card-header border-0">
+        <div class="card-title">
+            <h2> Roles</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0 pb-5">
+        <form class="form" id="formRole" asp-controller="Account" asp-route-id="@Model.UserId" asp-action="ChangeUserRole" method="post">
+            <label class="fs-6 fw-bold form-label">
+                <span class="">Select a Role and select permissions for role under the permissions section below. <i class="fa fa-asterisk px-2 text-danger"></i></span>
+            </label>
+            <div class="separator separator-dashed my-5"></div>
+            <div class="fv-row mb-4">
+                <div class="mb-9">
+                    <div class="badge badge-lg badge-light-primary d-inline"><span class="mr-3">Assigned Role : </span>@Model.UserRole?.RoleDisplayText</div>
+                </div>
+                @*<input class="form-control" placeholder="" readonly="readonly" value="@Model.UserRole?.RoleDisplayText" />*@
+                <input type="hidden" asp-for="RoleName" value="@Model.UserRole?.Name" />
+            </div>
+            <div id="divRoles" class="fv-row mb-4 hover-scroll h-250px px-5">
+                @{
+
+                    bool ShouldDisplayRole(ApplicationRole role)
+                    {
+                        return !(role.Name == ApplicationRoles.SuperAdministrator && !IsUserInRole(Model.UserLoggedIn, ApplicationRoles.SuperAdministrator));
+                    }
+
+                    bool IsUserInRole(ApplicationUser user, string roleName)
+                    {
+                        return _userManager.IsInRoleAsync(user, roleName).GetAwaiter().GetResult();
+                    }
+
+                    foreach (var role in Model.Roles)
+                    {
+                        // if (role.Name == ApplicationRoles.SuperAdministrator && !await _userManager.IsInRoleAsync(Model.UserLoggedIn, ApplicationRoles.SuperAdministrator))
+                        if (ShouldDisplayRole(role))
+                        {
+                            <div class="d-flex">
+                                <div class="form-check form-check-custom form-check-solid">
+                                    <input asp-for="RoleId" class="form-check-input me-3 roleRadio" type="radio" value="@role.Id" id="RoleId_@role.Id" onclick="GetPermissions(@role.Id,@Model.UserId)" />
+                                    <label class="form-check-label" for="RoleId_@role.Id">
+                                        <div class="fw-bolder text-gray-800">@role.RoleDisplayText</div>
+                                        <div class="text-gray-600">@role.RoleDescription</div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class='separator separator-dashed my-5'></div>
+                        }
+
+                    }
+                }
+            </div>
+            <div class="separator separator-dashed my-5"></div>
+            <div class="text-gray-600 float-end">
+                <button type="submit" id="role_submit" form="formRole" class="btn btn-lg btn-primary me-3">
+                    <span class="indicator-label">
+                        Save
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@*
+<div class="card pt-4 mb-6 mb-xl-9">
+    <div class="card-header border-0">
+        <div class="card-title">
+            <h2> Personal Info</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0 pb-5">
+        <form class="form" id="corporate_info_form">
+        </form>
+    </div>
+</div>*@

@@ -1,0 +1,229 @@
+﻿@model UserViewModel
+@inject IDataControllerService _dataService
+@{
+    //Layout = "_Layout";
+    ViewData["Title"] = "Create";
+    ViewData["MainMenu"] = "User Management";
+    ViewData["SubMenu"] = "Users";
+    ViewData["Page"] = "Create User";
+}
+
+<div class="row">
+    <div class="col">
+    </div>
+</div>
+<div class="card py-5 col-md-12 mb-5 mb-lg-5 mx-auto">
+    <div class="card-header">
+        <div class="card-title">
+            <h2 class="mb-0">Create User</h2>
+        </div>
+        <div class="card-toolbar">
+            <a asp-controller="Account" asp-action="Users" class="btn btn-primary px-3 float-end">
+                <i class="ki-duotone ki-arrow-left fs-2x">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+            </a>
+        </div>
+    </div>
+</div>
+<form asp-controller="Account" asp-action="CreateUser" method="post" enctype="multipart/form-data">
+    <div class="d-flex flex-column flex-lg-row">
+        <!--begin::Sidebar-->
+        <div class="flex-column flex-lg-row-auto w-100 w-lg-200px w-xl-300px mb-10">
+            @await Html.PartialAsync("_PhotoUpload", Model)
+           @*  @await Html.PartialAsync("_WebcamUpload", Model) *@
+        </div>
+        <!--end::Sidebar-->
+        <!--begin::Content-->
+        <div class="flex-lg-row-fluid ms-lg-5">
+            @await Html.PartialAsync("_UserInfoForm", Model)
+            @* @await Html.PartialAsync("_UserMemberForm", Model) *@
+            @await Html.PartialAsync("_UserSecurityForm", Model)
+            <!--begin::Actions-->
+            <div class="row">
+                <div class="col text-end pt-5">
+                    <a asp-controller="Account" asp-action="Users" id="btn_cancel" class="btn btn-light fs-3 me-3">
+                        Cancel
+                    </a>
+
+                    <button type="submit" id="btn_submit" class="btn btn-primary fs-3">
+                        <span class="indicator-label">
+                            Submit
+                        </span>
+                        <span class="indicator-progress">
+                            Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <!--end::Actions-->
+        </div>
+        <!--end::Content-->
+    </div>
+</form>
+
+@*
+
+<div class="card col-md-11 mb-5 mb-lg-10 mx-auto">
+    <div class="card-header">
+        <div class="card-title">
+            <h2 class="mb-0">Create User</h2>
+        </div>
+        <div class="card-toolbar">
+            <a asp-controller="Account" asp-action="Users" class="btn btn-primary px-3 float-end">
+                <i class="ki-duotone ki-arrow-left fs-2x">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form asp-controller="Account" asp-action="CreateUser" method="post" enctype="multipart/form-data">
+            <div class="row mb-8">
+                <div class="col-md-4">
+                </div>
+                <div class="col-md-4">
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+*@
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            let webcamElement = document.getElementById("my_camera");
+            if (webcamElement) {
+                Webcam.set({
+                    width: 320,
+                    height: 240,
+
+                    // final cropped size
+                    crop_width: 200,
+                    crop_height: 200,
+
+                    image_format: 'jpeg',
+                    jpeg_quality: 90
+                });
+                Webcam.attach('#my_camera');
+            }
+
+            $('.flatPickr_Date').flatpickr({
+                //dateFormat:"dd-mm-yyyy"
+                altInput: true,
+                altFormat: "j F, Y",
+                dateFormat: "Y-m-d",
+            });
+
+            // Your code here
+            var bornAgainCheckbox = document.getElementById('IsBornAgain');
+
+            // Check if the checkbox exists on the page
+            if (bornAgainCheckbox) {
+                // Add an event listener for the 'change' event
+                bornAgainCheckbox.addEventListener('change', function () {
+                    // Update the DOM based on the checkbox state
+                    if (bornAgainCheckbox.checked) {
+                        bornAgainCheckbox.value = '1';
+                        // User toggled to 'Yes'
+                        console.log('User is Born Again');
+                    } else {
+                        bornAgainCheckbox.value = '0';
+                        // User toggled to 'No'
+                        console.log('User is not Born Again');
+                    }
+                });
+            }
+
+            // Your code here
+            var baptizmCheckbox = document.getElementById('IsBaptized');
+
+            // Check if the checkbox exists on the page
+            if (baptizmCheckbox) {
+                // Add an event listener for the 'change' event
+                baptizmCheckbox.addEventListener('change', function () {
+                    // Update the DOM based on the checkbox state
+                    if (baptizmCheckbox.checked) {
+                        baptizmCheckbox.value = '1';
+                        // User toggled to 'Yes'
+                        console.log('User is Baptized');
+                    } else {
+                        baptizmCheckbox.value = '0';
+                        // User toggled to 'No'
+                        console.log('User is not Baptized');
+                    }
+                });
+            }
+
+        });
+
+        function take_snapshot() {
+            // take snapshot and get image data
+            Webcam.snap(function (data_uri) {
+                // display results in page
+                //document.getElementById('divImageHolder').innerHTML = '<img src="' + data_uri + '"/>';
+                let imageHolder = document.getElementById('divImageHolder');
+                let capturedImageData = document.getElementById('Base64StringPhoto');
+
+                if (data_uri) {
+                    if (imageHolder) {
+                        imageHolder.setAttribute('style', 'background-image: url(' + data_uri + '); width:200px !important; height:200px !important;');
+                    }
+
+                    if (capturedImageData) {
+                        console.log(data_uri);
+                        capturedImageData.value = data_uri;
+                    }
+                }
+
+
+                // Webcam.upload(data_uri, '/Camera/Capture',
+                //     function (code, text) {
+                //         //alert('Photo Captured');
+                //     }
+                // );
+
+                // Webcam.upload(data_uri, '/Camera/Capture',
+                //     function (code, text) {
+                //         //alert('Photo Captured');
+                //     }
+                // );
+            });
+        }
+
+        function uploadBase64Image(base64StringData) {
+            // Extract base64 portion if it's a data URI
+            const base64String = base64StringData.split(',')[1]; // Replace with your actual Base64 string
+            const mimeType = 'image/png'; // Replace with the appropriate image MIME type
+            const fileName = 'image.png'; // Replace with the desired file name
+
+            // Convert Base64 to Blob
+            const byteCharacters = atob(base64String);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: mimeType });
+
+            // Create a new file from the Blob
+            const file = new File([blob], fileName, { type: mimeType });
+
+            // Set the file input value programmatically
+            const fileInput = document.getElementById('Photo');
+            fileInput.files = [file];
+
+            // Trigger a change event on the file input (optional)
+            const event = new Event('change', { bubbles: true });
+            fileInput.dispatchEvent(event);
+        }
+
+    </script>
+
+}
