@@ -66,6 +66,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<Fault> Faults { get; set; }
     public DbSet<FaultAction> FaultActions { get; set; }
 
+    public DbSet<Expense> Expenses { get; set; }
+    public DbSet<ExpenseCategory> ExpenseCategories { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Define the relationship between ApplicationUser and EmployeeType

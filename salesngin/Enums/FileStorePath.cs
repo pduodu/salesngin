@@ -60,6 +60,10 @@
         //public const string OccurrencePhotoDirectory = "/occurrence/photos/";
         //public const string OccurrenceReportDirectory = "/occurrence/files/";
 
+        //Expense Paths
+        public const string ExpensesDirectory = "/uploads/expenses/";
+        public const string ExpensesDirectoryName = "uploads/expenses";
+
 
         public const string OccurrencePhotoDirectoryName = "OccurrencePhotos";
         public const string OccurrencePhotoDirectory = "~/OccurrencePhotos/";

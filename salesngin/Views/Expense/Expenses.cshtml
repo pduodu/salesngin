@@ -1,0 +1,107 @@
+@model ExpenseViewModel
+@{
+    ViewData["Title"] = "Expenses";
+    ViewData["MainMenu"] = "Finance Management";
+    ViewData["SubMenu"] = "Expenses";
+    ViewData["Page"] = "Expenses";
+
+    ViewBag.ToolBarDateFilter = true;
+    ViewBag.ToolBarStatusFilter = false;
+    ViewBag.ToolBarExportOptions = true;
+}
+
+<div class="card col-md-12 mx-auto mb-6 mb-xl-9">
+    <div class="card-header py-5">
+        <div class="card-title">
+            <h2 class="d-flex align-items-center">
+                Expenses
+                <span class="text-gray-600 fs-6 ms-1">(@Model.Expenses?.Count())</span>
+            </h2>
+        </div>
+
+      <div class="card-toolbar">
+    @if (Model.ModulePermission.Create)
+    {
+        <a asp-controller="Expense" asp-action="CreateExpense" class="btn btn-primary me-2">
+            <i class="ki-duotone ki-plus fs-2x"></i> Add Expense
+        </a>
+    }
+
+    <a asp-controller="ExpenseCategory" asp-action="ExpenseCategories"
+       class="btn btn-light-primary" style="background-color:#6f42c1; color:white;">
+        <i class="ki-duotone ki-category fs-2x"></i>
+      Expense Categories
+    </a>
+</div>
+
+    </div>
+
+    @await Html.PartialAsync("_TableToolbar")
+
+    <div class="card-body py-4" id="divTbPlaceholder">
+        <div class="table-responsive">
+            <table class="table align-middle table-row-dashed table-hover fs-6 gy-3 gs-3" id="ExpenseRecordsTable">
+                <thead>
+                    <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th style="width: 130px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-800 fw-bold">
+                    @foreach (var exp in Model.Expenses ?? Enumerable.Empty<Expense>())
+                    {
+                        string url = Url.Action("UpdateExpense", "Expense", new { id = exp.Id });
+                        <tr class="cursor-pointer" data-url="@url" onclick="navigateToRowLink(this);">
+
+                            <td>@exp.Category?.Name</td>
+                            <td class="text-primary fw-bold">₵@exp.Amount.ToString("N2")</td>
+                            <td>@exp.DateIncurred.ToString("dd-MMM-yyyy")</td>
+                            <td>@exp.Description</td>
+
+                            <td>
+                                <a class="btn btn-icon btn-active-light-primary w-30px h-30px mx-2"
+                                   asp-controller="Expense" asp-action="UpdateExpense" asp-route-id="@exp.Id">
+                                    <i class="ki-duotone ki-pencil fs-2qx"></i>
+                                </a>
+
+                                <a class="btn btn-icon btn-active-light-danger w-30px h-30px mx-2"
+                                   asp-controller="Expense" asp-action="Delete" asp-route-id="@exp.Id">
+                                    <i class="ki-duotone ki-trash fs-2qx"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    $(document).ready(function () {
+        KTUtil.onDOMContentLoaded(function () {
+            KTAppTableListing.init(
+                "ExpenseRecordsTable",
+                "tbl_daterange_flatpickr",
+                "searchInput",
+                "",
+                [],
+                "DateIncurred",
+                "",
+                "tbl_daterange_flatpickr_clear",
+                "datatable_export_buttons",
+                "datatable_table_export_menu"
+            );
+        });
+    });
+
+    function navigateToRowLink(element) {
+        var url = $(element).data('url');
+        if (url) window.location.href = url;
+    }
+</script>
+}

@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: salesngin-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: salesngin-db
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  smtp4dev:
+    image: rnwood/smtp4dev
+    container_name: salesngin-smtp4dev
+    restart: always
+    ports:
+      - "3000:80" # Web UI
+      - "2525:25" # SMTP port
+      - "1100:1100" # POP3 (optional)
+
+volumes:
+  mysql_data:
