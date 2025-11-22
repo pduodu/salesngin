@@ -450,6 +450,7 @@ public static class DbInitializer
                         ConstantModules.Inspections_Module,
                         ConstantModules.Faults_Module,
                         ConstantModules.Reporting_Module,
+                        ConstantModules.Expenses_Module
                     ];
 
                 string[] staffModulesNames = [

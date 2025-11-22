@@ -1,0 +1,225 @@
+@model salesngin.ViewModels.ExpenseCategoryViewModel
+
+@{
+    ViewData["Title"] = "Expense Categories";
+    ViewData["MainMenu"] = "Finance Management";
+    ViewData["SubMenu"] = "Expense Categories";
+    ViewData["Page"] = "Expense Categories";
+
+    ViewBag.ToolBarDateFilter = false;
+    ViewBag.ToolBarStatusFilter = false;
+    ViewBag.ToolBarExportOptions = false;
+}
+
+<div class="card col-md-12 mx-auto mb-6 mb-xl-9">
+
+    <!-- HEADER -->
+    <div class="card-header py-5 d-flex justify-content-between align-items-center">
+        <div class="card-title">
+            <h2 class="d-flex align-items-center">
+                Expense Categories
+                <span class="text-gray-600 fs-6 ms-1">(@Model.Categories?.Count)</span>
+            </h2>
+        </div>
+
+        <div class="card-toolbar">
+            @if (Model.ModulePermission?.Create == true)
+            {
+                <a href="javascript:void(0);" class="btn btn-light-primary fs-4"
+                   onclick="OpenExpenseCategoryCreateModal();" title="Add Category">
+                    <i class="ki-duotone ki-plus-circle fs-2x"></i>
+                    Add Category
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    @await Html.PartialAsync("_TableToolbar")
+
+    <!-- BODY -->
+    <div class="card-body pt-0">
+
+        <!-- SEARCH + FILTERS -->
+        <form method="get" asp-action="ExpenseCategories" class="mb-5">
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <input type="text"
+                           name="SearchString"
+                           value="@Model.SearchString"
+                           class="form-control"
+                           placeholder="Search by category name..." />
+                </div>
+
+                <div class="col-md-3">
+                    <select name="PageSize" class="form-select" onchange="this.form.submit()">
+                        @foreach (var size in Model.PageSizes)
+                        {
+                            <option value="@size" selected="@(Model.PageSize == size)">
+                                @size per page
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <button class="btn btn-secondary">Filter</button>
+                </div>
+
+            </div>
+        </form>
+
+        <!-- TABLE -->
+        <div class="table-responsive">
+            <table class="table align-middle table-row-dashed table-hover fs-5 gy-3 mb-0" id="expenseCategoryTable">
+                <thead>
+                <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th style="width:130px;" class="text-end">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody class="fw-semibold text-gray-600">
+                @if (Model.Categories != null && Model.Categories.Count > 0)
+                {
+                    foreach (var c in Model.Categories)
+                    {
+                        <tr>
+                            <td class="text-primary fw-bold fs-6">@c.Name</td>
+                            <td>@c.Description</td>
+
+                            <td>
+                                @if (c.IsActive)
+                                {
+                                    <span class="badge badge-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger">Inactive</span>
+                                }
+                            </td>
+
+                            <td class="text-end">
+
+                                <!-- EDIT -->
+                                @if (Model.ModulePermission?.Update == true)
+                                {
+                                    <a href="javascript:void(0);"
+                                       class="btn btn-icon btn-active-light-primary w-30px h-30px mx-2"
+                                       onclick="OpenExpenseCategoryEditModal(@c.Id)"
+                                       title="Edit">
+                                        <i class="ki-duotone ki-pencil fs-2qx"></i>
+                                    </a>
+                                }
+
+                                <!-- DELETE -->
+                                @if (Model.ModulePermission?.Delete == true)
+                                {
+                                    <a asp-controller="ExpenseCategory"
+                                       asp-action="Delete"
+                                       asp-route-id="@c.Id"
+                                       class="btn btn-icon btn-active-light-danger w-30px h-30px mx-2"
+                                       onclick="return confirm('Delete this category?');"
+                                       title="Delete">
+                                        <i class="ki-duotone ki-trash fs-2qx"></i>
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            No categories found.
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="d-flex justify-content-between mt-4">
+
+            <div class="text-gray-600">
+                Showing @Model.Categories?.Count of @Model.TotalRecords records
+            </div>
+
+            <ul class="pagination">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                        <a class="page-link"
+                           href="@Url.Action("ExpenseCategories", new { PageNumber = i, PageSize = Model.PageSize, SearchString = Model.SearchString })">
+                            @i
+                        </a>
+                    </li>
+                }
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CREATE MODAL -->
+<div id="modal-add" tabindex="-1" class="modal fade">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div id="modal-add-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="modal-edit" tabindex="-1" class="modal fade">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div id="modal-edit-content"></div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        function OpenExpenseCategoryCreateModal() {
+            $.get("@Url.Action("OpenCreateModal", "ExpenseCategory")",
+                function (html) {
+                    $("#modal-add-content").html(html);
+                    $("#modal-add").modal("show");
+                });
+        }
+
+        function OpenExpenseCategoryEditModal(id) {
+            $.get("@Url.Action("OpenEditModal", "ExpenseCategory")",
+                { id: id },
+                function (html) {
+                    $("#modal-edit-content").html(html);
+                    $("#modal-edit").modal("show");
+                });
+        }
+
+        KTUtil.onDOMContentLoaded(function () {
+            KTAppTableListing.init(
+                "expenseCategoryTable",
+                "tbl_daterange_flatpickr",
+                "searchInput",
+                "",
+                [],
+                "",
+                "",
+                "tbl_daterange_flatpickr_clear",
+                "datatable_export_buttons",
+                "datatable_table_export_menu"
+            );
+        });
+    </script>
+}

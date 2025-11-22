@@ -106,6 +106,9 @@ builder.Services.AddScoped<IItemsService, ItemsService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IRequestService, RequestService>();
+builder.Services.AddScoped<IExpensesService, ExpensesService>();
+builder.Services.AddScoped<IExpenseCategoryService, ExpenseCategoryService>();
+
 
 IHtmlSanitizer sanitizer = new HtmlSanitizer();
 builder.Services.AddSingleton(sanitizer);

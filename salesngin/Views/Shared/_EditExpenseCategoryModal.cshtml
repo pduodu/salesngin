@@ -1,0 +1,50 @@
+@model salesngin.ViewModels.ExpenseCategoryViewModel
+
+<form asp-action="Edit" asp-controller="ExpenseCategory" method="post" id="ExpenseCategoryEditForm">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="modal-header">
+        <h3 class="modal-title">Edit Expense Category</h3>
+        <div class="btn btn-icon btn-sm btn-active-light-danger ms-2"
+             data-bs-dismiss="modal" aria-label="Close">
+            <i class="ki-duotone ki-cross fs-1"></i>
+        </div>
+    </div>
+
+    <div class="modal-body py-5">
+
+        <div class="mb-5">
+            <label asp-for="Name" class="form-label required">Category Name</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-5">
+            <label asp-for="Description" class="form-label">Description</label>
+            <textarea asp-for="Description" rows="3" class="form-control"></textarea>
+        </div>
+
+        <div class="mb-5">
+            <label class="form-label">Status</label>
+            <select asp-for="IsActive" class="form-select">
+                <option value="true" selected="@(Model.IsActive)">Active</option>
+                <option value="false" selected="@(!Model.IsActive)">Inactive</option>
+            </select>
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+
+        @if (Model.ModulePermission?.Update == true)
+        {
+            <button type="submit" class="btn btn-primary">Update</button>
+        }
+    </div>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -244,6 +244,22 @@
                     </div>
                     <!--end:Menu item-->
 
+                    @if (await _dataService.GetModuleActionPermission(ConstantModules.Expenses_Module, loggedInUser.Id, ConstantPermissions.Read))
+                    {
+                        <div class="menu-item" data-bs-toggle="tooltip" data-bs-placement="right" title="Expenses">
+                            <a asp-controller="Expense" asp-action="Expenses"
+                            class="menu-link @Html.IsActive(new string[] { "Expense" }, new string[] { "Expenses", "CreateExpense", "UpdateExpense", "ExpenseDetails" }, "active")">
+                                <span class="menu-icon">
+                                    <i class="ki-duotone ki-money fs-2x @iconColor">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </span>
+                                <span class="menu-title">Expenses</span>
+                            </a>
+                        </div>
+                    }
+
                     <!--begin:Menu item-->
                     <div class="menu-item " data-bs-toggle="tooltip" data-bs-placement="right" title="Reports">
                         <a asp-controller="Facility" asp-action="Reports"

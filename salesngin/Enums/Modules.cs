@@ -22,6 +22,9 @@
             (14, ConstantModules.Inspections_Module, "Inspections Management"),
             (15, ConstantModules.Faults_Module, "Fault Management"),
             (16, ConstantModules.Reporting_Module, "Reports Generation"),
+            (17, ConstantModules.Expenses_Module, "Expenses Management"),
+            (18, ConstantModules.ExpenseCategory_Module, "Expense Categories")
+
         ];
     }
 
@@ -42,6 +45,8 @@
         public const string Stock_Module = "Stock";
         public const string Purchase_Module = "Purchases";
         public const string Orders_Module = "Orders";
+        public const string Expenses_Module = "Expenses";
+        public const string ExpenseCategory_Module = "ExpenseCategories";
 
         public const string Facility_Module = "Facility";
         public const string Inspections_Module = "Inspections";

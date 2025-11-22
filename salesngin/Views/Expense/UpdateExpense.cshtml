@@ -1,0 +1,52 @@
+@model ExpenseViewModel
+@{
+    ViewData["Title"] = "Update Expense";
+    ViewData["MainMenu"] = "Finance Management";
+    ViewData["SubMenu"] = "Expenses";
+    ViewData["Page"] = "Update Expense";
+}
+
+<div class="container-xxl" id="contentContainer">
+    <div class="row my-5">
+        <div class="col-md-6">
+            <h3>Update Expense</h3>
+            <p>Edit the fields below to modify this expense record.</p>
+        </div>
+        <div class="col-md-6">
+            <div class="d-flex justify-content-end">
+                <a asp-controller="Expense" asp-action="Expenses" class="btn btn-lg btn-primary me-5">
+                    <i class="ki-duotone ki-arrow-left fs-2x"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <form asp-controller="Expense" asp-action="UpdateExpense" asp-route-id="@Model.Id"
+          method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        @await Html.PartialAsync("Expense/_ExpenseFormEditor", Model)
+
+        <div class="my-5">
+            <a asp-controller="Expense" asp-action="Expenses" class="btn btn-danger float-end mx-3 fs-3">
+                <i class="ki-duotone ki-cross-circle fs-2"></i> Cancel
+            </a>
+
+            <button type="submit" class="btn btn-primary float-end fs-3">
+                <i class="ki-duotone ki-clipboard fs-2x"></i>
+                <span class="indicator-label">Save</span>
+                <span class="indicator-progress">Please wait...
+                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                </span>
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.types-select').select2({ width: 'resolve' });
+        });
+    </script>
+}

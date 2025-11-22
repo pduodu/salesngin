@@ -1,0 +1,63 @@
+@model ExpenseViewModel
+@{
+    ViewData["Title"] = "Expense Details";
+    ViewData["MainMenu"] = "Finance Management";
+    ViewData["SubMenu"] = "Expenses";
+    ViewData["Page"] = "Expense Details";
+}
+
+<div class="container-xxl my-5">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Expense Details</h3>
+        </div>
+        <div class="col-md-6">
+            <div class="d-flex justify-content-end">
+                <a asp-controller="Expense" asp-action="Expenses"
+                    class="btn btn-lg btn-primary me-5">
+                    <i class="ki-duotone ki-arrow-left fs-2x"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-8">
+        <div class="card-body p-10">
+
+            <div class="mb-6">
+                <h5 class="fw-bold">Category</h5>
+                <p>@Model.CategorySelectList?.FirstOrDefault(x => x.Value == Model.CategoryId.ToString())?.Text</p>
+            </div>
+
+            <div class="mb-6">
+                <h5 class="fw-bold">Amount</h5>
+                <p class="fw-semibold text-primary fs-4">₵@Model.Amount.ToString("N2")</p>
+            </div>
+
+            <div class="mb-6">
+                <h5 class="fw-bold">Date Incurred</h5>
+                <p>@Model.DateIncurred.ToString("dd-MMM-yyyy")</p>
+            </div>
+
+            <div class="mb-6">
+                <h5 class="fw-bold">Description</h5>
+                <p>@Model.Description</p>
+            </div>
+
+            <div class="mb-6">
+                <h5 class="fw-bold">Attachment</h5>
+                @if (!string.IsNullOrEmpty(Model.ExistingAttachmentPath))
+                {
+                    <a href="@Url.Content(Model.ExistingAttachmentPath)" target="_blank" class="btn btn-light-primary">
+                        View Attachment
+                    </a>
+                }
+                else
+                {
+                    <p>No attachment uploaded.</p>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
